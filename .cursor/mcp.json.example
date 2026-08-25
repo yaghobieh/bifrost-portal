@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "figma": {
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "bifrost": {
+      "command": "npx",
+      "args": ["-y", "@forgedevstack/bifrost-mcp"],
+      "env": {
+        "BIFROST_API_URL": "http://localhost:4100"
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+export { HeroArcs } from './HeroArcs';

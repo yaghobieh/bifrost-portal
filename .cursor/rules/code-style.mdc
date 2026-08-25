@@ -1,0 +1,19 @@
+---
+description: Bifrost Portal code style — types, consts, i18n, pink accent only
+alwaysApply: true
+---
+
+# Bifrost Portal Code Style
+
+No comments in code. No section dividers. No JSDoc.
+Types in `*.types.ts`. Constants in `*.const.ts`. Numbers in `numbers.const.ts`.
+Prefer `import type`. No `any`. No `export default` except tooling entry files.
+Barrel `index.ts` in every folder.
+
+User-facing copy through `useI18n()` / `Messages`. Never name competitor CMS products.
+
+Pink `#EA0A8E` is the only accent. Body, borders, and canvases stay neutral gray/white (and dark-mode neutrals).
+
+CSS prefix: `Bp-` (BEM). Bear for buttons and the API Explorer grid (`GridTable`). Compass for routing. Synapse for search state.
+
+This site is public docs, not the CMS admin.

@@ -1,0 +1,1 @@
+export { SearchHits } from './SearchHits';
