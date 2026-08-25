@@ -1,0 +1,13 @@
+export const PUBLIC_DOCS_PATH = '/api/public/docs';
+export const CMS_DOCS_COLLECTION = 'docs';
+export const CMS_DOCS_LOCALE = 'en';
+export const CMS_CONTENT_STATUS_PUBLISHED = 'published';
+export const CONTENT_TYPE_JSON = 'application/json';
+export const HTTP_METHOD_GET = 'GET';
+export const HTTP_STATUS_OK = 200;
+export const HTTP_STATUS_NOT_FOUND = 404;
+export const HTTP_STATUS_SERVICE_UNAVAILABLE = 503;
+export const HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
+export const ERROR_DATABASE_UNAVAILABLE = 'databaseUnavailable';
+export const ERROR_DOCS_UNAVAILABLE = 'docsUnavailable';
+export const ERROR_NOT_FOUND = 'notFound';

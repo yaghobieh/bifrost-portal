@@ -9,6 +9,16 @@
       "env": {
         "BIFROST_API_URL": "http://localhost:4100"
       }
+    },
+    "bifrost-cms": {
+      "command": "npx",
+      "args": ["-y", "@forgedevstack/bifrost-mcp"],
+      "env": {
+        "INK_API_URL": "http://localhost:4000",
+        "INK_CMS_USERNAME": "",
+        "INK_CMS_PASSWORD": "",
+        "INK_CMS_TOKEN": ""
+      }
     }
   }
 }

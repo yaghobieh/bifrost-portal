@@ -21,7 +21,7 @@ export const DocShell: FC<DocShellProps> = (props) => {
   const { toggleMode } = useBear();
   const route = useRoute();
   const path = route?.path ?? ROUTES.HOME;
-  const { searchOpen, searchQuery, openSearch, closeSearch, setSearchQuery } = useNucleus(portalNucleus);
+  const { searchOpen, searchQuery, docsBySlug, openSearch, closeSearch, setSearchQuery } = useNucleus(portalNucleus);
 
   useEffect(() => {
     const onKey = (event: globalThis.KeyboardEvent) => {
@@ -35,7 +35,7 @@ export const DocShell: FC<DocShellProps> = (props) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [openSearch, closeSearch]);
 
-  const hits = searchDocs(searchQuery);
+  const hits = searchDocs(docsBySlug, searchQuery);
 
   return (
     <div className="Bp-shell">

@@ -6,6 +6,8 @@ export const en: Messages = {
   version: 'v1.0.0',
   searchPlaceholder: 'Search docs',
   searchEmpty: 'No matching pages',
+  docsLoading: 'Loading docs from CMS…',
+  docsMissing: 'This page is not published in CMS yet.',
   onThisPage: 'On this page',
   previous: 'Previous',
   next: 'Next',
@@ -151,11 +153,11 @@ export const en: Messages = {
   demo: {
     title: 'Live demo',
     lead: 'A public walkthrough of Bifrost chrome. The CMS admin is a separate app; this site stays docs-only.',
-    note: 'Host this portal as Bifrost content after installment. Until then, this page is the static preview.',
+    note: 'This portal reads published CMS docs from Postgres. Deploy it on Vercel with DATABASE_URL set as a server env.',
   },
   changelog: {
     title: 'Changelog',
-    lead: 'Portal sprint 1.0.0 — public docs chrome, API Explorer, MCP, Figma MCP, Ask AI stub, and demo.',
-    body: 'CMS admin work for agent logs, permission grids, and pack levels lives on the admin sprint, not this public site.',
+    lead: 'Portal sprint 1.0.0 — public docs from Postgres, Vercel-ready API, API Explorer, MCP, Figma MCP, Ask AI, and demo.',
+    body: 'Docs pages live in the CMS `docs` collection. The view-only admin user can sign in to look at the CMS. Agent logs, permission grids, and pack levels stay on the admin sprint.',
   },
 };

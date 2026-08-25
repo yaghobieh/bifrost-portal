@@ -12,6 +12,8 @@ export interface Messages {
   version: string;
   searchPlaceholder: string;
   searchEmpty: string;
+  docsLoading: string;
+  docsMissing: string;
   onThisPage: string;
   previous: string;
   next: string;

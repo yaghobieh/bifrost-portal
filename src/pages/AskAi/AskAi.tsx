@@ -1,19 +1,22 @@
 import { useState, type FC, type FormEvent } from 'react';
 import { Button, Typography } from '@forgedevstack/bear';
-import { DocShell } from '@components/DocShell';
+import { useNucleus } from '@forgedevstack/synapse';
 import { useLingo } from '@forgedevstack/lingo';
+import { DocShell } from '@components/DocShell';
 import { EMPTY_STRING } from '@const/strings.const';
 import { ASK_AI_MAX_CHARS } from '@const/numbers.const';
 import { answerFromDocs } from '@utils/askAi.utils';
+import { portalNucleus } from '@store/portal.store';
 
 export const AskAi: FC = () => {
   const { t } = useLingo();
+  const { docsBySlug } = useNucleus(portalNucleus);
   const [question, setQuestion] = useState(EMPTY_STRING);
   const [answer, setAnswer] = useState(EMPTY_STRING);
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    setAnswer(answerFromDocs(question));
+    setAnswer(answerFromDocs(question, docsBySlug));
   };
 
   return (

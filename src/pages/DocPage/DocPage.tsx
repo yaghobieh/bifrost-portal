@@ -1,13 +1,15 @@
 import type { FC, ReactNode } from 'react';
 import { Link, useParams } from '@forgedevstack/forge-compass/react';
 import { Typography } from '@forgedevstack/bear';
+import { useNucleus } from '@forgedevstack/synapse';
 import { DocShell } from '@components/DocShell';
 import { CodeBlock } from '@components/CodeBlock';
 import { useLingo } from '@forgedevstack/lingo';
-import { DOC_PAGES } from '@data/docs.data';
 import { DEFAULT_DOC_SLUG, DOC_PATH } from '@const/routes.const';
 import { GUIDE_SLUGS } from '@const/nav.const';
 import { NUMBER_ZERO, NUMBER_ONE, NUMBER_TWO } from '@const/numbers.const';
+import { DOCS_STATUS_READY } from '@const/docsStatus.const';
+import { portalNucleus } from '@store/portal.store';
 
 const renderInline = (text: string): ReactNode => {
   const parts = text.split('`');
@@ -20,9 +22,31 @@ export const DocPage: FC = () => {
   const { t } = useLingo();
   const params = useParams<{ slug?: string }>();
   const slug = params.slug || DEFAULT_DOC_SLUG;
-  const doc = DOC_PAGES[slug] ?? DOC_PAGES[DEFAULT_DOC_SLUG];
-  const toc = doc.sections.map((section) => ({ id: section.id, label: section.heading }));
+  const { docsBySlug, docsStatus } = useNucleus(portalNucleus);
+  const doc = docsBySlug[slug];
   const tab = GUIDE_SLUGS.includes(slug) ? 'guides' : 'docs';
+
+  if (docsStatus !== DOCS_STATUS_READY) {
+    return (
+      <DocShell activeTab={tab}>
+        <article className="Bp-content">
+          <Typography variant="h1">{t('docsLoading')}</Typography>
+        </article>
+      </DocShell>
+    );
+  }
+
+  if (!doc) {
+    return (
+      <DocShell activeTab={tab}>
+        <article className="Bp-content">
+          <Typography variant="h1">{t('docsMissing')}</Typography>
+        </article>
+      </DocShell>
+    );
+  }
+
+  const toc = doc.sections.map((section) => ({ id: section.id, label: section.heading }));
 
   return (
     <DocShell toc={toc} activeToc={toc[NUMBER_ZERO]?.id} activeTab={tab}>

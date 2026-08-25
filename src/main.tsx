@@ -8,8 +8,11 @@ import { portalLingo } from '@i18n/portalLingo';
 import { App } from './App';
 import { bifrostTheme, bifrostVariants } from '@config/bear-theme';
 import { THEME_STORAGE_KEY } from '@const/strings.const';
+import { loadPortalDocs } from '@data/docs.data';
 import './styles/portal.css';
 import './styles/landing.css';
+
+void loadPortalDocs();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

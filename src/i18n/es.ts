@@ -6,6 +6,8 @@ export const es: Messages = {
   version: 'v1.0.0',
   searchPlaceholder: 'Buscar docs',
   searchEmpty: 'Sin páginas',
+  docsLoading: 'Cargando docs desde el CMS…',
+  docsMissing: 'Esta página aún no está publicada en el CMS.',
   onThisPage: 'En esta página',
   previous: 'Anterior',
   next: 'Siguiente',
@@ -151,11 +153,11 @@ export const es: Messages = {
   demo: {
     title: 'Demo en vivo',
     lead: 'Recorrido público del chrome de Bifrost. El admin del CMS es otra app; este sitio es solo docs.',
-    note: 'Hospeda este portal como contenido Bifrost después del installment. Hasta entonces, esta es la vista estática.',
+    note: 'Este portal lee las docs publicadas del CMS en Postgres. Despliégalo en Vercel con DATABASE_URL como env de servidor.',
   },
   changelog: {
     title: 'Cambios',
-    lead: 'Sprint del portal 1.0.0 — chrome de docs, API Explorer, MCP, Figma MCP, Ask AI y demo.',
-    body: 'Logs de agentes, grilla de permisos y pack levels viven en el sprint del admin, no en este sitio.',
+    lead: 'Sprint del portal 1.0.0 — docs públicas desde Postgres, API lista para Vercel, API Explorer, MCP, Figma MCP, Ask AI y demo.',
+    body: 'Las páginas de docs viven en la colección `docs` del CMS. El usuario admin de solo lectura puede entrar a ver el CMS. Logs de agentes, grilla de permisos y pack levels viven en el sprint del admin.',
   },
 };

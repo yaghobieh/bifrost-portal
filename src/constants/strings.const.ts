@@ -20,6 +20,9 @@ export const INK_HEX = '#14161C';
 export const POSTMAN_COLLECTION_NAME = 'Bifrost CMS API';
 export const POSTMAN_SCHEMA = 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json';
 export const DEFAULT_API_BASE = 'http://localhost:4100';
+export const PUBLIC_DOCS_PATH = '/api/public/docs';
+export const ASK_AI_EMPTY =
+  'No matching docs yet. Try installation, MCP, plugins, Cloud or local, agents, or the API Explorer.';
 export const COPY_LABEL = 'Copy';
 export const COPIED_LABEL = 'Copied';
 export const INSTALL_COMMAND = 'npx @forgedevstack/bifrost-cli install';

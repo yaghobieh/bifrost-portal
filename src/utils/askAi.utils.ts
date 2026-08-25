@@ -1,14 +1,20 @@
-import { DOC_PAGES, searchDocs } from '@data/docs.data';
+import type { DocPageModel } from '@data/docs.types';
+import { NUMBER_THREE, NUMBER_ZERO } from '@const/numbers.const';
+import { ASK_AI_EMPTY } from '@const/strings.const';
+import { searchDocs } from '@data/docs.data';
 
-export const answerFromDocs = (question: string): string => {
-  const hits = searchDocs(question);
+export const answerFromDocs = (
+  question: string,
+  docsBySlug: Record<string, DocPageModel>,
+): string => {
+  const hits = searchDocs(docsBySlug, question);
   if (!hits.length) {
-    return 'No matching docs yet. Try installation, MCP, plugins, Cloud or local, agents, or the API Explorer.';
+    return ASK_AI_EMPTY;
   }
-  const parts = hits.slice(0, 3).map((hit) => {
-    const doc = DOC_PAGES[hit.slug];
-    const first = doc.sections[0];
-    return `${doc.title}\n${doc.lead}\n${first?.paragraphs[0] ?? ''}`;
+  const parts = hits.slice(NUMBER_ZERO, NUMBER_THREE).map((hit) => {
+    const doc = docsBySlug[hit.slug];
+    const first = doc.sections[NUMBER_ZERO];
+    return `${doc.title}\n${doc.lead}\n${first?.paragraphs[NUMBER_ZERO] ?? ''}`;
   });
   return parts.join('\n\n');
 };

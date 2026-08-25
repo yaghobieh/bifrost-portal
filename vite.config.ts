@@ -2,9 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { resolve } from 'path';
+import { cmsDocsPlugin } from './vite-plugin-cms-docs';
 
-export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), tsconfigPaths(), cmsDocsPlugin(mode)],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -19,4 +20,4 @@ export default defineConfig({
       vue: resolve(__dirname, 'src/shims/vue.ts'),
     },
   },
-});
+}));
