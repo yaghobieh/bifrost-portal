@@ -30,7 +30,7 @@ import type {
   CmsLiveHealth,
   CmsPresenceUser,
 } from './CmsLive.types';
-import { mergeChatRooms, pingCmsHealth, sameMembers, toCmsLiveWsUrl } from './CmsLive.utils';
+import { mergeChatRooms, sameMembers, toCmsLiveWsUrl } from './CmsLive.utils';
 
 const CmsLiveContext = createContext<CmsLiveContextValue | null>(null);
 
@@ -72,24 +72,7 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
       setHealth({ status: CMS_LIVE_DOWN, db: false });
       setOnlineUsers([]);
       setSelfId(EMPTY_STRING);
-      return undefined;
     }
-    let stopped = false;
-    const applyHealth = (next: CmsLiveHealth) => {
-      if (stopped) {
-        return;
-      }
-      setHealth(next);
-    };
-    const poll = () => {
-      void pingCmsHealth().then(applyHealth);
-    };
-    poll();
-    const timer = window.setInterval(poll, CMS_LIVE_PING_MS);
-    return () => {
-      stopped = true;
-      window.clearInterval(timer);
-    };
   }, [token]);
 
   useEffect(() => {
@@ -168,6 +151,7 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
       next.onmessage = applyMessage;
       next.onopen = () => {
         delay = CMS_LIVE_RECONNECT_MS;
+        setHealth({ status: CMS_LIVE_CONNECTING, db: false });
         clearPing();
         if (next.readyState === WebSocket.OPEN) {
           next.send(JSON.stringify({ type: CMS_LIVE_TYPE_PRESENCE_PING }));
@@ -182,7 +166,11 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
       next.onclose = () => {
         clearPing();
         if (socketRef.current === next) socketRef.current = null;
-        if (stopped) return;
+        if (stopped) {
+          setHealth({ status: CMS_LIVE_DOWN, db: false });
+          return;
+        }
+        setHealth({ status: CMS_LIVE_CONNECTING, db: false });
         retryTimer = window.setTimeout(() => {
           delay = Math.min(delay * NUMBER_TWO, CMS_LIVE_RECONNECT_MAX_MS);
           connect();
