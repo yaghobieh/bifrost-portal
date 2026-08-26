@@ -17,6 +17,8 @@ export {
   CMS_SIDEBAR_WIDTH_PX,
 };
 
+export const CMS_CARD_PADDING = 'md' as const;
+
 export const CMS_NAV_IDS = {
   DASHBOARD: 'dashboard',
   CONTENT: 'content',

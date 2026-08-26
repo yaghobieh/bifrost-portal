@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Button, Card, Flex, Input, Typography } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
+import { CMS_CARD_PADDING } from '@pages/Cms/CmsShell';
 import { EMPTY_STRING } from '@const/index';
 import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
 import {
@@ -25,7 +26,7 @@ export const CastPageFields: FC<CastPageFieldsProps> = (props) => {
   const typeOptions = castTypeOptions(t.cmsCast);
 
   return (
-    <Card className="bifrost-cms-card mb-3">
+    <Card className="bifrost-cms-card mb-3" padding={CMS_CARD_PADDING}>
       <Flex direction="column" gap={3}>
         <div>
           <Typography variant="h4" className="mb-1">

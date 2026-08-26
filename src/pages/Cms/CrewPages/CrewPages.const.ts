@@ -88,6 +88,9 @@ export const CREW_PAGE_TABS = {
   DEVELOPER: 'developer',
 } as const;
 
+export const CREW_LAYOUT_COLS = 2 as const;
+export const CREW_LAYOUT_GAP = 4 as const;
+
 export type CrewRole = {
   id: string;
   name: string;

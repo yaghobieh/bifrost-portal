@@ -14,8 +14,10 @@ import {
   TabPanel,
   Tabs,
   Typography,
+  useBear,
   useBearMode,
 } from '@forgedevstack/bear';
+import { applyCmsBearPrimary } from '@components/ThemeSync';
 import { useAuth } from '@hooks/index';
 import { ALL_LOCALES, useI18n } from '@i18n/index';
 import type { Locale } from '@i18n/index';
@@ -109,6 +111,7 @@ import { SettingsUpdatePanel } from './components/SettingsUpdatePanel';
 export const SettingsPages: FC = () => {
   const { t, setLocale } = useI18n();
   const { mode } = useBearMode();
+  const { updateTheme, addVariant } = useBear();
   const { token, user } = useAuth();
   const userKey = user?.email || user?.username || SETTINGS_PROFILE_EMPTY;
   const [colors, setColors] = useState<CmsThemeColors>(
@@ -276,10 +279,14 @@ export const SettingsPages: FC = () => {
   };
 
   const onColorChange = (key: keyof CmsThemeColors) => (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
     setColors((current) => ({
       ...current,
-      [key]: event.target.value,
+      [key]: value,
     }));
+    if (key === 'primary') {
+      applyCmsBearPrimary(updateTheme, addVariant, value);
+    }
     markDirty();
   };
 
@@ -337,7 +344,7 @@ export const SettingsPages: FC = () => {
           </Typography>
         </div>
 
-        <Card className="bifrost-cms-card bifrost-cms-settings">
+        <Card padding="md" className="bifrost-cms-card bifrost-cms-settings">
           <Tabs defaultTab={SETTINGS_TABS.PROFILE} variant="line">
             <TabList className="mb-4" wrap>
               <Tab id={SETTINGS_TABS.PROFILE}>{t.settings.tabProfile}</Tab>
@@ -388,7 +395,7 @@ export const SettingsPages: FC = () => {
                     }}
                   />
                   <div className="bifrost-cms-settings-save">
-                    <Button size="sm" variant="bifrost" onClick={onSaveAll}>
+                    <Button size="sm" variant="primary" onClick={onSaveAll}>
                       {t.settings.saveAll}
                     </Button>
                     {saved ? (
@@ -509,7 +516,7 @@ export const SettingsPages: FC = () => {
                   }}
                 />
                 <div className="bifrost-cms-settings-save">
-                  <Button size="sm" variant="bifrost" onClick={onSaveAll}>
+                  <Button size="sm" variant="primary" onClick={onSaveAll}>
                     {t.settings.saveAll}
                   </Button>
                   {saved ? (
@@ -895,7 +902,7 @@ export const SettingsPages: FC = () => {
                 </SettingsSection>
                 ) : null}
                 <div className="bifrost-cms-settings-save">
-                  <Button size="sm" variant="bifrost" disabled={!canEditSettings} onClick={onSaveAll}>
+                  <Button size="sm" variant="primary" disabled={!canEditSettings} onClick={onSaveAll}>
                     {t.settings.saveAll}
                   </Button>
                   {saved ? (
@@ -1063,7 +1070,7 @@ export const SettingsPages: FC = () => {
                   />
                 </div>
                 <div className="bifrost-cms-settings-save">
-                  <Button size="sm" variant="bifrost" onClick={onSaveAll}>
+                  <Button size="sm" variant="primary" onClick={onSaveAll}>
                     {t.settings.saveAll}
                   </Button>
                   {saved ? (
@@ -1102,7 +1109,7 @@ export const SettingsPages: FC = () => {
                   )}
                 </SettingsSection>
                 <div className="bifrost-cms-settings-save">
-                  <Button size="sm" variant="bifrost" onClick={onSaveAll}>
+                  <Button size="sm" variant="primary" onClick={onSaveAll}>
                     {t.settings.mediaSaveCloud}
                   </Button>
                   {saved ? (
@@ -1150,7 +1157,7 @@ export const SettingsPages: FC = () => {
                   </Button>
                 </div>
                 <div className="bifrost-cms-settings-save">
-                  <Button size="sm" variant="bifrost" onClick={onSaveAll}>
+                  <Button size="sm" variant="primary" onClick={onSaveAll}>
                     {t.settings.saveAll}
                   </Button>
                   {saved ? (
@@ -1194,7 +1201,7 @@ export const SettingsPages: FC = () => {
                   </Button>
                 </SettingsSection>
                 <div className="bifrost-cms-settings-save">
-                  <Button size="sm" variant="bifrost" onClick={onSaveAll}>
+                  <Button size="sm" variant="primary" onClick={onSaveAll}>
                     {t.settings.saveAll}
                   </Button>
                   {saved ? (

@@ -69,7 +69,7 @@ export const EditorsPages: FC = () => {
             </Typography>
           </div>
           <Link to={ROUTES.PLAYGROUND}>
-            <Button size="sm" variant="bifrost">
+            <Button size="sm" variant="primary">
               {t.dashboard.openPlayground}
             </Button>
           </Link>
@@ -105,7 +105,7 @@ export const EditorsPages: FC = () => {
           ))}
         </div>
 
-        <Card className="bifrost-cms-card bifrost-cms-editor-preview">
+        <Card padding="md" className="bifrost-cms-card bifrost-cms-editor-preview">
           <Flex justify="between" align="center" className="mb-3">
             <Typography variant="h4" className="mb-0">
               {t.dashboard.editorsLivePreview}: {activeVariant}

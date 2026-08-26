@@ -161,7 +161,7 @@ export const ContentPages: FC = () => {
           {t.dashboard.contentSubtitle}
         </Typography>
 
-        <Card className="bifrost-cms-card bifrost-cms-startpage">
+        <Card padding="md" className="bifrost-cms-card bifrost-cms-startpage">
           <div>
             <div className="bifrost-cms-startpage__title">{t.dashboard.templatesTitle}</div>
             <div className="bifrost-cms-startpage__desc">{t.dashboard.templatesSubtitle}</div>
@@ -171,7 +171,7 @@ export const ContentPages: FC = () => {
               placement="bottom-end"
               minWidth={CONTENT_NEW_PAGE_MENU_MIN_WIDTH}
               trigger={
-                <Button size="sm" variant="bifrost" disabled={saving || !activeToken}>
+                <Button size="sm" variant="primary" disabled={saving || !activeToken}>
                   {t.dashboard.newPage}
                 </Button>
               }

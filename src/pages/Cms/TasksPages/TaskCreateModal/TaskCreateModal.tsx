@@ -88,7 +88,7 @@ export const TaskCreateModal: FC<TaskCreateModalProps> = (props) => {
             {t.cmsTasks.cancel}
           </Button>
           <Button
-            variant="bifrost"
+            variant="primary"
             disabled={!draft.title.trim() || !canEdit}
             onClick={() => {
               onSubmit(draft);

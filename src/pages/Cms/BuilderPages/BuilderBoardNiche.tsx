@@ -30,7 +30,7 @@ export const BuilderBoardNiche: FC = () => {
   };
 
   return (
-    <Card className="bifrost-cms-card bifrost-cms-builder__board-niche">
+    <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__board-niche">
       <Typography variant="h4" className="mb-1">
         {t.cmsBuilder.boardNiche}
       </Typography>
@@ -50,7 +50,7 @@ export const BuilderBoardNiche: FC = () => {
           value={label}
           onChange={(event) => setLabel(event.target.value)}
         />
-        <Button size="sm" variant="bifrost" disabled={!label.trim()} onClick={addStatus}>
+        <Button size="sm" variant="primary" disabled={!label.trim()} onClick={addStatus}>
           {t.cmsTasks.addStatus}
         </Button>
       </Flex>

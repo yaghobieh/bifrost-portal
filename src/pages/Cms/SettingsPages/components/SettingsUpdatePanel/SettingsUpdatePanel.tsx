@@ -63,7 +63,7 @@ export const SettingsUpdatePanel: FC<SettingsUpdatePanelProps> = () => {
           </Typography>
           <Button
             size="sm"
-            variant="bifrost"
+            variant="primary"
             disabled={updateDisabled}
             onClick={() => {
               void onUpdate();

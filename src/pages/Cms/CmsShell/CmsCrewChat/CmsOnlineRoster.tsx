@@ -29,7 +29,7 @@ export const CmsOnlineRoster: FC<CmsOnlineRosterProps> = (props) => {
         {t.cmsShell.online}
       </Typography>
       {canChat ? null : (
-        <Button size="sm" variant="bifrost" onClick={onInstall}>
+        <Button size="sm" variant="primary" onClick={onInstall}>
           {t.cmsShell.installChat}
         </Button>
       )}
@@ -67,7 +67,7 @@ export const CmsOnlineRoster: FC<CmsOnlineRosterProps> = (props) => {
           />
           <Button
             size="sm"
-            variant="bifrost"
+            variant="primary"
             className="mt-2"
             disabled={selectedIds.length === 0}
             onClick={() => {

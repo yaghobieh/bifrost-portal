@@ -539,6 +539,7 @@ export const es: Messages = {
     healthDownHint: 'ink-server no responde, o falló el ping de la base de datos. Arranca la API en el puerto 4000 e inicia sesión.',
     healthMissingApi: 'No hay URL de API. Define VITE_INK_API_URL o usa el valor local del puerto 4000.',
     updateHello: 'Hola — {version} está lista. Actualiza este CMS (y las libs Forge) desde bifrost-portal.',
+    updateChangelog: 'Padding de Bear Card, tema azul del CMS, Usuarios y permisos. Pulsa Actualizar aunque ya estés en esta versión.',
     updateNow: 'Actualizar',
     updateRunning: 'Actualizando…',
     updateHow: 'Cómo actualizar',
@@ -1027,7 +1028,7 @@ export const es: Messages = {
   },
   cmsCrew: {
     title: 'Usuarios',
-    pageTitle: 'Usuarios, permisos e info de desarrollador',
+    pageTitle: 'Usuarios y permisos',
     subtitle: 'Crea usuarios con roles. Los permisos se agrupan por recurso.',
     tabUsers: 'Usuarios y permisos',
     tabDeveloper: 'Desarrollador',

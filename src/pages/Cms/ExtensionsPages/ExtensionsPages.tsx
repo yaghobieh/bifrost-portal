@@ -216,7 +216,7 @@ export const ExtensionsPages: FC = () => {
               value={externalUrl}
               onChange={(event) => setExternalUrl(event.target.value)}
             />
-            <Button size="sm" variant="bifrost" onClick={onAddExternal}>
+            <Button size="sm" variant="primary" onClick={onAddExternal}>
               {t.cmsExtensions.addExternalAction}
             </Button>
           </div>
@@ -259,7 +259,7 @@ export const ExtensionsPages: FC = () => {
               const onCardClick = () => setSelected(item);
               return (
                 <div key={item.id} className="bifrost-cms-ext-hit" onClick={onCardClick}>
-                <Card className="bifrost-cms-card bifrost-cms-ext">
+                <Card padding="md" className="bifrost-cms-card bifrost-cms-ext">
                   <div className="bifrost-cms-ext__head">
                     <span className={`bifrost-cms-ext__mark${installed ? ' bifrost-cms-ext__mark--in' : ''}`}>
                       {mark}
@@ -288,13 +288,13 @@ export const ExtensionsPages: FC = () => {
                     )}
                     {item.status === 'available' ? (
                       <span onClick={(event) => event.stopPropagation()}>
-                        <Button size="sm" variant="bifrost" onClick={() => install(item.id)}>
+                        <Button size="sm" variant="primary" onClick={() => install(item.id)}>
                           {t.cmsExtensions.install}
                         </Button>
                       </span>
                     ) : null}
                     {item.status === 'installing' ? (
-                      <Button size="sm" variant="bifrost" disabled>
+                      <Button size="sm" variant="primary" disabled>
                         {statusLabel(item.status)}
                       </Button>
                     ) : null}
@@ -353,7 +353,7 @@ export const ExtensionsPages: FC = () => {
                 {selected.status === 'available' ? (
                   <Button
                     size="sm"
-                    variant="bifrost"
+                    variant="primary"
                     onClick={() => {
                       install(selected.id);
                       setSelected(null);
@@ -365,7 +365,7 @@ export const ExtensionsPages: FC = () => {
                 {selected.status === 'installed' ? (
                   <Button
                     size="sm"
-                    variant="bifrost"
+                    variant="primary"
                     onClick={() => {
                       setSelected(null);
                       openInstalled(selected.id);

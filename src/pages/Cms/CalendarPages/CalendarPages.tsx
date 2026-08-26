@@ -133,7 +133,7 @@ export const CalendarPages: FC = () => {
             {t.cmsCalendar.subtitle}
           </Typography>
         </div>
-        <Card className="bifrost-cms-card">
+        <Card padding="md" className="bifrost-cms-card">
           <Typography variant="h4" className="mb-2">
             {t.cmsCalendar.generateMeeting}
           </Typography>
@@ -163,7 +163,7 @@ export const CalendarPages: FC = () => {
                 onClick: () => toggleUser(user.id),
               }))}
             />
-            <Button variant="bifrost" onClick={() => void onGenerate()} disabled={!draftTitle.trim()}>
+            <Button variant="primary" onClick={() => void onGenerate()} disabled={!draftTitle.trim()}>
               {t.cmsCalendar.create}
             </Button>
           </Flex>
@@ -179,7 +179,7 @@ export const CalendarPages: FC = () => {
             })}
           </Flex>
         </Card>
-        <Card className="bifrost-cms-card">
+        <Card padding="md" className="bifrost-cms-card">
           <Calendar
             defaultView="week"
             events={meetings}
@@ -191,7 +191,7 @@ export const CalendarPages: FC = () => {
             layout="contained"
           />
         </Card>
-        <Card className="bifrost-cms-card">
+        <Card padding="md" className="bifrost-cms-card">
           <Typography variant="h4" className="mb-2">
             {t.cmsCalendar.meetings}
           </Typography>

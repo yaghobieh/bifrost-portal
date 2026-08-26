@@ -47,7 +47,7 @@ export const TaskBoardSettings: FC<TaskBoardSettingsProps> = (props) => {
               />
               <Button
                 size="sm"
-                variant="bifrost"
+                variant="primary"
                 disabled={!statusDraft.trim()}
                 onClick={() => {
                   onAddStatus(statusDraft);
@@ -84,7 +84,7 @@ export const TaskBoardSettings: FC<TaskBoardSettingsProps> = (props) => {
               />
               <Button
                 size="sm"
-                variant="bifrost"
+                variant="primary"
                 disabled={!fieldName.trim()}
                 onClick={() => {
                   onAddField(fieldName, fieldOption);

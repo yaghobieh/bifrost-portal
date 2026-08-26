@@ -105,7 +105,7 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
           <Button
             type="button"
             size="sm"
-            variant="bifrost"
+            variant="primary"
             onClick={onCreateRoom}
             disabled={!newRoomValue.trim()}
           >

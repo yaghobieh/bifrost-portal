@@ -13,14 +13,16 @@ import {
   CMS_SITE_EVENT,
   CMS_CATALOG_STORAGE_KEY,
   CMS_DEV_PREFS_EVENT,
+  CMS_THEME_EVENT,
   EMPTY_STRING,
   PINK_HEX,
-  PINK_SOFT_HEX,
+  BRIDGE_BLUE_HEX,
 } from '@const/index';
 import { CMS_NAV_IDS } from '../CmsShell/CmsShell.const';
 import type { SettingsTabId } from './SettingsPages.types';
 
 export const SETTINGS_THEME_STORAGE_KEY = CMS_THEME_STORAGE_KEY;
+export const SETTINGS_THEME_EVENT = CMS_THEME_EVENT;
 export const SETTINGS_PROFILE_STORAGE_KEY = CMS_PROFILE_STORAGE_KEY;
 export const SETTINGS_SITE_STORAGE_KEY = CMS_SITE_STORAGE_KEY;
 export const SETTINGS_MCP_STORAGE_KEY = CMS_MCP_STORAGE_KEY;
@@ -55,14 +57,14 @@ export const SETTINGS_SITE_PANELS = {
 export const SETTINGS_SAVE_SOURCE = 'settings' as const;
 
 export const SETTINGS_THEME_DEFAULTS_LIGHT = {
-  primary: PINK_HEX,
-  accent: PINK_HEX,
+  primary: BRIDGE_BLUE_HEX,
+  accent: BRIDGE_BLUE_HEX,
   background: '#f5f6f8',
 } as const;
 
 export const SETTINGS_THEME_DEFAULTS_DARK = {
-  primary: PINK_HEX,
-  accent: PINK_HEX,
+  primary: '#54a0ff',
+  accent: '#54a0ff',
   background: '#12192c',
 } as const;
 
@@ -164,7 +166,7 @@ export const SETTINGS_CHAT_SHOW = {
 
 export const SETTINGS_CHAT_PREFS_DEFAULTS = {
   sound: SETTINGS_CHAT_SOUND.ALL,
-  color: PINK_HEX,
+  color: BRIDGE_BLUE_HEX,
   show: SETTINGS_CHAT_SHOW.BOTH,
   roomSounds: {},
 } as const;
@@ -191,8 +193,8 @@ export const SETTINGS_SITE_SLUG_FALLBACK = 'bifrost';
 
 export const SETTINGS_MCP_JSON_INDENT = 2;
 
-export const SETTINGS_ACCENT_SOFT_LIGHT = PINK_SOFT_HEX;
-export const SETTINGS_ACCENT_SOFT_DARK = 'rgba(234, 10, 142, 0.22)';
+export const SETTINGS_ACCENT_SOFT_LIGHT = '#EAF0FE';
+export const SETTINGS_ACCENT_SOFT_DARK = 'rgba(41, 81, 196, 0.22)';
 
 export const SETTINGS_COLOR_INPUT_IDS = {
   PRIMARY: 'bifrost-cms-theme-primary',
@@ -285,6 +287,7 @@ export const SETTINGS_DEV_PREFS_EVENT = CMS_DEV_PREFS_EVENT;
 export const SETTINGS_DEV_PREFS_DEFAULTS = {
   showDeveloperPage: true,
 } as const;
+export const SETTINGS_STALE_THEME_PRIMARIES = [PINK_HEX];
 export const SETTINGS_STALE_SITE_NAMES = ['Ink CMS', 'ink CMS', 'testing 2', 'testing-2'];
 export const SETTINGS_CATALOG_STORAGE_KEY = CMS_CATALOG_STORAGE_KEY;
 export const SETTINGS_CATALOG_FORMAT = {

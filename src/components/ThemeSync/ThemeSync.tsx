@@ -1,12 +1,18 @@
-import { useEffect, type FC, type ReactNode } from 'react';
+import { useEffect, type FC } from 'react';
 import { useBear } from '@forgedevstack/bear';
+import { CMS_PATH } from '@config/cms.config';
+import { CMS_THEME_EVENT, SLASH } from '@const/index';
+import { loadCmsThemeColors } from '@pages/Cms/SettingsPages/SettingsPages.utils';
+import { applyCmsBearPrimary } from './ThemeSync.utils';
+import type { ThemeSyncProps } from './ThemeSync.types';
 
-interface ThemeSyncProps {
-  children: ReactNode;
-}
+const isCmsHost = (): boolean => {
+  const path = window.location.pathname;
+  return path === CMS_PATH || path.startsWith(`${CMS_PATH}${SLASH}`);
+};
 
 export const ThemeSync: FC<ThemeSyncProps> = ({ children }) => {
-  const { mode } = useBear();
+  const { mode, updateTheme, addVariant } = useBear();
   const isDark = mode === 'dark';
 
   useEffect(() => {
@@ -14,6 +20,16 @@ export const ThemeSync: FC<ThemeSyncProps> = ({ children }) => {
     document.body.classList.toggle('dark', isDark);
     document.body.classList.toggle('light', !isDark);
   }, [isDark]);
+
+  useEffect(() => {
+    if (!isCmsHost()) return undefined;
+    const applyBearTheme = () => {
+      applyCmsBearPrimary(updateTheme, addVariant, loadCmsThemeColors().primary);
+    };
+    applyBearTheme();
+    window.addEventListener(CMS_THEME_EVENT, applyBearTheme);
+    return () => window.removeEventListener(CMS_THEME_EVENT, applyBearTheme);
+  }, [addVariant, updateTheme]);
 
   return children;
 };

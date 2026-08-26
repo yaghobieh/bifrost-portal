@@ -5,6 +5,7 @@ import {
   Card,
   Chip,
   Flex,
+  Grid,
   Input,
   Select,
   Tab,
@@ -32,6 +33,8 @@ import { DeveloperPanel } from '../DeveloperPages';
 import {
   CREW_PAGE_TABS,
   CREW_PERMISSION_GROUPS,
+  CREW_LAYOUT_COLS,
+  CREW_LAYOUT_GAP,
   DEFAULT_CREW_ROLES,
   type CrewPermission,
   type CrewPermissionGroupId,
@@ -227,9 +230,8 @@ export const CrewPages: FC = () => {
             ) : null}
           </TabList>
           <TabPanel tabId={CREW_PAGE_TABS.USERS}>
-            <Flex gap={4} align="start" wrap="wrap">
-              <Flex direction="column" gap={4} className="flex-1">
-                <Card>
+            <Grid cols={CREW_LAYOUT_COLS} gap={CREW_LAYOUT_GAP}>
+                <Card padding="md">
                   <Typography variant="h4" className="mb-1">
                     {t.cmsCrew.usersTitle}
                   </Typography>
@@ -273,7 +275,8 @@ export const CrewPages: FC = () => {
                     />
                     <Button
                       size="sm"
-                      variant="bifrost"
+                      variant="primary"
+                      fullWidth
                       onClick={() => void createUser()}
                       disabled={saving}
                     >
@@ -329,10 +332,8 @@ export const CrewPages: FC = () => {
                     ]}
                   />
                 </Card>
-              </Flex>
 
-              <Flex direction="column" gap={4} className="flex-1">
-                <Card>
+                <Card padding="md">
                   <Typography variant="h4" className="mb-1">
                     {t.cmsCrew.rolesTitle}
                   </Typography>
@@ -378,7 +379,7 @@ export const CrewPages: FC = () => {
                     <Flex gap={2}>
                       <Button
                         size="sm"
-                        variant="bifrost"
+                        variant="primary"
                         onClick={() => void createRole()}
                         disabled={saving}
                       >
@@ -428,7 +429,7 @@ export const CrewPages: FC = () => {
                             <Flex gap={1}>
                               <Button
                                 size="sm"
-                                variant={editingRoleId === role.id ? 'bifrost' : 'outline'}
+                                variant={editingRoleId === role.id ? 'primary' : 'outline'}
                                 onClick={() => startEditRole(role)}
                               >
                                 {t.cmsCrew.editRole}
@@ -450,8 +451,7 @@ export const CrewPages: FC = () => {
                     ]}
                   />
                 </Card>
-              </Flex>
-            </Flex>
+            </Grid>
           </TabPanel>
           {showDeveloper ? (
             <TabPanel tabId={CREW_PAGE_TABS.DEVELOPER}>

@@ -75,7 +75,7 @@ export const TaskIssueModal: FC<TaskIssueModalProps> = (props) => {
           </Button>
           {canEdit ? (
             <Button
-              variant="bifrost"
+              variant="primary"
               disabled={!draft.title.trim() || !task}
               onClick={() => {
                 if (!task) return;

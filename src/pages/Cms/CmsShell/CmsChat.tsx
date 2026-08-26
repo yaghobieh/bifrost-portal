@@ -170,7 +170,7 @@ export const CmsChat: FC<CmsChatProps> = (props) => {
           <Button
             type="submit"
             size="sm"
-            variant="bifrost"
+            variant="primary"
             icon={<BearIcons.SparklesIcon size={CMS_ICON_SIZE} />}
             disabled={pending || !draft.trim()}
           >

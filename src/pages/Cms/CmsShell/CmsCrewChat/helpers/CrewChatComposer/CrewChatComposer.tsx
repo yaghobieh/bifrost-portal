@@ -113,7 +113,7 @@ export const CrewChatComposer: FC<CrewChatComposerProps> = (props) => {
         <Button
           type="submit"
           size="sm"
-          variant="bifrost"
+          variant="primary"
           className="bifrost-cms-crew__send"
           disabled={disabled}
           aria-label={sendLabel}

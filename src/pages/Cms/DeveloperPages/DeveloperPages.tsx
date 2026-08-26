@@ -3,7 +3,7 @@ import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
 import { DeveloperPanel } from './helpers/DeveloperPanel';
 
 export const DeveloperPages: FC = () => (
-  <CmsShell activeNavId={CMS_NAV_IDS.SETTINGS}>
+  <CmsShell activeNavId={CMS_NAV_IDS.CREW}>
     <DeveloperPanel />
   </CmsShell>
 );

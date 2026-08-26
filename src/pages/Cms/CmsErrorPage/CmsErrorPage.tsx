@@ -24,7 +24,7 @@ export const CmsErrorPage: FC<CmsErrorPageProps> = (props) => {
 
   return (
     <div className="bifrost-cms-error-page">
-      <Card className="bifrost-cms-card bifrost-cms-error-page__card">
+      <Card padding="md" className="bifrost-cms-card bifrost-cms-error-page__card">
         <Flex direction="column" gap={3} align="center">
           <Typography variant="h2" className="mb-0">
             {unauthorized ? t.cmsErrors.unauthorizedTitle : t.cmsErrors.oopsTitle}
@@ -33,7 +33,7 @@ export const CmsErrorPage: FC<CmsErrorPageProps> = (props) => {
             {unauthorized ? t.cmsErrors.unauthorizedBody : t.cmsErrors.oopsBody}
           </Typography>
           {onRetry ? (
-            <Button variant="bifrost" onClick={onRetry}>
+            <Button variant="primary" onClick={onRetry}>
               {t.cmsErrors.retry}
             </Button>
           ) : null}

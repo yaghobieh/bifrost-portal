@@ -11,7 +11,6 @@ import {
 import { CMS_UPDATE_BANNER_ID } from './CmsUpdateBanner.const';
 import type { CmsUpdateBannerProps } from './CmsUpdateBanner.types';
 import {
-  isBehindHub,
   loadDismissedVersion,
   saveDismissedVersion,
   versionFromInfo,
@@ -32,7 +31,7 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
   }, []);
 
   const dismissed = loadDismissedVersion() === TARGET_CMS_VERSION;
-  if (hidden || dismissed || !isBehindHub(current)) {
+  if (hidden || dismissed) {
     return null;
   }
 
@@ -50,13 +49,18 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
   return (
     <div id={CMS_UPDATE_BANNER_ID} className="bifrost-cms-update-banner" role="status">
       <Flex align="center" justify="between" wrap="wrap" gap={2} className="bifrost-cms-update-banner__inner">
-        <Typography variant="body2" className="mb-0">
-          {t.cmsShell.updateHello.replace('{version}', TARGET_CMS_VERSION)}
-        </Typography>
+        <Flex direction="column" gap={1}>
+          <Typography variant="body2" className="mb-0">
+            {t.cmsShell.updateHello.replace('{version}', TARGET_CMS_VERSION)}
+          </Typography>
+          <Typography variant="caption" color="muted" className="mb-0">
+            {t.cmsShell.updateChangelog}
+          </Typography>
+        </Flex>
         <Flex align="center" gap={2}>
           <Button
             size="sm"
-            variant="bifrost"
+            variant="primary"
             disabled={running}
             onClick={() => {
               void onUpdate();

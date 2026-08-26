@@ -78,7 +78,7 @@ export const SettingsCatalogPanel: FC<SettingsCatalogPanelProps> = () => {
           />
         </SettingsSection>
         <div className="bifrost-cms-settings-save">
-          <Button size="sm" variant="bifrost" onClick={onSave}>
+          <Button size="sm" variant="primary" onClick={onSave}>
             {t.settings.catalogSave}
           </Button>
           {saved && (

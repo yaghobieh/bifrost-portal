@@ -138,7 +138,7 @@ export const NotificationsPages: FC = () => {
                 {group.label}
               </Typography>
               {group.items.map((item) => (
-                <Card
+                <Card padding="md"
                   key={item.id}
                   className="bifrost-cms-card"
                   onClick={() => {

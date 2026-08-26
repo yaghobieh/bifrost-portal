@@ -47,7 +47,7 @@ export const LiveEditPages: FC = () => {
           </Typography>
         </div>
 
-        <Card className="bifrost-cms-card">
+        <Card padding="md" className="bifrost-cms-card">
           <Typography variant="h4" className="mb-2">
             {t.cmsLiveEdit.sessionTitle}
           </Typography>
@@ -73,7 +73,7 @@ export const LiveEditPages: FC = () => {
                 setCopied(false);
               }}
             />
-            <Card className="bifrost-cms-card bifrost-cms-card--nested">
+            <Card padding="md" className="bifrost-cms-card bifrost-cms-card--nested">
               <Typography variant="caption" className="bifrost-cms__muted mb-1 block">
                 {t.cmsLiveEdit.generatedLink}
               </Typography>
@@ -82,7 +82,7 @@ export const LiveEditPages: FC = () => {
               </Typography>
             </Card>
             <Flex gap={2} className="flex-wrap">
-              <Button size="sm" variant="bifrost" onClick={() => void copyLink()} disabled={!liveUrl}>
+              <Button size="sm" variant="primary" onClick={() => void copyLink()} disabled={!liveUrl}>
                 {copied ? t.cmsLiveEdit.copied : t.cmsLiveEdit.copyLink}
               </Button>
               {liveUrl ? (
@@ -96,7 +96,7 @@ export const LiveEditPages: FC = () => {
           </Flex>
         </Card>
 
-        <Card className="bifrost-cms-card">
+        <Card padding="md" className="bifrost-cms-card">
           <Typography variant="h4" className="mb-2">
             {t.cmsLiveEdit.howTitle}
           </Typography>

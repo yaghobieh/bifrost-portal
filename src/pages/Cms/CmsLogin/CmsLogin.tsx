@@ -225,7 +225,7 @@ export const CmsLogin: FC = () => {
                     </span>
                   </label>
                 )}
-                <Button type="submit" className="bifrost-cms-login__submit" disabled={loading}>
+                <Button type="submit" variant="primary" className="bifrost-cms-login__submit" disabled={loading}>
                   {submitLabel}
                 </Button>
               </Flex>

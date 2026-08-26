@@ -4,6 +4,8 @@ html.bifrost-cms-host #root {
   width: 100%;
   height: 100%;
   min-height: 100%;
+  background: var(--bear-bg-secondary, #F5F6F8);
+  color: var(--bear-text-primary, #12141A);
 }
 
 .bifrost-cms,
@@ -16,7 +18,7 @@ html.bifrost-cms-host #root {
   --bifrost-cms-accent: var(--bear-primary-600);
   --bifrost-cms-accent-soft: var(--bear-primary-50);
   --bifrost-cms-highlight: var(--bear-primary-50);
-  --bifrost-cms-sidebar: #111827;
+  --bifrost-cms-sidebar: #14161C;
   --bifrost-cms-sidebar-text: #e8eaef;
   --bifrost-cms-sidebar-muted: #9ca3af;
   --bifrost-cms-success: var(--bear-success-600);
@@ -55,7 +57,7 @@ html.bifrost-cms-host #root {
   --bifrost-cms-accent: var(--bear-primary-400);
   --bifrost-cms-accent-soft: color-mix(in srgb, var(--bear-primary-600) 22%, transparent);
   --bifrost-cms-highlight: var(--bear-primary-600);
-  --bifrost-cms-sidebar: #111827;
+  --bifrost-cms-sidebar: #14161C;
   --bifrost-cms-sidebar-text: #e8eaef;
   --bifrost-cms-sidebar-muted: #9ca3af;
   color-scheme: dark;
@@ -934,7 +936,7 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms-login__quote {
-  border-left: 2px solid #ea0a8e;
+  border-left: 2px solid var(--bear-primary-600, #2951C4);
   padding-left: 0.875rem;
 }
 
@@ -1060,15 +1062,11 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms-login__terms a {
-  color: #8a3fd4;
+  color: var(--bear-primary-600, #2951C4);
 }
 
 .bifrost-cms-login__submit {
   width: 100%;
-  background-image: linear-gradient(90deg, #2951c4, #8a3fd4, #ea0a8e) !important;
-  border: 0 !important;
-  color: #fff !important;
-  font-weight: 700;
 }
 
 .bifrost-cms-login .bifrost-cms__muted {

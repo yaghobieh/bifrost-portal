@@ -20,7 +20,7 @@ export const OnboardingStepRow: FC<OnboardingStepRowProps> = (props) => {
           {title}
         </Typography>
         {kind === CMS_ONBOARDING_STEP_CTA && (
-          <Button variant="bifrost" className="bifrost-cms-onboarding__cta" onClick={() => onStep(navId)}>
+          <Button variant="primary" className="bifrost-cms-onboarding__cta" onClick={() => onStep(navId)}>
             {ctaLabel}
           </Button>
         )}

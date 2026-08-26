@@ -96,7 +96,7 @@ export const MediaPages: FC = () => {
           />
           <Button
             size="sm"
-            variant="bifrost"
+            variant="primary"
             disabled={uploading || !activeToken}
             onClick={() => inputRef.current?.click()}
           >
@@ -127,7 +127,7 @@ export const MediaPages: FC = () => {
 
         <div className="bifrost-cms-list bifrost-cms-list--media">
           {items.map((item) => (
-            <Card key={item.id} className="bifrost-cms-card bifrost-cms-media-card">
+            <Card padding="md" key={item.id} className="bifrost-cms-card bifrost-cms-media-card">
               {item.secureUrl || item.url ? (
                 <img
                   src={item.secureUrl || item.url}

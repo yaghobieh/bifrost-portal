@@ -73,7 +73,7 @@ const CastFormFields: FC<Omit<CastFormProps, 'formKey'>> = (props) => {
         </Button>
         <Button
           size="sm"
-          variant="bifrost"
+          variant="primary"
           type="submit"
           icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
         >

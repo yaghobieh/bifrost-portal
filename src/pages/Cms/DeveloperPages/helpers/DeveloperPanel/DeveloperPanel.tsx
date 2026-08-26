@@ -1,7 +1,8 @@
 import { useEffect, useState, type FC } from 'react';
-import { Card, Flex, Spinner, Typography } from '@forgedevstack/bear';
+import { Card, Divider, Flex, Grid, Spinner, Typography } from '@forgedevstack/bear';
 import { useNucleus } from '@forgedevstack/synapse';
 import { useI18n } from '@i18n/index';
+import { NUMBER_ONE } from '@const/index';
 import { authNucleus } from '@sdk/index';
 import { fetchAuditLogs } from '@sdk/modules/audit';
 import {
@@ -10,10 +11,12 @@ import {
   fetchVersionInfo,
 } from '@sdk/modules/version';
 import type { VersionInfo } from '@sdk/modules/version';
-import { CmsGridTable } from '../../../CmsShell';
+import { CmsGridTable, CMS_CARD_PADDING } from '../../../CmsShell';
 import {
   DEVELOPER_BUILD_ROW_IDS,
   DEVELOPER_EMPTY,
+  DEVELOPER_LAYOUT_COLS,
+  DEVELOPER_LAYOUT_GAP,
   DEVELOPER_RUNTIME_ROW_IDS,
 } from '../../DeveloperPages.const';
 import type { DeveloperAuditRow, DeveloperRowId, DeveloperRowLabels } from '../../DeveloperPages.types';
@@ -87,47 +90,53 @@ export const DeveloperPanel: FC = () => {
           </Typography>
         </Flex>
       )}
-      <Card>
+      <Card padding={CMS_CARD_PADDING}>
         <Typography variant="h4" className="mb-1">
           {t.cmsDeveloper.title}
         </Typography>
         <Typography variant="body2" color="secondary" className="mb-4">
           {t.cmsDeveloper.subtitle}
         </Typography>
-        <Flex gap={6} align="start">
-          <Flex direction="column" gap={0} className="flex-1">
-            <Typography variant="caption" className="mb-2">
+        <Grid cols={DEVELOPER_LAYOUT_COLS} gap={DEVELOPER_LAYOUT_GAP}>
+          <Flex direction="column" gap={0}>
+            <Typography variant="overline" color="muted" className="mb-2">
               {t.cmsDeveloper.runtimeGroup}
             </Typography>
-            {runtimeRows.map((row) => (
-              <Flex key={row.id} justify="between" align="center" gap={3}>
-                <Typography variant="body2" color="secondary" className="mb-0">
-                  {row.label}
-                </Typography>
-                <Typography variant="body2" className="mb-0">
-                  {row.value || DEVELOPER_EMPTY}
-                </Typography>
+            {runtimeRows.map((row, index) => (
+              <Flex key={row.id} direction="column" gap={0}>
+                <Flex justify="between" align="center" gap={3}>
+                  <Typography variant="body2" color="secondary" className="mb-0">
+                    {row.label}
+                  </Typography>
+                  <Typography variant="body2" className="mb-0">
+                    {row.value || DEVELOPER_EMPTY}
+                  </Typography>
+                </Flex>
+                {index < runtimeRows.length - NUMBER_ONE && <Divider />}
               </Flex>
             ))}
           </Flex>
-          <Flex direction="column" gap={0} className="flex-1">
-            <Typography variant="caption" className="mb-2">
+          <Flex direction="column" gap={0}>
+            <Typography variant="overline" color="muted" className="mb-2">
               {t.cmsDeveloper.buildGroup}
             </Typography>
-            {buildRows.map((row) => (
-              <Flex key={row.id} justify="between" align="center" gap={3}>
-                <Typography variant="body2" color="secondary" className="mb-0">
-                  {row.label}
-                </Typography>
-                <Typography variant="body2" className="mb-0">
-                  {row.value || DEVELOPER_EMPTY}
-                </Typography>
+            {buildRows.map((row, index) => (
+              <Flex key={row.id} direction="column" gap={0}>
+                <Flex justify="between" align="center" gap={3}>
+                  <Typography variant="body2" color="secondary" className="mb-0">
+                    {row.label}
+                  </Typography>
+                  <Typography variant="body2" className="mb-0">
+                    {row.value || DEVELOPER_EMPTY}
+                  </Typography>
+                </Flex>
+                {index < buildRows.length - NUMBER_ONE && <Divider />}
               </Flex>
             ))}
           </Flex>
-        </Flex>
+        </Grid>
       </Card>
-      <Card>
+      <Card padding={CMS_CARD_PADDING}>
         <Typography variant="h4" className="mb-1">
           {t.cmsDeveloper.auditTitle}
         </Typography>

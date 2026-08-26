@@ -1,4 +1,4 @@
-import { useEffect, useState, type DragEvent, type FC } from 'react';
+import { useEffect, useState, type ChangeEvent, type DragEvent, type FC } from 'react';
 import { useNavigate, useParams } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import {
@@ -22,7 +22,7 @@ import { DRAG_WIDGET_MIME, EMPTY_STRING, ROUTES, cmsBuilderPath, CMS_EDIT_SIDE_M
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import type { ContentStatus } from '@sdk/modules/content';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING } from '../CmsShell';
 import { loadStoredWidth, saveStoredWidth, startHorizontalResize } from '../CmsShell/CmsShell.utils';
 import {
   BEAR_WIDGET_CATALOG,
@@ -234,6 +234,32 @@ export const ContentEdit: FC = () => {
     setSaveOk(false);
   };
 
+  const markUnsaved = () => setSaveOk(false);
+
+  const onStringInput =
+    (setter: (value: string) => void) => (event: ChangeEvent<HTMLInputElement>) => {
+      setter(event.target.value);
+      markUnsaved();
+    };
+
+  const onStatusSelect = (value: ContentStatus) => {
+    setStatus(value);
+    markUnsaved();
+  };
+
+  const onToggleSeoCollapsed = () => {
+    const next = !seoCollapsed;
+    setSeoCollapsed(next);
+    saveSeoCollapsed(next);
+  };
+
+  const seoChevron = () => {
+    if (seoCollapsed) {
+      return <BearIcons.ChevronRightIcon size={CMS_ICON_SIZE} />;
+    }
+    return <BearIcons.ChevronDownIcon size={CMS_ICON_SIZE} />;
+  };
+
   const templateItem = findLinkedTemplate(items, target?.payload, target?.id);
   const templateFields = castFieldsFromPayload(templateItem?.payload);
   const displayFields = mergeCastFields(templateFields, pageFields);
@@ -400,7 +426,7 @@ export const ContentEdit: FC = () => {
             </Button>
             <Button
               size="sm"
-              variant="bifrost"
+              variant="primary"
               icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
               onClick={() => void onSave()}
               disabled={!target || saving}
@@ -436,35 +462,26 @@ export const ContentEdit: FC = () => {
             className="bifrost-cms-edit__layout"
             style={{ gridTemplateColumns: `minmax(0, 1fr) ${sideWidth}px` }}
           >
-            <Card className="bifrost-cms-card bifrost-cms-edit__main">
+            <Card className="bifrost-cms-card bifrost-cms-edit__main" padding={CMS_CARD_PADDING}>
               <Flex direction="column" gap={3}>
                 <Input
                   id={CONTENT_EDIT_TITLE_ID}
                   className="bifrost-cms-edit__title"
                   label={t.contentEdit.titleField}
                   value={title}
-                  onChange={(event) => {
-                    setTitle(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setTitle)}
                 />
                 <Input
                   id={CONTENT_EDIT_SUBTITLE_ID}
                   label={t.contentEdit.subtitle}
                   value={subtitle}
-                  onChange={(event) => {
-                    setSubtitle(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setSubtitle)}
                 />
                 <Input
                   id={CONTENT_EDIT_SLUG_ID}
                   label={t.contentEdit.slug}
                   value={slug}
-                  onChange={(event) => {
-                    setSlug(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setSlug)}
                 />
                 {preview ? (
                   <div
@@ -565,28 +582,20 @@ export const ContentEdit: FC = () => {
               }}
             />
             <aside className="bifrost-cms-edit__side">
-              <Card className="bifrost-cms-card mb-3 bifrost-cms-edit__seo">
+              <Card className="bifrost-cms-card mb-3" padding={CMS_CARD_PADDING}>
                 <button
                   type="button"
                   className="bifrost-cms-edit__seo-toggle"
-                  onClick={() => {
-                    const next = !seoCollapsed;
-                    setSeoCollapsed(next);
-                    saveSeoCollapsed(next);
-                  }}
+                  onClick={onToggleSeoCollapsed}
                 >
                   <Typography variant="h4" className="mb-0">
                     {t.contentEdit.publishTitle}
                   </Typography>
-                  {seoCollapsed ? (
-                    <BearIcons.ChevronRightIcon size={CMS_ICON_SIZE} />
-                  ) : (
-                    <BearIcons.ChevronDownIcon size={CMS_ICON_SIZE} />
-                  )}
+                  {seoChevron()}
                 </button>
-                {seoCollapsed ? null : (
+                {!seoCollapsed && (
                   <>
-                <Typography variant="caption" className="bifrost-cms__muted mb-2 block">
+                <Typography variant="caption" color="muted" className="mb-2">
                   {t.contentEdit.statusLabel}
                 </Typography>
                 <Flex gap={1} className="flex-wrap mb-3">
@@ -594,11 +603,8 @@ export const ContentEdit: FC = () => {
                     <Button
                       key={value}
                       size="sm"
-                      variant={status === value ? 'ink' : 'outline'}
-                      onClick={() => {
-                        setStatus(value);
-                        setSaveOk(false);
-                      }}
+                      variant={status === value ? 'primary' : 'outline'}
+                      onClick={() => onStatusSelect(value)}
                     >
                       {value}
                     </Button>
@@ -608,37 +614,25 @@ export const ContentEdit: FC = () => {
                   id={CONTENT_EDIT_AUTHOR_ID}
                   label={t.contentEdit.author}
                   value={author}
-                  onChange={(event) => {
-                    setAuthor(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setAuthor)}
                 />
                 <Input
                   id={CONTENT_EDIT_FEATURED_ID}
                   label={t.contentEdit.featuredImage}
                   value={featuredImage}
-                  onChange={(event) => {
-                    setFeaturedImage(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setFeaturedImage)}
                 />
                 <Input
                   id={CONTENT_EDIT_TAGS_ID}
                   label={t.contentEdit.tags}
                   value={tags}
-                  onChange={(event) => {
-                    setTags(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setTags)}
                 />
                 <Input
                   id={CONTENT_EDIT_CATEGORIES_ID}
                   label={t.contentEdit.categories}
                   value={categories}
-                  onChange={(event) => {
-                    setCategories(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setCategories)}
                 />
                 <Typography variant="h5" className="mt-3 mb-1">
                   {t.contentEdit.seoPanel}
@@ -647,28 +641,19 @@ export const ContentEdit: FC = () => {
                   id={CONTENT_EDIT_SEO_TITLE_ID}
                   label={t.contentEdit.seoTitle}
                   value={seoTitle}
-                  onChange={(event) => {
-                    setSeoTitle(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setSeoTitle)}
                 />
                 <Input
                   id={CONTENT_EDIT_SEO_DESC_ID}
                   label={t.contentEdit.seoDescription}
                   value={seoDescription}
-                  onChange={(event) => {
-                    setSeoDescription(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setSeoDescription)}
                 />
                 <Input
                   id={CONTENT_EDIT_SEO_KEYWORD_ID}
                   label={t.contentEdit.seoKeyword}
                   value={seoKeyword}
-                  onChange={(event) => {
-                    setSeoKeyword(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setSeoKeyword)}
                 />
                 <Typography variant="h5" className="mt-3 mb-1">
                   {t.contentEdit.socialPanel}
@@ -677,28 +662,19 @@ export const ContentEdit: FC = () => {
                   id={CONTENT_EDIT_OG_TITLE_ID}
                   label={t.contentEdit.ogTitle}
                   value={ogTitle}
-                  onChange={(event) => {
-                    setOgTitle(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setOgTitle)}
                 />
                 <Input
                   id={CONTENT_EDIT_OG_DESC_ID}
                   label={t.contentEdit.ogDescription}
                   value={ogDescription}
-                  onChange={(event) => {
-                    setOgDescription(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setOgDescription)}
                 />
                 <Input
                   id={CONTENT_EDIT_OG_IMAGE_ID}
                   label={t.contentEdit.ogImage}
                   value={ogImage}
-                  onChange={(event) => {
-                    setOgImage(event.target.value);
-                    setSaveOk(false);
-                  }}
+                  onChange={onStringInput(setOgImage)}
                 />
                 <DatePicker
                   id={CONTENT_EDIT_SCHEDULE_DATE_ID}
@@ -745,15 +721,15 @@ export const ContentEdit: FC = () => {
                 }}
               />
 
-              <Card className="bifrost-cms-card mb-3">
+              <Card className="bifrost-cms-card mb-3" padding={CMS_CARD_PADDING}>
                 <Typography variant="h4" className="mb-1">
                   {t.contentEdit.revisionsTitle}
                 </Typography>
-                <Typography variant="caption" className="bifrost-cms__muted mb-3 block">
+                <Typography variant="caption" color="muted" className="mb-3">
                   {t.contentEdit.revisionsHint}
                 </Typography>
                 {revisions.length === 0 ? (
-                  <Typography variant="caption" className="bifrost-cms__muted mb-0">
+                  <Typography variant="caption" color="muted" className="mb-0">
                     {t.contentEdit.revisionsEmpty}
                   </Typography>
                 ) : (

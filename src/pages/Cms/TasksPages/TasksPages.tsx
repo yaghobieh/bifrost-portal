@@ -193,7 +193,7 @@ export const TasksPages: FC = () => {
         <Flex align="center" gap={2} className="flex-wrap">
           <Button
             size="sm"
-            variant="bifrost"
+            variant="primary"
             icon={<BearIcons.PlusIcon size={CMS_ICON_SIZE} />}
             onClick={() => openCreate(TASK_STATUS.TODO)}
           >

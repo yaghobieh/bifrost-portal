@@ -130,7 +130,7 @@ export const TemplatesPages: FC = () => {
           </div>
           <Button
             size="sm"
-            variant="bifrost"
+            variant="primary"
             icon={<BearIcons.PlusIcon size={CMS_ICON_SIZE} />}
             onClick={() => void onNewTemplate()}
             disabled={saving || !activeToken}
@@ -143,7 +143,7 @@ export const TemplatesPages: FC = () => {
         </Typography>
         <div className="bifrost-cms-templates-grid">
           {PAGE_LAYOUT_TEMPLATES.map((layout) => (
-            <Card key={layout.id} className="bifrost-cms-card">
+            <Card padding="md" key={layout.id} className="bifrost-cms-card">
               <Flex direction="column" gap={2}>
                 <Typography variant="h4" className="mb-0">
                   {layout.title}
@@ -161,7 +161,7 @@ export const TemplatesPages: FC = () => {
                 <Flex gap={2} className="flex-wrap">
                   <Button
                     size="sm"
-                    variant="bifrost"
+                    variant="primary"
                     icon={<BearIcons.GridIcon size={CMS_ICON_SIZE} />}
                     onClick={() => navigate(cmsBuilderPath({ layout: layout.id }))}
                   >
@@ -203,7 +203,7 @@ export const TemplatesPages: FC = () => {
         ) : (
           <div className="bifrost-cms-templates-grid">
             {templates.map((item) => (
-              <Card key={item.id} className="bifrost-cms-card">
+              <Card padding="md" key={item.id} className="bifrost-cms-card">
                 <Flex direction="column" gap={2}>
                   <Typography variant="h4" className="mb-0">
                     {item.title || item.slug}
@@ -230,7 +230,7 @@ export const TemplatesPages: FC = () => {
                     </Button>
                     <Button
                       size="sm"
-                      variant="bifrost"
+                      variant="primary"
                       onClick={() => void onUseSaved(item.id)}
                       disabled={saving || !activeToken}
                     >

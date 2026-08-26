@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FC, type MouseEvent } from 'react';
-import '@/styles/cms.css';
+import '@/styles/cms.scss';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import {

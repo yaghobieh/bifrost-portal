@@ -61,7 +61,7 @@ export const PlansPages: FC = () => {
           {plans.map((plan) => {
             const isActive = activeUserPlan === plan.id;
             return (
-              <Card
+              <Card padding="md"
                 key={plan.id}
                 className={`bifrost-cms-card bifrost-cms-plan-card${
                   isActive ? ' bifrost-cms-plan-card--active' : ''
@@ -105,7 +105,7 @@ export const PlansPages: FC = () => {
                   ) : (
                     <Button
                       size="sm"
-                      variant="bifrost"
+                      variant="primary"
                       disabled={switching}
                       onClick={() => void onSwitch(plan.id)}
                     >
@@ -124,7 +124,7 @@ export const PlansPages: FC = () => {
           </Typography>
         ) : null}
 
-        <Card className="bifrost-cms-card">
+        <Card padding="md" className="bifrost-cms-card">
           <PlanCompareTable />
         </Card>
       </Flex>

@@ -41,6 +41,7 @@ export const CMS_SITE_EVENT = 'bifrost-cms-site';
 export const CMS_CHAT_PREFS_EVENT = 'bifrost-cms-chat-prefs';
 export const CMS_NOTIFY_PREFS_EVENT = 'bifrost-cms-notify-prefs';
 export const CMS_DEV_PREFS_EVENT = 'bifrost-cms-dev-prefs';
+export const CMS_THEME_EVENT = 'bifrost-cms-theme';
 export const CMS_EXTENSIONS_EVENT = 'bifrost-cms-extensions';
 export const CMS_CREW_OPEN_EVENT = 'bifrost-cms-crew-open';
 export const CMS_AGENT_APPLY_EVENT = 'bifrost-cms-agent-apply';

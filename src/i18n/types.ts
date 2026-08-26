@@ -490,6 +490,7 @@ export interface Messages {
     healthDownHint: string;
     healthMissingApi: string;
     updateHello: string;
+    updateChangelog: string;
     updateNow: string;
     updateRunning: string;
     updateHow: string;

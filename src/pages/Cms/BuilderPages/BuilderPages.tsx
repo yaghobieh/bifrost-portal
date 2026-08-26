@@ -190,7 +190,7 @@ export const BuilderPages: FC = () => {
         </div>
         <BuilderBoardNiche />
         {!installed ? (
-          <Card className="bifrost-cms-card">
+          <Card padding="md" className="bifrost-cms-card">
             <Typography variant="h4" className="mb-2">
               {t.cmsBuilder.lockedTitle}
             </Typography>
@@ -199,7 +199,7 @@ export const BuilderPages: FC = () => {
             </Typography>
             <Button
               size="sm"
-              variant="bifrost"
+              variant="primary"
               icon={<BearIcons.PackageIcon size={CMS_ICON_SIZE} />}
               onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
             >
@@ -214,7 +214,7 @@ export const BuilderPages: FC = () => {
             }}
           >
             <div className="bifrost-cms-builder__pane bifrost-cms-builder__pane--palette">
-            <Card className="bifrost-cms-card bifrost-cms-builder__palette">
+            <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__palette">
               <Typography variant="h4" className="mb-1">
                 {t.cmsBuilder.palette}
               </Typography>
@@ -377,7 +377,7 @@ export const BuilderPages: FC = () => {
               onMouseDown={onPaletteResize}
             />
             </div>
-            <Card className="bifrost-cms-card bifrost-cms-builder__canvas">
+            <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__canvas">
               <div className="bifrost-cms-builder__toolbar">
                 <Tabs
                   value={stageTab}
@@ -436,7 +436,7 @@ export const BuilderPages: FC = () => {
                     trigger={
                       <Button
                         size="sm"
-                        variant="bifrost"
+                        variant="primary"
                         icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
                         aria-label={t.cmsBuilder.saveCanvas}
                       >
@@ -528,7 +528,7 @@ export const BuilderPages: FC = () => {
               aria-label={t.cmsBuilder.inspector}
               onMouseDown={onInspectorResize}
             />
-            <Card className="bifrost-cms-card bifrost-cms-builder__inspector">
+            <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__inspector">
               <Typography variant="h4" className="mb-2">
                 {t.cmsBuilder.inspector}
               </Typography>

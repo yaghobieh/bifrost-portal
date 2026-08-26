@@ -540,6 +540,7 @@ export const en: Messages = {
     healthDownHint: 'ink-server is not reachable, or the database ping failed. Start the API on port 4000 and sign in again.',
     healthMissingApi: 'No API URL. Set VITE_INK_API_URL or use the local default on port 4000.',
     updateHello: 'Hi — {version} is ready. Update this CMS (and Forge libs) from bifrost-portal.',
+    updateChangelog: 'Bear Card padding, CMS blue theme, Users & permissions. Click Update even if you are already on this version.',
     updateNow: 'Update',
     updateRunning: 'Updating…',
     updateHow: 'How to update',
@@ -1027,7 +1028,7 @@ export const en: Messages = {
   },
   cmsCrew: {
     title: 'Users',
-    pageTitle: 'Users, permissions & developer info',
+    pageTitle: 'Users & permissions',
     subtitle: 'Create users with roles. Permissions are grouped by resource.',
     tabUsers: 'Users & Permissions',
     tabDeveloper: 'Developer',

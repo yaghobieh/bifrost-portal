@@ -110,7 +110,7 @@ export const SettingsPasswordOtp: FC<SettingsPasswordOtpProps> = (props) => {
       />
       <Button
         size="sm"
-        variant="bifrost"
+        variant="primary"
         disabled={busy || !otp.trim() || password.length < NUMBER_EIGHT}
         onClick={() => void onConfirm()}
       >

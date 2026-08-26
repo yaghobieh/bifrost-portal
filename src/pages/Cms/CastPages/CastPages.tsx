@@ -126,7 +126,7 @@ export const CastPages: FC = () => {
           </Typography>
         </div>
         {!installed ? (
-          <Card className="bifrost-cms-card">
+          <Card padding="md" className="bifrost-cms-card">
             <Typography variant="h4" className="mb-2">
               {t.cmsCast.lockedTitle}
             </Typography>
@@ -135,7 +135,7 @@ export const CastPages: FC = () => {
             </Typography>
             <Button
               size="sm"
-              variant="bifrost"
+              variant="primary"
               icon={<BearIcons.PackageIcon size={CMS_ICON_SIZE} />}
               onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
             >
@@ -144,7 +144,7 @@ export const CastPages: FC = () => {
           </Card>
         ) : (
           <div className="bifrost-cms-cast">
-            <Card className="bifrost-cms-card">
+            <Card padding="md" className="bifrost-cms-card">
               <Typography variant="h4" className="mb-2">
                 {t.cmsCast.groups}
               </Typography>
@@ -156,7 +156,7 @@ export const CastPages: FC = () => {
                 onChange={onTargetChange}
               />
             </Card>
-            <Card className="bifrost-cms-card">
+            <Card padding="md" className="bifrost-cms-card">
               <CastForm
                 formKey={targetId || 'new'}
                 initialTitle={title}

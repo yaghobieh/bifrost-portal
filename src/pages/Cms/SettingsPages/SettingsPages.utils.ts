@@ -32,6 +32,7 @@ import {
   SETTINGS_DEV_PREFS_EVENT,
   SETTINGS_THEME_DEFAULTS_DARK,
   SETTINGS_THEME_DEFAULTS_LIGHT,
+  SETTINGS_THEME_EVENT,
   SETTINGS_THEME_STORAGE_KEY,
   SETTINGS_CHAT_PREFS_DEFAULTS,
   SETTINGS_CHAT_PREFS_EVENT,
@@ -48,6 +49,7 @@ import {
   SETTINGS_MCP_JSON_INDENT,
   SETTINGS_MCP_TOOL_SUFFIXES,
   SETTINGS_SITE_SLUG_FALLBACK,
+  SETTINGS_STALE_THEME_PRIMARIES,
 } from './SettingsPages.const';
 import type {
   CmsApiErrorMode,
@@ -142,17 +144,19 @@ export const loadCmsThemeColors = (): CmsThemeColors => {
     const raw = localStorage.getItem(SETTINGS_THEME_STORAGE_KEY);
     if (!raw) return { ...SETTINGS_THEME_DEFAULTS };
     const parsed = JSON.parse(raw) as Partial<CmsThemeColors>;
-    return {
-      primary: isHexColor(parsed.primary)
-        ? parsed.primary
-        : SETTINGS_THEME_DEFAULTS.primary,
-      accent: isHexColor(parsed.accent)
-        ? parsed.accent
-        : SETTINGS_THEME_DEFAULTS.accent,
-      background: isHexColor(parsed.background)
-        ? parsed.background
-        : SETTINGS_THEME_DEFAULTS.background,
-    };
+    const primary = isHexColor(parsed.primary)
+      ? parsed.primary
+      : SETTINGS_THEME_DEFAULTS.primary;
+    const accent = isHexColor(parsed.accent)
+      ? parsed.accent
+      : SETTINGS_THEME_DEFAULTS.accent;
+    const background = isHexColor(parsed.background)
+      ? parsed.background
+      : SETTINGS_THEME_DEFAULTS.background;
+    if (SETTINGS_STALE_THEME_PRIMARIES.some((value) => value === primary)) {
+      return { ...SETTINGS_THEME_DEFAULTS };
+    }
+    return { primary, accent, background };
   } catch {
     return { ...SETTINGS_THEME_DEFAULTS };
   }
@@ -160,6 +164,7 @@ export const loadCmsThemeColors = (): CmsThemeColors => {
 
 export const saveCmsThemeColors = (colors: CmsThemeColors): void => {
   localStorage.setItem(SETTINGS_THEME_STORAGE_KEY, JSON.stringify(colors));
+  window.dispatchEvent(new Event(SETTINGS_THEME_EVENT));
 };
 
 const emptyProfile = (): CmsProfile => ({
