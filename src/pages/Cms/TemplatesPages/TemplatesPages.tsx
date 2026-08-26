@@ -8,7 +8,7 @@ import { cmsBuilderPath, cmsEditPath } from '@const/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   CONTENT_COLLECTION_PAGES,
   DOCUMENT_DEFAULT_LOCALE,
@@ -118,16 +118,11 @@ export const TemplatesPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.TEMPLATES}>
-      <Flex direction="column" gap={4}>
-        <Flex justify="between" align="end" className="gap-3 flex-wrap">
-          <div>
-            <Typography variant="h2" className="mb-1">
-              {t.cmsTemplates.title}
-            </Typography>
-            <Typography variant="body2" className="bifrost-cms__muted mb-0">
-              {t.cmsTemplates.subtitle}
-            </Typography>
-          </div>
+      <Flex direction="column" gap={6}>
+        <CmsPageHeader
+          title={t.cmsTemplates.title}
+          subtitle={t.cmsTemplates.subtitle}
+          actions={
           <Button
             size="sm"
             variant="primary"
@@ -137,13 +132,14 @@ export const TemplatesPages: FC = () => {
           >
             {t.cmsTemplates.newTemplate}
           </Button>
-        </Flex>
+          }
+        />
         <Typography variant="h4" className="mb-0">
           {t.cmsTemplates.layoutsTitle}
         </Typography>
         <div className="bifrost-cms-templates-grid">
           {PAGE_LAYOUT_TEMPLATES.map((layout) => (
-            <Card padding="md" key={layout.id} className="bifrost-cms-card">
+            <Card padding="md" key={layout.id}>
               <Flex direction="column" gap={2}>
                 <Typography variant="h4" className="mb-0">
                   {layout.title}
@@ -203,7 +199,7 @@ export const TemplatesPages: FC = () => {
         ) : (
           <div className="bifrost-cms-templates-grid">
             {templates.map((item) => (
-              <Card padding="md" key={item.id} className="bifrost-cms-card">
+              <Card padding="md" key={item.id}>
                 <Flex direction="column" gap={2}>
                   <Typography variant="h4" className="mb-0">
                     {item.title || item.slug}

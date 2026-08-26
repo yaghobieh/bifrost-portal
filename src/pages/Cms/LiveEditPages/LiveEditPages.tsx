@@ -47,7 +47,7 @@ export const LiveEditPages: FC = () => {
           </Typography>
         </div>
 
-        <Card padding="md" className="bifrost-cms-card">
+        <Card padding="md">
           <Typography variant="h4" className="mb-2">
             {t.cmsLiveEdit.sessionTitle}
           </Typography>
@@ -73,7 +73,7 @@ export const LiveEditPages: FC = () => {
                 setCopied(false);
               }}
             />
-            <Card padding="md" className="bifrost-cms-card bifrost-cms-card--nested">
+            <Card padding="md" className="bifrost-cms-card--nested">
               <Typography variant="caption" className="bifrost-cms__muted mb-1 block">
                 {t.cmsLiveEdit.generatedLink}
               </Typography>
@@ -96,7 +96,7 @@ export const LiveEditPages: FC = () => {
           </Flex>
         </Card>
 
-        <Card padding="md" className="bifrost-cms-card">
+        <Card padding="md">
           <Typography variant="h4" className="mb-2">
             {t.cmsLiveEdit.howTitle}
           </Typography>

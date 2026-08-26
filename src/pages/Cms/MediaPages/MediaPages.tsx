@@ -6,7 +6,7 @@ import { useI18n } from '@i18n/index';
 import { EMPTY_STRING } from '@const/index';
 import { NUMBER_ZERO } from '@const/numbers.const';
 import { authNucleus, mediaNucleus } from '@sdk/index';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { MEDIA_ACCEPT, MEDIA_FILE_INPUT_ID } from './MediaPages.const';
 
 export const MediaPages: FC = () => {
@@ -41,22 +41,18 @@ export const MediaPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.MEDIA}>
-      <Flex direction="column" gap={4}>
-        <Flex justify="between" align="center" className="gap-3 flex-wrap">
-          <div>
-            <Typography variant="h2" className="mb-1">
-              {t.dashboard.mediaTitle}
-            </Typography>
-            <Typography variant="body2" className="bifrost-cms__muted mb-0">
-              {t.dashboard.mediaSubtitle}
-            </Typography>
-          </div>
-          {source ? (
-            <Badge variant="info" className="text-xs">
-              {source}
-            </Badge>
-          ) : null}
-        </Flex>
+      <Flex direction="column" gap={6}>
+        <CmsPageHeader
+          title={t.dashboard.mediaTitle}
+          subtitle={t.dashboard.mediaSubtitle}
+          actions={
+            source ? (
+              <Badge variant="info" className="text-xs">
+                {source}
+              </Badge>
+            ) : null
+          }
+        />
 
         <div
           className={`bifrost-cms-dropzone${dragging ? ' bifrost-cms-dropzone--active' : ''}${
@@ -127,7 +123,7 @@ export const MediaPages: FC = () => {
 
         <div className="bifrost-cms-list bifrost-cms-list--media">
           {items.map((item) => (
-            <Card padding="md" key={item.id} className="bifrost-cms-card bifrost-cms-media-card">
+            <Card padding="md" key={item.id} className="bifrost-cms-media-card">
               {item.secureUrl || item.url ? (
                 <img
                   src={item.secureUrl || item.url}

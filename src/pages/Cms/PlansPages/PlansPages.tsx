@@ -63,7 +63,7 @@ export const PlansPages: FC = () => {
             return (
               <Card padding="md"
                 key={plan.id}
-                className={`bifrost-cms-card bifrost-cms-plan-card${
+                className={`bifrost-cms-plan-card${
                   isActive ? ' bifrost-cms-plan-card--active' : ''
                 }`}
               >
@@ -124,7 +124,7 @@ export const PlansPages: FC = () => {
           </Typography>
         ) : null}
 
-        <Card padding="md" className="bifrost-cms-card">
+        <Card padding="md">
           <PlanCompareTable />
         </Card>
       </Flex>

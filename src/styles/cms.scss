@@ -2743,14 +2743,32 @@ html.bifrost-cms-host #root {
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   color: var(--bifrost-cms-text);
 }
 
 .bifrost-cms-page__sub {
   font-size: 13px;
   color: var(--bifrost-cms-muted);
-  margin-bottom: 22px;
+  margin-bottom: 0;
+}
+
+.bifrost-cms-page-header__title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  color: var(--bifrost-cms-text);
+}
+
+.bifrost-cms-page-header__sub {
+  font-size: 13px;
+  color: var(--bifrost-cms-muted);
+  margin-bottom: 0;
+}
+
+.bifrost-cms-page-header {
+  padding-bottom: 8px;
 }
 
 .bifrost-cms-card__title {
@@ -3199,16 +3217,10 @@ html.bifrost-cms-host #root {
   gap: 4px;
 }
 
-.bifrost-cms-settings {
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
 .bifrost-cms-settings-box,
 .bifrost-cms-settings-split__box {
-  background: #fff;
+  background: var(--bifrost-cms-surface);
+  color: var(--bifrost-cms-text);
   border: 1px solid var(--bifrost-cms-border);
   border-radius: 12px;
   padding: 18px;

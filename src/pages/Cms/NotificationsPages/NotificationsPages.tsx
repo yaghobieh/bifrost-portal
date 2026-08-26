@@ -140,7 +140,6 @@ export const NotificationsPages: FC = () => {
               {group.items.map((item) => (
                 <Card padding="md"
                   key={item.id}
-                  className="bifrost-cms-card"
                   onClick={() => {
                     markItem(item.id);
                     if (item.href) navigate(item.href);

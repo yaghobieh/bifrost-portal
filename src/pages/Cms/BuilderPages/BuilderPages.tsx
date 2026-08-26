@@ -4,7 +4,7 @@ import { InkEditor } from '@forgedevstack/ink';
 import { cmsInkAiProps } from '@/ai/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { ROUTES } from '@const/index';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   BUILDER_INK_MIN_HEIGHT_PX,
   BUILDER_INSPECTOR_NONE,
@@ -179,18 +179,11 @@ export const BuilderPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.BUILDER}>
-      <Flex direction="column" gap={4} className="bifrost-cms-builder">
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.cmsBuilder.title}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {t.cmsBuilder.subtitle}
-          </Typography>
-        </div>
+      <Flex direction="column" gap={6} className="bifrost-cms-builder">
+        <CmsPageHeader title={t.cmsBuilder.title} subtitle={t.cmsBuilder.subtitle} />
         <BuilderBoardNiche />
         {!installed ? (
-          <Card padding="md" className="bifrost-cms-card">
+          <Card padding="md">
             <Typography variant="h4" className="mb-2">
               {t.cmsBuilder.lockedTitle}
             </Typography>
@@ -214,7 +207,7 @@ export const BuilderPages: FC = () => {
             }}
           >
             <div className="bifrost-cms-builder__pane bifrost-cms-builder__pane--palette">
-            <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__palette">
+            <Card padding="md" className="bifrost-cms-builder__palette">
               <Typography variant="h4" className="mb-1">
                 {t.cmsBuilder.palette}
               </Typography>
@@ -377,7 +370,7 @@ export const BuilderPages: FC = () => {
               onMouseDown={onPaletteResize}
             />
             </div>
-            <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__canvas">
+            <Card padding="md" className="bifrost-cms-builder__canvas">
               <div className="bifrost-cms-builder__toolbar">
                 <Tabs
                   value={stageTab}
@@ -528,7 +521,7 @@ export const BuilderPages: FC = () => {
               aria-label={t.cmsBuilder.inspector}
               onMouseDown={onInspectorResize}
             />
-            <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__inspector">
+            <Card padding="md" className="bifrost-cms-builder__inspector">
               <Typography variant="h4" className="mb-2">
                 {t.cmsBuilder.inspector}
               </Typography>

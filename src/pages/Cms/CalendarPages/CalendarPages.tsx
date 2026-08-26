@@ -133,7 +133,7 @@ export const CalendarPages: FC = () => {
             {t.cmsCalendar.subtitle}
           </Typography>
         </div>
-        <Card padding="md" className="bifrost-cms-card">
+        <Card padding="md">
           <Typography variant="h4" className="mb-2">
             {t.cmsCalendar.generateMeeting}
           </Typography>
@@ -179,7 +179,7 @@ export const CalendarPages: FC = () => {
             })}
           </Flex>
         </Card>
-        <Card padding="md" className="bifrost-cms-card">
+        <Card padding="md">
           <Calendar
             defaultView="week"
             events={meetings}
@@ -191,7 +191,7 @@ export const CalendarPages: FC = () => {
             layout="contained"
           />
         </Card>
-        <Card padding="md" className="bifrost-cms-card">
+        <Card padding="md">
           <Typography variant="h4" className="mb-2">
             {t.cmsCalendar.meetings}
           </Typography>

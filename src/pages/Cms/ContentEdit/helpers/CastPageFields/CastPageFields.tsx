@@ -22,7 +22,7 @@ export const CastPageFields: FC<CastPageFieldsProps> = (props) => {
   const typeOptions = castTypeOptions(t.cmsCast);
 
   return (
-    <Card className="bifrost-cms-card mb-3" padding={CMS_CARD_PADDING}>
+    <Card className="mb-3" padding={CMS_CARD_PADDING}>
       <Flex direction="column" gap={3}>
         <div>
           <Typography variant="h4" className="mb-1">

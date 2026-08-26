@@ -9,7 +9,7 @@ import { useI18n } from '@i18n/index';
 import { cmsBuilderPath, cmsEditPath, EMPTY_STRING } from '@const/index';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   CONTENT_COLLECTION_PAGES,
   CONTENT_COLUMN_IDS,
@@ -153,20 +153,22 @@ export const ContentPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.PAGES}>
-      <Flex direction="column" gap={0} className="bifrost-cms-page">
-        <Typography variant="h2" className="bifrost-cms-page__title mb-0">
-          {t.dashboard.contentTitle}
-        </Typography>
-        <Typography variant="body2" className="bifrost-cms-page__sub mb-0">
-          {t.dashboard.contentSubtitle}
-        </Typography>
-
-        <Card padding="md" className="bifrost-cms-card bifrost-cms-startpage">
-          <div>
-            <div className="bifrost-cms-startpage__title">{t.dashboard.templatesTitle}</div>
-            <div className="bifrost-cms-startpage__desc">{t.dashboard.templatesSubtitle}</div>
-          </div>
-          <Flex gap={2} align="center">
+      <Flex direction="column" gap={6} className="bifrost-cms-page">
+        <CmsPageHeader
+          title={t.dashboard.contentTitle}
+          subtitle={t.dashboard.contentSubtitle}
+          extra={
+            <Card variant="elevated" padding="md">
+              <Flex justify="between" align="center" gap={3} className="flex-wrap">
+                <div>
+                  <Typography variant="h4" className="mb-1">
+                    {t.dashboard.templatesTitle}
+                  </Typography>
+                  <Typography variant="body2" className="bifrost-cms__muted mb-0">
+                    {t.dashboard.templatesSubtitle}
+                  </Typography>
+                </div>
+                <Flex gap={2} align="center">
             <Dropdown
               placement="bottom-end"
               minWidth={CONTENT_NEW_PAGE_MENU_MIN_WIDTH}
@@ -177,8 +179,11 @@ export const ContentPages: FC = () => {
               }
               items={newPageItems}
             />
-          </Flex>
-        </Card>
+                </Flex>
+              </Flex>
+            </Card>
+          }
+        />
 
         {error && (
           <Typography variant="body2" className={CONTENT_ERROR_CLASS}>
