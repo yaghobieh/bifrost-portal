@@ -61,6 +61,9 @@ export const CastPages: FC = () => {
     { value: CAST_FIELD_TYPE.EMAIL, label: t.cmsCast.typeEmail },
     { value: CAST_FIELD_TYPE.IMAGE, label: t.cmsCast.typeImage },
     { value: CAST_FIELD_TYPE.RICH, label: t.cmsCast.typeRich },
+    { value: CAST_FIELD_TYPE.FILE, label: t.cmsCast.typeFile },
+    { value: CAST_FIELD_TYPE.BACKGROUND, label: t.cmsCast.typeBackground },
+    { value: CAST_FIELD_TYPE.SELECT, label: t.cmsCast.typeSelect },
   ];
 
   const onTargetChange = (value: string) => {

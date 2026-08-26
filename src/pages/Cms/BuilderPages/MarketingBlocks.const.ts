@@ -1,10 +1,8 @@
 export const MARKETING_BLUE = '#2951C4';
-export const MARKETING_VIOLET = '#8A3FD4';
-export const MARKETING_PINK = '#EA0A8E';
 export const MARKETING_WHITE = '#ffffff';
 export const MARKETING_INK = '#14161C';
 export const MARKETING_MUTED = '#5B5F6A';
-export const MARKETING_GRADIENT = `linear-gradient(90deg, ${MARKETING_BLUE}, ${MARKETING_VIOLET}, ${MARKETING_PINK})`;
+export const MARKETING_GRADIENT = MARKETING_BLUE;
 
 export const MARKETING_WIDGET_IDS = {
   HERO: 'mkt-hero',

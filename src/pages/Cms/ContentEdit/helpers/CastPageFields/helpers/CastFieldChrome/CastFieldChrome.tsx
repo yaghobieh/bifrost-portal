@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Badge, Flex, Input, Select, Switch, Typography } from '@forgedevstack/bear';
 import { isStringValue } from '@utils';
+import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
 import { isCastFieldType, slugFromLabel } from '@pages/Cms/CastPages/CastPages.utils';
 import { CAST_TYPE_SELECT_ID_PREFIX } from '@pages/Cms/ContentEdit/helpers/CastPageFields/CastPageFields.const';
 import type { CastFieldChromeProps } from './CastFieldChrome.types';
@@ -13,6 +14,7 @@ export const CastFieldChrome: FC<CastFieldChromeProps> = (props) => {
     fromTemplateLabel,
     fieldLabelPlaceholder,
     fieldRequiredLabel,
+    fieldOptionsLabel,
     onFieldChange,
   } = props;
   if (locked) {
@@ -51,6 +53,15 @@ export const CastFieldChrome: FC<CastFieldChromeProps> = (props) => {
           onFieldChange(field.id, { label, name: slugFromLabel(label) });
         }}
       />
+      {field.type === CAST_FIELD_TYPE.SELECT && (
+        <Input
+          label={fieldOptionsLabel}
+          value={field.options}
+          size="sm"
+          fullWidth
+          onChange={(event) => onFieldChange(field.id, { options: event.target.value })}
+        />
+      )}
       <Switch
         label={fieldRequiredLabel}
         checked={field.required}

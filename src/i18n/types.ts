@@ -967,6 +967,8 @@ export interface Messages {
     typeRich: string;
     typeFile: string;
     typeBackground: string;
+    typeSelect: string;
+    fieldOptions: string;
     fieldRequired: string;
     emailFormat: string;
     numberMin: string;

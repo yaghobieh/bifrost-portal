@@ -6,7 +6,8 @@ export type CastFieldType =
   | 'image'
   | 'rich'
   | 'file'
-  | 'background';
+  | 'background'
+  | 'select';
 
 export type CastField = {
   id: string;
@@ -17,6 +18,7 @@ export type CastField = {
   emailFormat: boolean;
   min: string;
   max: string;
+  options: string;
 };
 
 export type CastGroupPayload = {

@@ -8,5 +8,6 @@ export type CastFieldChromeProps = {
   fromTemplateLabel: string;
   fieldLabelPlaceholder: string;
   fieldRequiredLabel: string;
+  fieldOptionsLabel: string;
   onFieldChange: (id: string, patch: Partial<CastField>) => void;
 };

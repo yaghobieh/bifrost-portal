@@ -12,6 +12,7 @@ export const createCastField = (): CastField => ({
   emailFormat: true,
   min: CAST_NONE,
   max: CAST_NONE,
+  options: CAST_NONE,
 });
 
 export const slugFromLabel = (label: string): string =>
@@ -32,15 +33,11 @@ export const fieldsFromPayload = (payload: Record<string, unknown> | undefined):
     emailFormat: field.emailFormat !== false,
     min: field.min ?? CAST_NONE,
     max: field.max ?? CAST_NONE,
+    options: field.options ?? CAST_NONE,
   }));
 };
 
 export const withCastPayload = (fields: CastField[]): CastGroupPayload => ({ fields });
 
 export const isCastFieldType = (value: string): value is CastFieldType =>
-  value === CAST_FIELD_TYPE.TEXT ||
-  value === CAST_FIELD_TYPE.TEXTAREA ||
-  value === CAST_FIELD_TYPE.NUMBER ||
-  value === CAST_FIELD_TYPE.EMAIL ||
-  value === CAST_FIELD_TYPE.IMAGE ||
-  value === CAST_FIELD_TYPE.RICH;
+  Object.values(CAST_FIELD_TYPE).some((type) => type === value);

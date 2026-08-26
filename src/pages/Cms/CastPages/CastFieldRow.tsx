@@ -11,7 +11,7 @@ import {
   CAST_TYPE_PREFIX,
 } from './CastPages.const';
 import type { CastFieldRowProps } from './CastFieldRow.types';
-import { slugFromLabel } from './CastPages.utils';
+import { slugFromLabel, isCastFieldType } from './CastPages.utils';
 
 export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
   const { field, typeOptions, onFieldChange, onRemove } = props;
@@ -55,8 +55,11 @@ export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
           size="sm"
           fullWidth
           onChange={(value) => {
+            if (!isCastFieldType(String(value))) {
+              return;
+            }
             typeField.actions.setValue(value);
-            onFieldChange(field.id, { type: value as typeof field.type });
+            onFieldChange(field.id, { type: value });
           }}
         />
         <Input
@@ -108,6 +111,15 @@ export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
               />
             </Flex>
           ) : null}
+          {field.type === CAST_FIELD_TYPE.SELECT && (
+            <Input
+              label={t.cmsCast.fieldOptions}
+              value={field.options}
+              size="sm"
+              fullWidth
+              onChange={(event) => onFieldChange(field.id, { options: event.target.value })}
+            />
+          )}
         </Flex>
       </div>
       <Button size="sm" variant="outline" onClick={onRemove}>

@@ -22,6 +22,7 @@ export const CAST_FIELD_TYPE = {
   RICH: 'rich',
   FILE: 'file',
   BACKGROUND: 'background',
+  SELECT: 'select',
 } as const satisfies Record<string, CastFieldType>;
 
 export const CAST_SLUG_REPLACE = /[^a-z0-9]+/g;
@@ -36,4 +37,5 @@ export const CAST_FIELD_TYPE_OPTIONS: readonly { value: CastFieldType; labelKey:
   { value: CAST_FIELD_TYPE.RICH, labelKey: CAST_FIELD_TYPE.RICH },
   { value: CAST_FIELD_TYPE.FILE, labelKey: CAST_FIELD_TYPE.FILE },
   { value: CAST_FIELD_TYPE.BACKGROUND, labelKey: CAST_FIELD_TYPE.BACKGROUND },
+  { value: CAST_FIELD_TYPE.SELECT, labelKey: CAST_FIELD_TYPE.SELECT },
 ];

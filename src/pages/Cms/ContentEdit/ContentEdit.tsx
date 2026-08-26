@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type DragEvent, type FC } from 'react';
+import { useEffect, useState, type ChangeEvent, type FC } from 'react';
 import { useNavigate, useParams } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import {
@@ -7,7 +7,6 @@ import {
   Button,
   Card,
   DatePicker,
-  Drawer,
   Flex,
   Input,
   Spinner,
@@ -18,14 +17,13 @@ import { InkEditor } from '@forgedevstack/ink';
 import { cmsInkAiProps } from '@/ai/index';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
-import { DRAG_WIDGET_MIME, EMPTY_STRING, ROUTES, cmsBuilderPath, CMS_EDIT_SIDE_MAX_PX, CMS_EDIT_SIDE_MIN_PX, CMS_EDIT_SIDE_WIDTH_KEY, CMS_EDIT_SIDE_WIDTH_PX } from '@const/index';
+import { EMPTY_STRING, ROUTES, cmsBuilderPath, CMS_EDIT_SIDE_MAX_PX, CMS_EDIT_SIDE_MIN_PX, CMS_EDIT_SIDE_WIDTH_KEY, CMS_EDIT_SIDE_WIDTH_PX } from '@const/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import type { ContentStatus } from '@sdk/modules/content';
 import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING } from '../CmsShell';
 import { loadStoredWidth, saveStoredWidth, startHorizontalResize } from '../CmsShell/CmsShell.utils';
 import {
-  BEAR_WIDGET_CATALOG,
   CONTENT_EDIT_AUTHOR_ID,
   CONTENT_EDIT_CATEGORIES_ID,
   CONTENT_EDIT_EDITOR_MIN_HEIGHT_PX,
@@ -62,9 +60,7 @@ import {
   PAYLOAD_KEY_TAGS,
   PAYLOAD_KEY_TEMPLATE,
 } from './ContentEdit.const';
-import type { BearWidgetDef } from './ContentEdit.types';
 import {
-  appendWidgetHtml,
   joinScheduleAt,
   loadSeoCollapsed,
   nowScheduleAt,
@@ -144,7 +140,6 @@ export const ContentEdit: FC = () => {
   const [saveOk, setSaveOk] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [seoCollapsed, setSeoCollapsed] = useState(() => loadSeoCollapsed());
-  const [widgetsOpen, setWidgetsOpen] = useState(false);
   const [sideWidth, setSideWidth] = useState(() =>
     loadStoredWidth(
       CMS_EDIT_SIDE_WIDTH_KEY,
@@ -196,25 +191,6 @@ export const ContentEdit: FC = () => {
     setSaveOk(false);
     setHydrated(true);
   }, [target?.id, target?.kind, target?.bodyHtml, target?.title, target?.status, items]);
-
-  const insertWidget = (widget: BearWidgetDef) => {
-    setBodyHtml((current) => appendWidgetHtml(current, widget.html));
-    setSaveOk(false);
-  };
-
-  const onDragStart = (event: DragEvent<HTMLButtonElement>, widgetId: string) => {
-    event.dataTransfer.setData(DRAG_WIDGET_MIME, widgetId);
-    event.dataTransfer.effectAllowed = 'copy';
-  };
-
-  const onEditorDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const widgetId = event.dataTransfer.getData(DRAG_WIDGET_MIME);
-    const widget = BEAR_WIDGET_CATALOG.find((entry) => entry.id === widgetId);
-    if (widget) {
-      insertWidget(widget);
-    }
-  };
 
   const pushRevision = () => {
     const revision: ContentRevision = {
@@ -402,13 +378,6 @@ export const ContentEdit: FC = () => {
           <Flex align="center" gap={2} className="flex-wrap">
             <Button
               size="sm"
-              variant={widgetsOpen ? 'ink' : 'outline'}
-              onClick={() => setWidgetsOpen(true)}
-            >
-              {t.contentEdit.widgetsOpen}
-            </Button>
-            <Button
-              size="sm"
               variant={preview ? 'ink' : 'outline'}
               onClick={() => setPreview((value) => !value)}
             >
@@ -518,11 +487,7 @@ export const ContentEdit: FC = () => {
                     />
                   </div>
                 ) : (
-                  <div
-                    className="bifrost-cms-editor-stage ink-theme-snow"
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={onEditorDrop}
-                  >
+                  <div className="bifrost-cms-editor-stage ink-theme-snow">
                     <InkEditor
                       value={bodyHtml}
                       onChange={(next) => {
@@ -564,7 +529,7 @@ export const ContentEdit: FC = () => {
             <button
               type="button"
               className="bifrost-cms-panel-resize"
-              aria-label={t.contentEdit.widgetsTitle}
+              aria-label={t.contentEdit.castFieldsTitle}
               onMouseDown={(event) => {
                 event.preventDefault();
                 startHorizontalResize(
@@ -758,36 +723,6 @@ export const ContentEdit: FC = () => {
           </div>
         ) : null}
       </Flex>
-      <Drawer
-        isOpen={widgetsOpen}
-        onClose={() => setWidgetsOpen(false)}
-        title={t.contentEdit.widgetsTitle}
-        side="left"
-        size="sm"
-      >
-        <Typography variant="caption" className="bifrost-cms__muted mb-3 block">
-          {t.contentEdit.widgetsHint}
-        </Typography>
-        <Flex direction="column" gap={2}>
-          {BEAR_WIDGET_CATALOG.map((widget) => (
-            <button
-              key={widget.id}
-              type="button"
-              className="bifrost-cms-widget-chip"
-              draggable
-              onDragStart={(event) => onDragStart(event, widget.id)}
-              onClick={() => insertWidget(widget)}
-            >
-              <Typography variant="body2" className="mb-0 font-medium">
-                {widget.label}
-              </Typography>
-              <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                {widget.bearComponent}
-              </Typography>
-            </button>
-          ))}
-        </Flex>
-      </Drawer>
     </CmsShell>
   );
 };

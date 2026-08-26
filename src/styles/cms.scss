@@ -2394,16 +2394,40 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms-canvas-node {
-  margin: 0.5rem 0;
-  padding: 0.75rem;
-  border: 1px solid var(--bifrost-cms-border);
+  position: relative;
+  margin: 0;
+  padding: 1.5rem 1rem 1rem;
+  border: 1.5px dashed var(--bifrost-cms-border);
   border-radius: 0.5rem;
   background: var(--bifrost-cms-surface);
 }
 
 .bifrost-cms-canvas-node--selected {
-  outline: 2px solid var(--bifrost-cms-accent);
-  background: var(--bifrost-cms-accent-soft);
+  outline: none;
+  border-color: var(--bifrost-cms-accent);
+  border-style: solid;
+  background: var(--bifrost-cms-surface);
+}
+
+.bifrost-cms-canvas-node__label {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.5rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bifrost-cms-muted);
+  background: var(--bifrost-cms-surface);
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.2rem;
+  border: 1px solid var(--bifrost-cms-border);
+  z-index: 2;
+}
+
+.bifrost-cms-canvas-node--selected .bifrost-cms-canvas-node__label {
+  color: #fff;
+  background: var(--bifrost-cms-accent);
+  border-color: var(--bifrost-cms-accent);
 }
 
 .bifrost-cms-canvas-node--flex {
@@ -2432,12 +2456,6 @@ html.bifrost-cms-host #root {
 .bifrost-cms-canvas-node--column {
   flex: 1;
   min-width: 0;
-}
-
-.bifrost-cms-canvas-node__label {
-  display: block;
-  margin-bottom: 0.35rem;
-  opacity: 0.7;
 }
 
 .bifrost-cms-canvas-menu {
