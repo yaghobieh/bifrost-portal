@@ -1919,6 +1919,22 @@ html.bifrost-cms-host #root {
   box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.28);
 }
 
+.bifrost-cms-live-editors__item {
+  position: relative;
+  display: inline-flex;
+}
+
+.bifrost-cms-live-editors__dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--bifrost-cms-success);
+  box-shadow: 0 0 0 2px var(--bifrost-cms-surface);
+}
+
 .bifrost-cms-online-status-wrap {
   position: relative;
 }

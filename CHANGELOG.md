@@ -2,6 +2,25 @@
 
 ## 1.1.10
 
+### Added
+- Live presence and crew chat fan-out between CMS agents.
+- Live location avatars on page edit and Users.
+- Cursor workers in `.cursor/workers` — commit as `Worker: {name}`.
+
+### Fixed
+- Online / green Online and chat delivery between two logged-in agents.
+- Health comes from the live socket, not HTTP polling.
+
+### Planned for 1.1.11
+- Chat read receipts (blue ticks), configurable
+- Developer live agents page
+- Anthropic Claude Sonnet 5 as default CMS copilot token (OpenAI failover)
+- Plugin update badge
+- Live agent AI on login
+- Email and SMS send
+- Cleaner roles (site admin, editor, manager)
+- Changeable chat status
+
 ### Changed
 - CMS Cards use Bear `padding="md"` ([Bear Card](https://bearui.com/components/card)).
 - CMS theme is redesign blue via BearProvider; Settings primary updates Bear live.

@@ -11,6 +11,9 @@ export type CmsLiveHealth = {
 export type CmsPresenceUser = {
   id: string;
   name: string;
+  avatar: string;
+  location: string;
+  locationLabel: string;
 };
 
 export type CmsChatMessage = {

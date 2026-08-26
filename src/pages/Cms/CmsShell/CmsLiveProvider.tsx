@@ -4,6 +4,7 @@ import { EMPTY_STRING } from '@const/index';
 import { useAuth } from '@hooks/index';
 import { markNotificationReadRequest, type CmsNotification } from '@sdk/modules/cms';
 import type { CmsTask, TaskBoardConfig } from '../TasksPages/TasksPages.types';
+import { loadCmsProfile } from '../SettingsPages';
 import {
   CMS_LIVE_CONNECTING,
   CMS_LIVE_DOWN,
@@ -18,7 +19,6 @@ import {
   CMS_LIVE_TYPE_NOTIFICATION,
   CMS_LIVE_TYPE_NOTIFICATIONS,
   CMS_LIVE_TYPE_PRESENCE,
-  CMS_LIVE_TYPE_PRESENCE_PING,
   CMS_LIVE_TYPE_TASKS,
   CMS_LIVE_TYPE_TASKS_UPDATE,
   CMS_LIVE_LOCAL_ROOM_PREFIX,
@@ -30,7 +30,16 @@ import type {
   CmsLiveHealth,
   CmsPresenceUser,
 } from './CmsLive.types';
-import { mergeChatRooms, pingCmsHealth, sameMembers, toCmsLiveWsUrl } from './CmsLive.utils';
+import {
+  mergeChatRooms,
+  parseLiveSocketPayload,
+  presencePingBody,
+  resolveChatRoom,
+  resolveChatRooms,
+  resolvePresenceUsers,
+  sameMembers,
+  toCmsLiveWsUrl,
+} from './CmsLive.utils';
 
 const CmsLiveContext = createContext<CmsLiveContextValue | null>(null);
 
@@ -49,6 +58,17 @@ const idleLive = (): CmsLiveContextValue => ({
   createRoom: () => EMPTY_STRING,
   sendChat: () => undefined,
 });
+
+const resolveNotification = (value: unknown): CmsNotification | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+  const row = value as CmsNotification;
+  if (typeof row.id !== 'string') {
+    return null;
+  }
+  return row;
+};
 
 export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
   const { token, user } = useAuth();
@@ -75,34 +95,17 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
       return undefined;
     }
     let stopped = false;
-    const applyHealth = (next: CmsLiveHealth) => {
-      if (stopped) {
-        return;
-      }
-      setHealth(next);
-    };
-    const poll = () => {
-      void pingCmsHealth().then(applyHealth);
-    };
-    poll();
-    const timer = window.setInterval(poll, CMS_LIVE_PING_MS);
-    return () => {
-      stopped = true;
-      window.clearInterval(timer);
-    };
-  }, [token]);
-
-  useEffect(() => {
-    if (!token) {
-      setOnlineUsers([]);
-      setSelfId(EMPTY_STRING);
-      return undefined;
-    }
-    let stopped = false;
     let socket: WebSocket | null = null;
     let pingTimer: number | null = null;
     let retryTimer: number | null = null;
     let delay = CMS_LIVE_RECONNECT_MS;
+
+    const pingName = user?.name || user?.username || EMPTY_STRING;
+    const pingBody = () =>
+      presencePingBody({
+        name: pingName,
+        avatar: loadCmsProfile().avatarDataUrl || EMPTY_STRING,
+      });
 
     const clearPing = () => {
       if (pingTimer !== null) {
@@ -112,56 +115,76 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
     };
 
     const applyMessage = (event: MessageEvent<string>) => {
-      try {
-        const payload = JSON.parse(String(event.data)) as {
-          type?: string;
-          db?: boolean;
-          items?: CmsNotification[];
-          unread?: number;
-          item?: CmsNotification;
-          users?: CmsPresenceUser[];
-          selfId?: string;
-          tasks?: CmsTask[];
-          board?: TaskBoardConfig | null;
-          rooms?: CmsChatRoom[];
-        };
-        if (payload.type === CMS_LIVE_TYPE_HEALTH) {
-          setHealth({
-            status: payload.db ? CMS_LIVE_OK : CMS_LIVE_DOWN,
-            db: Boolean(payload.db),
-          });
-          return;
-        }
-        if (payload.type === CMS_LIVE_TYPE_NOTIFICATIONS && Array.isArray(payload.items)) {
-          setItems(payload.items);
-          setUnread(typeof payload.unread === 'number' ? payload.unread : 0);
-          return;
-        }
-        if (payload.type === CMS_LIVE_TYPE_NOTIFICATION && payload.item) {
-          setItems((current) => [payload.item as CmsNotification, ...current]);
-          if (typeof payload.unread === 'number') setUnread(payload.unread);
-          return;
-        }
-        if (payload.type === CMS_LIVE_TYPE_PRESENCE && Array.isArray(payload.users)) {
-          setOnlineUsers(payload.users.filter((row) => row && typeof row.id === 'string'));
-          if (typeof payload.selfId === 'string') setSelfId(payload.selfId);
-          return;
-        }
-        if (payload.type === CMS_LIVE_TYPE_TASKS) {
-          if (Array.isArray(payload.tasks)) setTasks(payload.tasks);
-          if (payload.board) setBoard(payload.board);
-          return;
-        }
-        if (payload.type === CMS_LIVE_TYPE_CHAT_ROOMS && Array.isArray(payload.rooms)) {
-          setRooms((current) => mergeChatRooms(current, payload.rooms as CmsChatRoom[]));
-        }
-      } catch {
+      const payload = parseLiveSocketPayload(String(event.data));
+      if (!payload) {
         return;
+      }
+      if (payload.type === CMS_LIVE_TYPE_HEALTH) {
+        if (payload.db) {
+          setHealth({ status: CMS_LIVE_OK, db: true });
+          return;
+        }
+        setHealth({ status: CMS_LIVE_DOWN, db: false });
+        return;
+      }
+      if (payload.type === CMS_LIVE_TYPE_NOTIFICATIONS && Array.isArray(payload.items)) {
+        const nextItems = payload.items
+          .map(resolveNotification)
+          .filter((item): item is CmsNotification => Boolean(item));
+        setItems(nextItems);
+        if (payload.unread !== null) {
+          setUnread(payload.unread);
+        }
+        return;
+      }
+      if (payload.type === CMS_LIVE_TYPE_NOTIFICATION) {
+        const item = resolveNotification(payload.item);
+        if (!item) {
+          return;
+        }
+        setItems((current) => [item, ...current]);
+        if (payload.unread !== null) {
+          setUnread(payload.unread);
+        }
+        return;
+      }
+      if (payload.type === CMS_LIVE_TYPE_PRESENCE) {
+        setOnlineUsers(resolvePresenceUsers(payload.users));
+        if (payload.selfId) {
+          setSelfId(payload.selfId);
+        }
+        return;
+      }
+      if (payload.type === CMS_LIVE_TYPE_TASKS) {
+        if (Array.isArray(payload.tasks)) {
+          setTasks(payload.tasks as CmsTask[]);
+        }
+        if (payload.board) {
+          setBoard(payload.board as TaskBoardConfig);
+        }
+        return;
+      }
+      if (payload.type === CMS_LIVE_TYPE_CHAT_ROOMS) {
+        const incoming = resolveChatRooms(payload.rooms);
+        if (incoming.length > 0) {
+          setRooms((current) => mergeChatRooms(current, incoming));
+        }
+        return;
+      }
+      if (payload.type === CMS_LIVE_TYPE_CHAT_MESSAGE || payload.type === CMS_LIVE_TYPE_CHAT_ROOM) {
+        const room = resolveChatRoom(payload.room);
+        if (!room) {
+          return;
+        }
+        setRooms((current) => mergeChatRooms(current, [room]));
       }
     };
 
     const connect = () => {
-      if (stopped) return;
+      if (stopped) {
+        return;
+      }
+      setHealth({ status: CMS_LIVE_CONNECTING, db: false });
       const next = new WebSocket(toCmsLiveWsUrl(token));
       socket = next;
       socketRef.current = next;
@@ -170,19 +193,24 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
         delay = CMS_LIVE_RECONNECT_MS;
         clearPing();
         if (next.readyState === WebSocket.OPEN) {
-          next.send(JSON.stringify({ type: CMS_LIVE_TYPE_PRESENCE_PING }));
+          next.send(pingBody());
         }
         pingTimer = window.setInterval(() => {
           if (next.readyState === WebSocket.OPEN) {
-            next.send(JSON.stringify({ type: CMS_LIVE_TYPE_PRESENCE_PING }));
+            next.send(pingBody());
           }
         }, CMS_LIVE_PING_MS);
       };
       next.onerror = () => undefined;
       next.onclose = () => {
         clearPing();
-        if (socketRef.current === next) socketRef.current = null;
-        if (stopped) return;
+        if (socketRef.current === next) {
+          socketRef.current = null;
+        }
+        if (stopped) {
+          return;
+        }
+        setHealth({ status: CMS_LIVE_CONNECTING, db: false });
         retryTimer = window.setTimeout(() => {
           delay = Math.min(delay * NUMBER_TWO, CMS_LIVE_RECONNECT_MAX_MS);
           connect();
@@ -194,21 +222,27 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
     return () => {
       stopped = true;
       clearPing();
-      if (retryTimer !== null) window.clearTimeout(retryTimer);
+      if (retryTimer !== null) {
+        window.clearTimeout(retryTimer);
+      }
       socket?.close();
       setOnlineUsers([]);
       setSelfId(EMPTY_STRING);
     };
-  }, [token]);
+  }, [token, user?.name, user?.username]);
 
   const sendJson = (payload: unknown) => {
     const socket = socketRef.current;
-    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return;
+    }
     socket.send(JSON.stringify(payload));
   };
 
   const markRead = (id: string) => {
-    if (!token) return;
+    if (!token) {
+      return;
+    }
     void markNotificationReadRequest(token, id);
     setItems((current) =>
       current.map((row) =>
@@ -258,7 +292,9 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
     };
     roomsRef.current = [...current, nextRoom];
     setRooms((roomsNow) => {
-      if (channel && roomsNow.some((room) => room.tag === channel)) return roomsNow;
+      if (channel && roomsNow.some((room) => room.tag === channel)) {
+        return roomsNow;
+      }
       if (!channel && roomsNow.some((room) => !room.tag && sameMembers(room.userIds, unique))) {
         return roomsNow;
       }

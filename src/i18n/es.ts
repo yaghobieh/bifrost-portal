@@ -466,6 +466,7 @@ export const es: Messages = {
     online: 'En línea',
     onlineLoadMore: 'Cargar más',
     onlineEmpty: 'Nadie más está en línea',
+    onlineHere: 'Aquí',
     crewChat: 'Chat del equipo',
     crewInbox: 'Mensajes',
     crewBack: 'Atrás',

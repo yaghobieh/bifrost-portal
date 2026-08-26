@@ -75,8 +75,15 @@ export const CmsOnlineStatus: FC<CmsOnlineStatusProps> = (props) => {
                   }}
                 >
                   <span className="bifrost-cms-online-status__live" />
-                  <Avatar initials={initialsFromName(person.name)} size="sm" />
-                  <span>{person.name}</span>
+                  <Avatar src={person.avatar || undefined} initials={initialsFromName(person.name)} size="sm" />
+                  <Flex direction="column" gap={0}>
+                    <span>{person.name}</span>
+                    {person.locationLabel && (
+                      <Typography variant="caption" className="mb-0 bifrost-cms__muted">
+                        {person.locationLabel}
+                      </Typography>
+                    )}
+                  </Flex>
                 </button>
               ))}
               {remaining > NUMBER_ZERO ? (

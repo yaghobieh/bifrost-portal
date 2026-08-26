@@ -419,6 +419,7 @@ export interface Messages {
     online: string;
     onlineLoadMore: string;
     onlineEmpty: string;
+    onlineHere: string;
     crewChat: string;
     crewInbox: string;
     crewBack: string;
