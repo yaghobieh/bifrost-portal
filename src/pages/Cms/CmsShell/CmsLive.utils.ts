@@ -7,10 +7,12 @@ import {
   CMS_LIVE_LOCAL_ROOM_PREFIX,
   CMS_LIVE_OK,
   CMS_LIVE_PATH,
+  CMS_LIVE_PATH_SEP,
   CMS_LIVE_TOKEN_QUERY,
+  CMS_LIVE_TYPE_PRESENCE_PING,
   CMS_LIVE_WS_PROTOCOL,
 } from './CmsLive.const';
-import type { CmsChatRoom, CmsLiveHealth } from './CmsLive.types';
+import type { CmsChatMessage, CmsChatRoom, CmsLiveHealth, CmsPresenceUser } from './CmsLive.types';
 
 export const cmsApiOrigin = (): string => {
   if (INK_API_URL) {
@@ -101,3 +103,162 @@ export const findServerMatch = (rooms: CmsChatRoom[], local: CmsChatRoom): CmsCh
   rooms.find(
     (room) => !room.id.startsWith(CMS_LIVE_LOCAL_ROOM_PREFIX) && matchRoom(local, room),
   );
+
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  if (!value) {
+    return false;
+  }
+  return typeof value === 'object' && !Array.isArray(value);
+};
+
+const readString = (value: unknown): string => {
+  if (typeof value !== 'string') {
+    return EMPTY_STRING;
+  }
+  return value;
+};
+
+export const currentLiveLocation = (): { location: string; locationLabel: string } => {
+  if (typeof window === 'undefined') {
+    return { location: EMPTY_STRING, locationLabel: EMPTY_STRING };
+  }
+  const location = window.location.pathname;
+  const parts = location.split(CMS_LIVE_PATH_SEP).filter((part) => part.length > 0);
+  if (parts.length === 0) {
+    return { location, locationLabel: location };
+  }
+  return { location, locationLabel: parts[parts.length - 1] };
+};
+
+export const presencePingBody = (params: { name: string; avatar: string }): string => {
+  const { name, avatar } = params;
+  const { location, locationLabel } = currentLiveLocation();
+  return JSON.stringify({
+    type: CMS_LIVE_TYPE_PRESENCE_PING,
+    location,
+    locationLabel,
+    name,
+    avatar,
+  });
+};
+
+export const resolvePresenceUsers = (value: unknown): CmsPresenceUser[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  const users: CmsPresenceUser[] = [];
+  value.forEach((row) => {
+    if (!isRecord(row)) {
+      return;
+    }
+    const id = readString(row.id);
+    if (!id) {
+      return;
+    }
+    users.push({
+      id,
+      name: readString(row.name),
+      avatar: readString(row.avatar),
+      location: readString(row.location),
+      locationLabel: readString(row.locationLabel),
+    });
+  });
+  return users;
+};
+
+export const resolveChatRoom = (value: unknown): CmsChatRoom | null => {
+  if (!isRecord(value)) {
+    return null;
+  }
+  const id = readString(value.id);
+  if (!id) {
+    return null;
+  }
+  const userIds = Array.isArray(value.userIds)
+    ? value.userIds.filter((item) => typeof item === 'string')
+    : [];
+  const messages: CmsChatMessage[] = [];
+  if (Array.isArray(value.messages)) {
+    value.messages.forEach((row) => {
+      if (!isRecord(row)) {
+        return;
+      }
+      const messageId = readString(row.id);
+      const body = readString(row.body);
+      if (!messageId || !body) {
+        return;
+      }
+      messages.push({
+        id: messageId,
+        userId: readString(row.userId),
+        name: readString(row.name),
+        body,
+        at: readString(row.at),
+      });
+    });
+  }
+  return {
+    id,
+    userIds,
+    tag: readString(value.tag),
+    messages,
+  };
+};
+
+export const resolveChatRooms = (value: unknown): CmsChatRoom[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  const rooms: CmsChatRoom[] = [];
+  value.forEach((row) => {
+    const room = resolveChatRoom(row);
+    if (room) {
+      rooms.push(room);
+    }
+  });
+  return rooms;
+};
+
+export type CmsLiveParsedPayload = {
+  type: string;
+  db: boolean;
+  items: unknown;
+  unread: number | null;
+  item: unknown;
+  users: unknown;
+  selfId: string;
+  tasks: unknown;
+  board: unknown;
+  rooms: unknown;
+  room: unknown;
+};
+
+export const parseLiveSocketPayload = (raw: string): CmsLiveParsedPayload | null => {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isRecord(parsed)) {
+      return null;
+    }
+    const type = readString(parsed.type);
+    if (!type) {
+      return null;
+    }
+    const unread = typeof parsed.unread === 'number' ? parsed.unread : null;
+    return {
+      type,
+      db: Boolean(parsed.db),
+      items: parsed.items,
+      unread,
+      item: parsed.item,
+      users: parsed.users,
+      selfId: readString(parsed.selfId),
+      tasks: parsed.tasks,
+      board: parsed.board,
+      rooms: parsed.rooms,
+      room: parsed.room,
+    };
+  } catch {
+    return null;
+  }
+};
+

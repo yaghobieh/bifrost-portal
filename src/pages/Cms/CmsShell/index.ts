@@ -2,6 +2,7 @@ export { CmsShell } from './CmsShell';
 export { ErrorHost } from './ErrorHost';
 export { CmsGridTable } from './CmsGridTable';
 export { CmsPageHeader } from './helpers/CmsPageHeader';
+export { LiveEditors } from './helpers/LiveEditors';
 export type { CmsShellProps } from './CmsShell.types';
 export type { CmsGridTableProps } from './CmsGridTable.types';
 export type { CmsPageHeaderProps } from './helpers/CmsPageHeader';

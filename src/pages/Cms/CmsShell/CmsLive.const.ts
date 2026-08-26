@@ -11,6 +11,7 @@ export const CMS_LIVE_TYPE_NOTIFICATIONS = 'notifications';
 export const CMS_LIVE_TYPE_NOTIFICATION = 'notification';
 export const CMS_LIVE_TYPE_PRESENCE = 'presence';
 export const CMS_LIVE_TYPE_PRESENCE_PING = 'presence:ping';
+export const CMS_LIVE_PATH_SEP = '/';
 export const CMS_LIVE_TYPE_TASKS = 'tasks';
 export const CMS_LIVE_TYPE_TASKS_UPDATE = 'tasks:update';
 export const CMS_LIVE_TYPE_CHAT_ROOMS = 'chat:rooms';

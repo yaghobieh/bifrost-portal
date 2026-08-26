@@ -26,7 +26,9 @@ import {
   updateCrewRoleRequest,
   updateCrewUserRoleRequest,
 } from '@sdk/modules/cms';
-import { CmsGridTable, CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
+import { CmsGridTable, CmsShell, CMS_NAV_IDS, CmsPageHeader, LiveEditors } from '../CmsShell';
+import { useCmsLive } from '../CmsShell/CmsLiveProvider';
+import { currentLiveLocation } from '../CmsShell/CmsLive.utils';
 import {
   CREW_PAGE_TABS,
   CREW_PERMISSION_GROUPS,
@@ -42,6 +44,7 @@ import {
 export const CrewPages: FC = () => {
   const { t } = useI18n();
   const { token } = useNucleus(authNucleus);
+  const { onlineUsers, selfId } = useCmsLive();
   const [users, setUsers] = useState<CrewUser[]>([]);
   const [roles, setRoles] = useState<CrewRole[]>(DEFAULT_CREW_ROLES);
   const [name, setName] = useState(EMPTY_STRING);
@@ -199,7 +202,17 @@ export const CrewPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.CREW}>
       <Flex direction="column" gap={6}>
-        <CmsPageHeader title={t.cmsCrew.pageTitle} subtitle={t.cmsCrew.subtitle} />
+        <CmsPageHeader
+          title={t.cmsCrew.pageTitle}
+          subtitle={t.cmsCrew.subtitle}
+          actions={
+            <LiveEditors
+              users={onlineUsers}
+              currentUserId={selfId}
+              location={currentLiveLocation().location}
+            />
+          }
+        />
         {loadError ? (
           <Typography variant="body2" color="danger" className="mb-0">
             {t.cmsCrew.loadError}

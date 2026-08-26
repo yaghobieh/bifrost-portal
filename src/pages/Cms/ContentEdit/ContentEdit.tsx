@@ -22,7 +22,9 @@ import { EMPTY_STRING, ROUTES, cmsBuilderPath, CMS_EDIT_SIDE_MAX_PX, CMS_EDIT_SI
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import type { ContentStatus } from '@sdk/modules/content';
-import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING, LiveEditors } from '../CmsShell';
+import { useCmsLive } from '../CmsShell/CmsLiveProvider';
+import { currentLiveLocation } from '../CmsShell/CmsLive.utils';
 import { loadStoredWidth, saveStoredWidth, startHorizontalResize } from '../CmsShell/CmsShell.utils';
 import {
   BEAR_WIDGET_CATALOG,
@@ -108,6 +110,7 @@ export const ContentEdit: FC = () => {
   const params = useParams<{ id?: string }>();
   const { navigate } = useNavigate();
   const { token: providerToken } = useAuth();
+  const { onlineUsers, selfId } = useCmsLive();
   const { token } = useNucleus(authNucleus);
   const {
     items,
@@ -393,6 +396,11 @@ export const ContentEdit: FC = () => {
             <Typography variant="h3" className="mb-0 bifrost-cms-edit__heading">
               {title || t.contentEdit.title}
             </Typography>
+            <LiveEditors
+              users={onlineUsers}
+              currentUserId={selfId}
+              location={currentLiveLocation().location}
+            />
             {target ? (
               <Badge variant="info" className="text-xs">
                 {target.slug}
