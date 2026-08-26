@@ -1,31 +1,43 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import '@forgedevstack/bear/styles.css';
+import '@forgedevstack/ink/styles.css';
 import '@forgedevstack/grid-table/grid-table.css';
+import '@forgedevstack/calendar/styles.css';
 import { BearProvider } from '@forgedevstack/bear';
 import { LingoProvider } from '@forgedevstack/lingo';
+import { I18nProvider } from '@i18n/index';
 import { portalLingo } from '@i18n/portalLingo';
-import { App } from './App';
 import { bifrostTheme, bifrostVariants } from '@config/bear-theme';
-import { THEME_STORAGE_KEY } from '@const/strings.const';
-import { loadPortalDocs } from '@data/docs.data';
-import './styles/portal.css';
-import './styles/landing.css';
+import { CMS_PATH } from '@config/cms.config';
+import { SLASH, THEME_STORAGE_KEY } from '@const/strings.const';
+import { App } from './App';
+import './styles/index.css';
+import './styles/cms.css';
 
-void loadPortalDocs();
+const cmsPath = window.location.pathname;
+const onCmsHost = cmsPath === CMS_PATH || cmsPath.startsWith(`${CMS_PATH}${SLASH}`);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BearProvider
-      defaultMode="light"
-      theme={bifrostTheme}
-      customVariants={bifrostVariants}
-      persistPreference
-      storageKey={THEME_STORAGE_KEY}
-    >
-      <LingoProvider instance={portalLingo}>
-        <App />
-      </LingoProvider>
-    </BearProvider>
-  </React.StrictMode>,
+if (onCmsHost) {
+  document.documentElement.classList.add('bifrost-cms-host');
+} else {
+  void import('./styles/portal.css');
+  void import('./styles/landing.css');
+}
+
+const app = (
+  <I18nProvider>
+    <App />
+  </I18nProvider>
+);
+
+createRoot(document.getElementById('root')!).render(
+  <BearProvider
+    defaultMode="light"
+    persistPreference
+    storageKey={THEME_STORAGE_KEY}
+    theme={bifrostTheme}
+    customVariants={bifrostVariants}
+  >
+    {onCmsHost ? app : <LingoProvider instance={portalLingo}>{app}</LingoProvider>}
+  </BearProvider>,
 );

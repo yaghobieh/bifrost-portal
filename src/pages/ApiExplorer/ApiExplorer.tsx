@@ -16,11 +16,18 @@ import {
 } from '@const/numbers.const';
 import { GRID_THEME_VARS } from '@config/bear-theme';
 import { downloadPostmanCollection } from '@utils/postman.utils';
+import { CMS_API_SLUG } from '@const/strings.const';
+import { usePublicPage } from '@hooks/usePublicPage';
+import { PublicPageCanvas } from '@components/PublicPageCanvas';
+import { PageLoader } from '@components/PageLoader';
+import { API_EXPLORER_TAB } from './ApiExplorer.const';
+import { apiExplorerThemeMode } from './ApiExplorer.utils';
 
 export const ApiExplorer: FC = () => {
   const { t } = useLingo();
   const { mode } = useBear();
-  const themeMode = mode === 'light' ? 'light' : 'dark';
+  const { item, loading } = usePublicPage(CMS_API_SLUG);
+  const themeMode = apiExplorerThemeMode({ mode });
   const columns: ColumnDefinition<ApiEndpoint>[] = [
     {
       id: 'method',
@@ -58,9 +65,14 @@ export const ApiExplorer: FC = () => {
     },
   ];
 
+  if (loading) {
+    return <PageLoader />;
+  }
+
   return (
-    <DocShell activeTab="api">
+    <DocShell activeTab={API_EXPLORER_TAB}>
       <div className="Bp-explorer">
+        <PublicPageCanvas payload={item?.payload} />
         <Flex align="center" justify="between" gap={4} className="Bp-explorer__toolbar">
           <div>
             <Typography variant="h1">{t('explorer.title')}</Typography>

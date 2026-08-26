@@ -3,12 +3,20 @@ import { resolve } from 'node:path';
 import { config } from 'dotenv';
 import { neon } from '@neondatabase/serverless';
 import { DOC_PAGES } from './portalDocs.seed';
+import { LANDING_PAYLOAD, SITE_PAGES_SEED } from './portalPages.seed';
 import {
   CMS_CONTENT_STATUS_PUBLISHED,
   CMS_DOCS_COLLECTION,
   CMS_DOCS_LOCALE,
+  CMS_HOME_COLLECTION,
+  CMS_HOME_SLUG,
+  CMS_PAGES_COLLECTION,
+  CMS_HOME_TITLE,
   CREW_ROLES,
   DEFAULT_JWT_SECRET,
+  PAGE_KIND_ARTICLE,
+  PAGE_KIND_DOC,
+  PAGE_KIND_LANDING,
   PROVIDER_PASSWORD,
   USER_PLAN_FREE,
   USER_ROLE_USER,
@@ -80,6 +88,13 @@ const run = async () => {
   `;
   await sql`CREATE INDEX IF NOT EXISTS cms_content_collection_idx ON cms_content (collection)`;
   await sql`
+    CREATE TABLE IF NOT EXISTS cms_kv (
+      key TEXT PRIMARY KEY,
+      value JSONB NOT NULL DEFAULT 'null'::jsonb,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`
     CREATE TABLE IF NOT EXISTS cms_roles (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       slug TEXT NOT NULL UNIQUE,
@@ -117,6 +132,7 @@ const run = async () => {
   const pages = Object.values(DOC_PAGES);
   for (const page of pages) {
     const payloadJson = JSON.stringify({
+      kind: PAGE_KIND_DOC,
       lead: page.lead,
       crumb: page.crumb,
       sections: page.sections,
@@ -126,7 +142,7 @@ const run = async () => {
     await sql`
       INSERT INTO cms_content (collection, slug, locale, title, payload, status)
       VALUES (
-        ${CMS_DOCS_COLLECTION},
+        ${CMS_PAGES_COLLECTION},
         ${page.slug},
         ${CMS_DOCS_LOCALE},
         ${page.title},
@@ -141,6 +157,49 @@ const run = async () => {
         updated_at = NOW()
     `;
   }
+
+  const landingJson = JSON.stringify({ kind: PAGE_KIND_LANDING, ...LANDING_PAYLOAD });
+  await sql`
+    INSERT INTO cms_content (collection, slug, locale, title, payload, status)
+    VALUES (
+      ${CMS_PAGES_COLLECTION},
+      ${CMS_HOME_SLUG},
+      ${CMS_DOCS_LOCALE},
+      ${CMS_HOME_TITLE},
+      ${landingJson}::jsonb,
+      ${CMS_CONTENT_STATUS_PUBLISHED}
+    )
+    ON CONFLICT (collection, slug, locale)
+    DO UPDATE SET
+      title = EXCLUDED.title,
+      payload = EXCLUDED.payload,
+      status = EXCLUDED.status,
+      updated_at = NOW()
+  `;
+
+  for (const sitePage of SITE_PAGES_SEED) {
+    const sitePayloadJson = JSON.stringify({ kind: PAGE_KIND_ARTICLE, ...sitePage.payload });
+    await sql`
+      INSERT INTO cms_content (collection, slug, locale, title, payload, status)
+      VALUES (
+        ${CMS_PAGES_COLLECTION},
+        ${sitePage.slug},
+        ${CMS_DOCS_LOCALE},
+        ${sitePage.title},
+        ${sitePayloadJson}::jsonb,
+        ${CMS_CONTENT_STATUS_PUBLISHED}
+      )
+      ON CONFLICT (collection, slug, locale)
+      DO UPDATE SET
+        title = EXCLUDED.title,
+        payload = EXCLUDED.payload,
+        status = EXCLUDED.status,
+        updated_at = NOW()
+    `;
+  }
+
+  await sql`DELETE FROM cms_content WHERE collection = ${CMS_DOCS_COLLECTION}`;
+  await sql`DELETE FROM cms_content WHERE collection = ${CMS_HOME_COLLECTION}`;
 
   const passwordHash = hashPassword(VIEWER_PASSWORD);
   const rows = await sql`
@@ -188,7 +247,9 @@ const run = async () => {
     ON CONFLICT (user_id, role_id) DO NOTHING
   `;
 
-  console.log(`seeded ${pages.length} docs pages and viewer ${VIEWER_USERNAME} (${VIEWER_CREW_SLUG})`);
+  console.log(
+    `seeded ${pages.length} docs, landing, ${SITE_PAGES_SEED.length} site pages into pages, viewer ${VIEWER_USERNAME} (${VIEWER_CREW_SLUG})`,
+  );
 };
 
 run().catch((error: unknown) => {

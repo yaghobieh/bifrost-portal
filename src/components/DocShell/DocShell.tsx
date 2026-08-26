@@ -6,7 +6,7 @@ import { useLingo } from '@forgedevstack/lingo';
 import { NAV_GROUPS, TOP_TABS } from '@const/nav.const';
 import { ROUTES } from '@const/routes.const';
 import { DOCS_VERSION, GITHUB_REPO_URL, SEARCH_SHORTCUT } from '@const/strings.const';
-import { searchDocs } from '@data/docs.data';
+import { searchNav } from '@data/docs.data';
 import { portalNucleus } from '@store/portal.store';
 import { BifrostMark } from '@components/BifrostMark';
 import { SearchHits } from './helpers/SearchHits';
@@ -21,7 +21,7 @@ export const DocShell: FC<DocShellProps> = (props) => {
   const { toggleMode } = useBear();
   const route = useRoute();
   const path = route?.path ?? ROUTES.HOME;
-  const { searchOpen, searchQuery, docsBySlug, openSearch, closeSearch, setSearchQuery } = useNucleus(portalNucleus);
+  const { searchOpen, searchQuery, openSearch, closeSearch, setSearchQuery } = useNucleus(portalNucleus);
 
   useEffect(() => {
     const onKey = (event: globalThis.KeyboardEvent) => {
@@ -35,7 +35,7 @@ export const DocShell: FC<DocShellProps> = (props) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [openSearch, closeSearch]);
 
-  const hits = searchDocs(docsBySlug, searchQuery);
+  const hits = searchNav(searchQuery, (key) => t(key as never));
 
   return (
     <div className="Bp-shell">

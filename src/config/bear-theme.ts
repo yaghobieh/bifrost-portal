@@ -38,22 +38,6 @@ export const bifrostTheme: BearThemeOverride = {
   colors: {
     primary: BIFROST_PINK,
     secondary: BIFROST_NEUTRAL,
-    background: {
-      primary: '#FFFFFF',
-      secondary: '#FAFAFB',
-      tertiary: '#F5F6F8',
-    },
-    text: {
-      primary: '#161618',
-      secondary: '#5B5F6A',
-      muted: '#93969F',
-      inverted: '#FFFFFF',
-    },
-    border: {
-      default: '#E7E7EC',
-      subtle: '#F0F1F4',
-      strong: '#D3D5DC',
-    },
   },
   typography: {
     fontFamily: {
@@ -82,6 +66,18 @@ export const bifrostVariants: CustomVariantsMap = {
     bgHover: 'rgba(234, 10, 142, 0.16)',
     text: PINK_HEX,
     border: 'rgba(234, 10, 142, 0.28)',
+  },
+  ink: {
+    bg: PINK_HEX,
+    bgHover: PINK_HOVER_HEX,
+    text: '#ffffff',
+    ring: '#F03AAB',
+  },
+  inkOutline: {
+    bg: 'transparent',
+    bgHover: PINK_SOFT_HEX,
+    text: PINK_HEX,
+    border: PINK_HEX,
   },
 };
 

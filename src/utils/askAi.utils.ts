@@ -1,20 +1,36 @@
 import type { DocPageModel } from '@data/docs.types';
 import { NUMBER_THREE, NUMBER_ZERO } from '@const/numbers.const';
 import { ASK_AI_EMPTY } from '@const/strings.const';
-import { searchDocs } from '@data/docs.data';
+import { fetchPublicDoc } from '@data/page.api';
+import { searchNav } from '@data/docs.data';
 
-export const answerFromDocs = (
+const formatDoc = (doc: DocPageModel): string => {
+  const first = doc.sections[NUMBER_ZERO];
+  return `${doc.title}\n${doc.lead}\n${first?.paragraphs[NUMBER_ZERO] ?? ''}`;
+};
+
+export const answerFromNav = async (
   question: string,
-  docsBySlug: Record<string, DocPageModel>,
-): string => {
-  const hits = searchDocs(docsBySlug, question);
+  titleOf: (key: string) => string,
+  signal?: AbortSignal,
+): Promise<string> => {
+  const hits = searchNav(question, titleOf);
   if (!hits.length) {
     return ASK_AI_EMPTY;
   }
-  const parts = hits.slice(NUMBER_ZERO, NUMBER_THREE).map((hit) => {
-    const doc = docsBySlug[hit.slug];
-    const first = doc.sections[NUMBER_ZERO];
-    return `${doc.title}\n${doc.lead}\n${first?.paragraphs[NUMBER_ZERO] ?? ''}`;
-  });
+  const picked = hits.slice(NUMBER_ZERO, NUMBER_THREE);
+  const docs = await Promise.all(
+    picked.map(async (hit) => {
+      try {
+        return await fetchPublicDoc(hit.slug, signal);
+      } catch {
+        return null;
+      }
+    }),
+  );
+  const parts = docs.filter((doc): doc is DocPageModel => Boolean(doc)).map(formatDoc);
+  if (!parts.length) {
+    return ASK_AI_EMPTY;
+  }
   return parts.join('\n\n');
 };

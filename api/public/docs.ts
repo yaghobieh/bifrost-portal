@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { listPublishedDocs } from '../../server/cmsDocs';
 import {
   CONTENT_TYPE_JSON,
   ERROR_DATABASE_UNAVAILABLE,
@@ -7,7 +7,6 @@ import {
   HTTP_STATUS_OK,
   HTTP_STATUS_SERVICE_UNAVAILABLE,
 } from '../../server/cmsDocs.const';
-import { listPublishedDocs } from '../../server/cmsDocs';
 
 export const config = { runtime: 'edge' };
 

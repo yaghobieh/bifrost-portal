@@ -1,39 +1,29 @@
-import type { FC, ReactNode } from 'react';
-import { Link, useParams } from '@forgedevstack/forge-compass/react';
+import type { FC } from 'react';
+import { useParams } from '@forgedevstack/forge-compass/react';
 import { Typography } from '@forgedevstack/bear';
-import { useNucleus } from '@forgedevstack/synapse';
 import { DocShell } from '@components/DocShell';
 import { CodeBlock } from '@components/CodeBlock';
 import { useLingo } from '@forgedevstack/lingo';
-import { DEFAULT_DOC_SLUG, DOC_PATH } from '@const/routes.const';
-import { GUIDE_SLUGS } from '@const/nav.const';
-import { NUMBER_ZERO, NUMBER_ONE, NUMBER_TWO } from '@const/numbers.const';
-import { DOCS_STATUS_READY } from '@const/docsStatus.const';
-import { portalNucleus } from '@store/portal.store';
-
-const renderInline = (text: string): ReactNode => {
-  const parts = text.split('`');
-  return parts.map((part, index) =>
-    index % NUMBER_TWO === NUMBER_ONE ? <code key={`${part}-${index}`}>{part}</code> : part,
-  );
-};
+import { DEFAULT_DOC_SLUG } from '@const/routes.const';
+import { NUMBER_ZERO, NUMBER_ONE } from '@const/numbers.const';
+import { usePublicPage } from '@hooks/usePublicPage';
+import { mapCmsDoc } from '@data/docs.mapper';
+import { PageLoader } from '@components/PageLoader';
+import { StageCanvas, readCanvas } from '@components/StageCanvas';
+import { DOC_CRUMB_SEP } from './DocPage.const';
+import { docPageTab, renderDocNext, renderDocPrev, renderInline } from './DocPage.utils';
 
 export const DocPage: FC = () => {
   const { t } = useLingo();
   const params = useParams<{ slug?: string }>();
   const slug = params.slug || DEFAULT_DOC_SLUG;
-  const { docsBySlug, docsStatus } = useNucleus(portalNucleus);
-  const doc = docsBySlug[slug];
-  const tab = GUIDE_SLUGS.includes(slug) ? 'guides' : 'docs';
+  const { item, loading } = usePublicPage(slug);
+  const doc = item ? mapCmsDoc({ slug: item.slug, title: item.title, payload: item.payload }) : null;
+  const canvas = item ? readCanvas(item.payload) : [];
+  const tab = docPageTab(slug);
 
-  if (docsStatus !== DOCS_STATUS_READY) {
-    return (
-      <DocShell activeTab={tab}>
-        <article className="Bp-content">
-          <Typography variant="h1">{t('docsLoading')}</Typography>
-        </article>
-      </DocShell>
-    );
+  if (loading) {
+    return <PageLoader />;
   }
 
   if (!doc) {
@@ -52,10 +42,17 @@ export const DocPage: FC = () => {
     <DocShell toc={toc} activeToc={toc[NUMBER_ZERO]?.id} activeTab={tab}>
       <article className="Bp-content">
         <div className="Bp-crumb">
-          {doc.crumb.split(' / ').slice(NUMBER_ZERO, -NUMBER_ONE).join(' / ')} / <b>{doc.title}</b>
+          {doc.crumb.split(DOC_CRUMB_SEP).slice(NUMBER_ZERO, -NUMBER_ONE).join(DOC_CRUMB_SEP)}
+          {DOC_CRUMB_SEP}
+          <b>{doc.title}</b>
         </div>
         <Typography variant="h1">{doc.title}</Typography>
         <Typography variant="body1">{doc.lead}</Typography>
+        {canvas.length > NUMBER_ZERO && (
+          <div className="Bp-stage">
+            <StageCanvas nodes={canvas} />
+          </div>
+        )}
         {doc.sections.map((section) => (
           <section key={section.id} id={section.id}>
             <Typography variant="h2">{section.heading}</Typography>
@@ -95,20 +92,16 @@ export const DocPage: FC = () => {
           </section>
         ))}
         <div className="Bp-foot">
-          {doc.prev ? (
-            <Link to={DOC_PATH(doc.prev.slug)} className="Bp-foot__card">
-              <div className="Bp-foot__lbl">{t('previous')}</div>
-              <div className="Bp-foot__title">{doc.prev.title}</div>
-            </Link>
-          ) : (
-            <div />
-          )}
-          {doc.next && (
-            <Link to={DOC_PATH(doc.next.slug)} className="Bp-foot__card is-next">
-              <div className="Bp-foot__lbl">{t('next')}</div>
-              <div className="Bp-foot__title">{doc.next.title}</div>
-            </Link>
-          )}
+          {renderDocPrev({
+            slug: doc.prev?.slug,
+            title: doc.prev?.title,
+            previousLabel: t('previous'),
+          })}
+          {renderDocNext({
+            slug: doc.next?.slug,
+            title: doc.next?.title,
+            nextLabel: t('next'),
+          })}
         </div>
       </article>
     </DocShell>

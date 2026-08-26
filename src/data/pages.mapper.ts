@@ -1,0 +1,56 @@
+import type { LandingCopy, SitePageCopy } from './pages.types';
+import { EMPTY_STRING } from '@const/strings.const';
+
+const asString = (value: unknown): string => (typeof value === 'string' ? value : EMPTY_STRING);
+
+export const mapLanding = (payload: Record<string, unknown>): LandingCopy => ({
+  navProduct: asString(payload.navProduct),
+  startFree: asString(payload.startFree),
+  eyebrow: asString(payload.eyebrow),
+  titleBefore: asString(payload.titleBefore),
+  titleEm: asString(payload.titleEm),
+  titleAfter: asString(payload.titleAfter),
+  sub: asString(payload.sub),
+  readDocs: asString(payload.readDocs),
+  stripBuilder: asString(payload.stripBuilder),
+  stripStore: asString(payload.stripStore),
+  stripCrew: asString(payload.stripCrew),
+  stripAi: asString(payload.stripAi),
+  previewUrl: asString(payload.previewUrl),
+  bridgeEyebrow: asString(payload.bridgeEyebrow),
+  bridgeTitle: asString(payload.bridgeTitle),
+  bridgeSub: asString(payload.bridgeSub),
+  featEyebrow: asString(payload.featEyebrow),
+  featTitle: asString(payload.featTitle),
+  featSub: asString(payload.featSub),
+  featStage: asString(payload.featStage),
+  featStageBody: asString(payload.featStageBody),
+  featStore: asString(payload.featStore),
+  featStoreBody: asString(payload.featStoreBody),
+  featCrew: asString(payload.featCrew),
+  featCrewBody: asString(payload.featCrewBody),
+  featAi: asString(payload.featAi),
+  featAiBody: asString(payload.featAiBody),
+  codeEyebrow: asString(payload.codeEyebrow),
+  codeTitle: asString(payload.codeTitle),
+  codeSub: asString(payload.codeSub),
+  codeCheckApi: asString(payload.codeCheckApi),
+  codeCheckTs: asString(payload.codeCheckTs),
+  codeCheckHost: asString(payload.codeCheckHost),
+  codeComment: asString(payload.codeComment),
+  ctaTitle: asString(payload.ctaTitle),
+  ctaSub: asString(payload.ctaSub),
+  footerBlurb: asString(payload.footerBlurb),
+  footerResources: asString(payload.footerResources),
+  footerCompany: asString(payload.footerCompany),
+  builtOn: asString(payload.builtOn),
+});
+
+export const mapSitePage = (slug: string, title: string, payload: Record<string, unknown>): SitePageCopy => ({
+  slug,
+  title: asString(payload.title) || title,
+  lead: asString(payload.lead),
+  body: asString(payload.body),
+  note: asString(payload.note) || undefined,
+  previewUrl: asString(payload.previewUrl) || undefined,
+});
