@@ -64,6 +64,10 @@ html:not(.bifrost-cms-host) body {
   -webkit-font-smoothing: antialiased;
 }
 html:not(.bifrost-cms-host) a { color: inherit; text-decoration: none; }
+html:not(.bifrost-cms-host) .Bl-nav a.Bl-nav__link,
+html:not(.bifrost-cms-host) .Bl-nav a.Bl-nav__gh {
+  color: #fff;
+}
 html:not(.bifrost-cms-host) button { font-family: inherit; }
 
 .Bp-shell { min-height: 100vh; background: var(--surface); }

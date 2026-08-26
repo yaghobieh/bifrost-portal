@@ -10,6 +10,7 @@
 ### Fixed
 - Online / green Online and chat delivery between two logged-in agents.
 - Health comes from the live socket, not HTTP polling.
+- Public site topbar links are white on the dark nav.
 
 ### Planned for 1.1.11
 - Chat read receipts (blue ticks), configurable
