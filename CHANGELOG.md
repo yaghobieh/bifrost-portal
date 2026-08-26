@@ -13,3 +13,4 @@
 - Update banner changelog line even when already on this version.
 - Content fields pick their input type (text, select, rich editor, and more) instead of a widget drawer.
 - Stage marketing blocks use CMS blue `#2951C4`.
+- The 1.1.10 update uses Bear `Snackbar` instead of a custom banner.
