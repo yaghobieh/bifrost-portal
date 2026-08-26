@@ -50,7 +50,7 @@ import {
   saveUserChatPrefs,
 } from '../SettingsPages';
 import { SETTINGS_CHAT_SHOW } from '../SettingsPages/SettingsPages.const';
-import { isCrewChatInstalled, hydrateExtensionsRemote } from '../ExtensionsPages';
+import { isCrewChatInstalled, isMarketingPagesInstalled, hydrateExtensionsRemote } from '../ExtensionsPages';
 import { playChatSound, shouldPlayChatSound } from './CmsCrewChat/cmsChatSound.utils';
 import { CmsAgentBar } from './CmsAgentBar';
 import { CmsAgentDock } from './CmsAgentDock';
@@ -179,6 +179,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const lastChatRef = useRef<Record<string, string>>({});
   const chatPrimedRef = useRef(false);
   const [chatInstalled, setChatInstalled] = useState(() => isCrewChatInstalled());
+  const [marketingInstalled, setMarketingInstalled] = useState(() => isMarketingPagesInstalled());
   const canCrewChat = chatInstalled;
 
   useEffect(() => {
@@ -188,7 +189,10 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   }, [prefsUserKey]);
 
   useEffect(() => {
-    const onExtensions = () => setChatInstalled(isCrewChatInstalled());
+    const onExtensions = () => {
+      setChatInstalled(isCrewChatInstalled());
+      setMarketingInstalled(isMarketingPagesInstalled());
+    };
     const onCrewOpen = () => {
       setChatInstalled(true);
       setCrewRoomId((current) => current ?? CMS_CREW_DRAWER_OPEN);
@@ -367,7 +371,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const designChildren: CmsSidebarNavItem[] = [
     {
       id: CMS_NAV_IDS.BUILDER,
-      label: t.cmsShell.contentTypeBuilder,
+      label: marketingInstalled ? t.cmsShell.marketing : t.cmsShell.contentTypeBuilder,
       icon: <BearIcons.GridIcon size={CMS_ICON_SIZE} />,
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.BUILDER],
     },

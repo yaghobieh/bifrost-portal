@@ -410,6 +410,7 @@ export interface Messages {
     calendar: string;
     templates: string;
     builder: string;
+    marketing: string;
     analytics: string;
     settings: string;
     team: string;
@@ -818,6 +819,8 @@ export interface Messages {
     revisionsEmpty: string;
     collabHint: string;
     openStage: string;
+    openMarketing: string;
+    canvasHint: string;
     castFieldsTitle: string;
     castFieldsHint: string;
     castAddField: string;
@@ -843,6 +846,8 @@ export interface Messages {
   cmsBuilder: {
     title: string;
     subtitle: string;
+    marketingTitle: string;
+    marketingSubtitle: string;
     lockedTitle: string;
     lockedBody: string;
     openStore: string;

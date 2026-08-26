@@ -6,6 +6,7 @@ export type BearWidgetDef = {
   label: string;
   bearComponent: string;
   html: string;
+  previewSrc?: string;
 };
 
 export type ContentEditKind =

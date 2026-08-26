@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type DragEvent, type FC } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type FC } from 'react';
 import { useNavigate, useParams } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import {
@@ -74,6 +74,12 @@ import {
 } from './ContentEdit.utils';
 import { CastPageFields } from './helpers/CastPageFields';
 import type { BearWidgetDef } from './ContentEdit.types';
+import type { CanvasNode } from '../BuilderPages/BuilderPages.types';
+import { canvasFromPayload, withCanvasPayload } from '../BuilderPages/BuilderPages.utils';
+import { BEAR_WIDGET_PREVIEW_SRC } from '../BuilderPages/BuilderPages.const';
+import { BuilderPages } from '../BuilderPages';
+import { WidgetPaletteChip } from '../BuilderPages/helpers/WidgetPaletteChip';
+import { isMarketingPagesInstalled } from '../ExtensionsPages';
 import {
   CAST_VALUE_SUMMARY_JOIN,
   CAST_VALUE_SUMMARY_SEP,
@@ -164,6 +170,10 @@ export const ContentEdit: FC = () => {
   }, [activeToken, fetchContent, fetchPages]);
 
   const target = id ? resolveEditTarget(id, pages, items) : null;
+  const hasCanvas = Boolean(canvasFromPayload(target?.payload));
+  const canvasSaveRef = useRef<(() => Promise<void>) | null>(null);
+  const canvasTreeRef = useRef<CanvasNode[] | null>(null);
+  const marketingInstalled = isMarketingPagesInstalled();
 
   useEffect(() => {
     if (!target) {
@@ -316,6 +326,17 @@ export const ContentEdit: FC = () => {
       [PAYLOAD_KEY_TEMPLATE]: existingTemplate || undefined,
       [PAYLOAD_KEY_LAYOUT]: existingLayout || undefined,
     };
+    const withEditorPayload = (base: Record<string, unknown>): Record<string, unknown> => {
+      const next = {
+        ...base,
+        ...extras,
+        html: bodyHtml,
+      };
+      if (hasCanvas && canvasTreeRef.current) {
+        return withCanvasPayload(next, canvasTreeRef.current);
+      }
+      return next;
+    };
     if (target.kind === CONTENT_EDIT_KIND.PAGE) {
       const okPage = await updatePage(activeToken, {
         id: target.id,
@@ -344,11 +365,7 @@ export const ContentEdit: FC = () => {
               slug: contentPage.slug,
               locale: contentPage.locale || target.locale || 'en',
               title,
-              payload: {
-                ...contentPage.payload,
-                ...extras,
-                html: bodyHtml,
-              },
+              payload: withEditorPayload(contentPage.payload),
               status,
             }),
           )
@@ -356,13 +373,11 @@ export const ContentEdit: FC = () => {
       setSaveOk(okPage && Boolean(okMeta) && okItem);
       return;
     }
-    const payload = {
+    const payload = withEditorPayload({
       ...(target.payload || {}),
-      html: bodyHtml,
       blocks: [{ type: 'html', html: bodyHtml }],
-      ...extras,
       [PAYLOAD_KEY_TEMPLATE]: existingTemplate || DOCUMENT_TEMPLATE_ID,
-    };
+    });
     const ok = await saveContent(activeToken, {
       collection: target.collection || EMPTY_STRING,
       slug,
@@ -400,6 +415,7 @@ export const ContentEdit: FC = () => {
             ) : null}
           </Flex>
           <Flex align="center" gap={2} className="flex-wrap">
+            {!hasCanvas ? (
             <Button
               size="sm"
               variant={widgetsOpen ? 'ink' : 'outline'}
@@ -407,6 +423,8 @@ export const ContentEdit: FC = () => {
             >
               {t.contentEdit.widgetsOpen}
             </Button>
+            ) : null}
+            {!hasCanvas ? (
             <Button
               size="sm"
               variant={preview ? 'ink' : 'outline'}
@@ -414,6 +432,7 @@ export const ContentEdit: FC = () => {
             >
               {preview ? t.contentEdit.editMode : t.contentEdit.preview}
             </Button>
+            ) : null}
             <Button
               size="sm"
               variant="outline"
@@ -422,7 +441,7 @@ export const ContentEdit: FC = () => {
               }}
               disabled={!target}
             >
-              {t.contentEdit.openStage}
+              {marketingInstalled ? t.contentEdit.openMarketing : t.contentEdit.openStage}
             </Button>
             <Button
               size="sm"
@@ -483,7 +502,19 @@ export const ContentEdit: FC = () => {
                   value={slug}
                   onChange={onStringInput(setSlug)}
                 />
-                {preview ? (
+                {hasCanvas ? (
+                  <Flex direction="column" gap={2}>
+                    <Typography variant="caption" className="bifrost-cms__muted mb-0">
+                      {t.contentEdit.canvasHint}
+                    </Typography>
+                    <BuilderPages
+                      boundDocId={target.id}
+                      embedded
+                      saveRef={canvasSaveRef}
+                      treeRef={canvasTreeRef}
+                    />
+                  </Flex>
+                ) : preview ? (
                   <div
                     className="bifrost-cms-preview-shell"
                     style={
@@ -758,6 +789,7 @@ export const ContentEdit: FC = () => {
           </div>
         ) : null}
       </Flex>
+      {!hasCanvas ? (
       <Drawer
         isOpen={widgetsOpen}
         onClose={() => setWidgetsOpen(false)}
@@ -770,24 +802,17 @@ export const ContentEdit: FC = () => {
         </Typography>
         <Flex direction="column" gap={2}>
           {BEAR_WIDGET_CATALOG.map((widget) => (
-            <button
+            <WidgetPaletteChip
               key={widget.id}
-              type="button"
-              className="bifrost-cms-widget-chip"
-              draggable
+              label={widget.label}
+              previewSrc={widget.previewSrc || BEAR_WIDGET_PREVIEW_SRC}
               onDragStart={(event) => onDragStart(event, widget.id)}
               onClick={() => insertWidget(widget)}
-            >
-              <Typography variant="body2" className="mb-0 font-medium">
-                {widget.label}
-              </Typography>
-              <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                {widget.bearComponent}
-              </Typography>
-            </button>
+            />
           ))}
         </Flex>
       </Drawer>
+      ) : null}
     </CmsShell>
   );
 };

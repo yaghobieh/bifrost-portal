@@ -1,3 +1,5 @@
+import type { MutableRefObject } from 'react';
+
 export type CanvasKind =
   | 'section'
   | 'column'
@@ -70,4 +72,19 @@ export type CanvasMenuState = {
   y: number;
 };
 
-export type BuilderPagesProps = Record<string, never>;
+export type UseBuilderPagesOptions = {
+  boundDocId?: string;
+};
+
+export type BuilderPagesProps = {
+  boundDocId?: string;
+  embedded?: boolean;
+  saveRef?: MutableRefObject<(() => Promise<void>) | null>;
+  treeRef?: MutableRefObject<CanvasNode[] | null>;
+};
+
+export type LayoutBlockDef = {
+  id: CanvasKind;
+  label: string;
+  previewSrc: string;
+};

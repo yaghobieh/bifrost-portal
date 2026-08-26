@@ -1601,18 +1601,45 @@ html.bifrost-cms-host #root {
 .bifrost-cms-widget-chip {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.35rem;
   width: 100%;
   min-height: 3.25rem;
   text-align: center;
-  padding: 0.55rem 0.4rem;
+  padding: 0.4rem;
   border: 1px solid var(--bifrost-cms-border);
   border-radius: 0.5rem;
   background: var(--bifrost-cms-surface);
   cursor: grab;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bifrost-cms-widget-chip__thumb {
+  display: block;
+  height: 3.5rem;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: var(--bifrost-cms-bg);
+  pointer-events: none;
+}
+
+.bifrost-cms-widget-chip__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bifrost-cms-widget-chip__html {
+  display: block;
+  transform: scale(0.22);
+  transform-origin: top left;
+  width: 455%;
+}
+
+.bifrost-cms-builder--embedded {
+  min-height: 28rem;
 }
 
 .bifrost-cms-widget-chip:hover {

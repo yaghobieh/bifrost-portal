@@ -15,6 +15,7 @@ import {
   CMS_BUILDER_PALETTE_WIDTH_KEY,
   CMS_BUILDER_PALETTE_WIDTH_PX,
   DRAG_WIDGET_MIME,
+  CMS_EXTENSIONS_EVENT,
   ROUTES,
   cmsBuilderPath,
 } from '@const/index';
@@ -49,6 +50,7 @@ import {
   LAYOUT_BLOCKS,
   LAYOUT_MIME,
 } from '../BuilderPages.const';
+import { isMarketingPagesInstalled } from '../../ExtensionsPages';
 import { MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
 import type {
   BuilderInspectorTab,
@@ -59,6 +61,7 @@ import type {
   CanvasMenuState,
   CanvasNode,
   PageCode,
+  UseBuilderPagesOptions,
 } from '../BuilderPages.types';
 import {
   canvasFromPayload,
@@ -82,7 +85,8 @@ import {
 } from '../BuilderPages.utils';
 import { createCustomWidget, loadCustomWidgets, saveCustomWidgets } from '../customWidgets.utils';
 
-export const useBuilderPages = () => {
+export const useBuilderPages = (options?: UseBuilderPagesOptions) => {
+  const boundDocId = options?.boundDocId ?? BUILDER_INSPECTOR_NONE;
   const { t } = useI18n();
   const { navigate } = useNavigate();
   const { token: providerToken } = useAuth();
@@ -90,6 +94,7 @@ export const useBuilderPages = () => {
   const { items, fetchContent } = useNucleus(contentNucleus);
   const activeToken = token || providerToken;
   const installed = true;
+  const [marketingInstalled, setMarketingInstalled] = useState(isMarketingPagesInstalled);
   const [tree, setTree] = useState<CanvasNode[]>(() => loadBuilderTree());
   const [selectedId, setSelectedId] = useState(BUILDER_INSPECTOR_NONE);
   const [dropParentId, setDropParentId] = useState(BUILDER_INSPECTOR_NONE);
@@ -134,6 +139,20 @@ export const useBuilderPages = () => {
   }, [activeToken, fetchContent]);
 
   useEffect(() => {
+    const onExtensions = () => {
+      setMarketingInstalled(isMarketingPagesInstalled());
+    };
+    window.addEventListener(CMS_EXTENSIONS_EVENT, onExtensions);
+    return () => {
+      window.removeEventListener(CMS_EXTENSIONS_EVENT, onExtensions);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (boundDocId) {
+      setTargetId(boundDocId);
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     const docId = params.get(BUILDER_QUERY_DOC) || BUILDER_INSPECTOR_NONE;
     const layoutId = params.get(BUILDER_QUERY_LAYOUT);
@@ -147,7 +166,7 @@ export const useBuilderPages = () => {
       return;
     }
     if (docId) setTargetId(docId);
-  }, []);
+  }, [boundDocId]);
 
   useEffect(() => {
     if (!targetId) return;
@@ -376,15 +395,19 @@ export const useBuilderPages = () => {
     [MARKETING_WIDGET_IDS.CTA_BAND]: t.cmsBuilder.marketingCtaBand,
     [MARKETING_WIDGET_IDS.FOOTER]: t.cmsBuilder.marketingFooter,
   };
-  const marketingWidgets = MARKETING_WIDGETS.map((widget) => ({
-    ...widget,
-    label: marketingLabels[widget.id],
-  }));
+  const marketingWidgets = marketingInstalled
+    ? MARKETING_WIDGETS.map((widget) => ({
+        ...widget,
+        label: marketingLabels[widget.id],
+      }))
+    : [];
   const layers = flattenLayers(tree);
 
   return {
     t,
     installed,
+    marketingInstalled,
+    boundDocId,
     tree,
     selectedId,
     setSelectedId,

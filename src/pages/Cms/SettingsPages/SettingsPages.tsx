@@ -101,7 +101,7 @@ import {
   saveUserThemeColors,
   slugifySiteName,
 } from './SettingsPages.utils';
-import { isCrewChatInstalled } from '../ExtensionsPages';
+import { isCrewChatInstalled, isMarketingPagesInstalled } from '../ExtensionsPages';
 import { SettingsPasswordOtp } from './components/SettingsPasswordOtp';
 import { SettingsSection } from './components/SettingsSection';
 import { SettingsToggleRow } from './components/SettingsToggleRow';
@@ -212,7 +212,9 @@ export const SettingsPages: FC = () => {
       [CMS_NAV_IDS.MEDIA]: t.cmsShell.media,
       [CMS_NAV_IDS.CREW]: t.cmsShell.crew,
       [CMS_NAV_IDS.LIVE_EDIT]: t.cmsShell.liveEdit,
-      [CMS_NAV_IDS.BUILDER]: t.cmsShell.builder,
+      [CMS_NAV_IDS.BUILDER]: isMarketingPagesInstalled()
+        ? t.cmsShell.marketing
+        : t.cmsShell.builder,
       [CMS_NAV_IDS.CALENDAR]: t.cmsShell.calendar,
     };
     return labels[id] || id;

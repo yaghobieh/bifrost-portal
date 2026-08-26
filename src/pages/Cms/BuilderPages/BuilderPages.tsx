@@ -1,4 +1,4 @@
-import { type DragEvent, type FC, type MouseEvent } from 'react';
+import { type DragEvent, type FC, type MouseEvent, useEffect } from 'react';
 import { BearIcons, Button, Card, Dropdown, Flex, Input, Tab, TabList, TabPanel, Tabs, Typography } from '@forgedevstack/bear';
 import { InkEditor } from '@forgedevstack/ink';
 import { cmsInkAiProps } from '@/ai/index';
@@ -20,22 +20,27 @@ import {
   BUILDER_VIEWPORT,
   BUILDER_VIEWPORT_WIDTH_PX,
   AI_STYLE_SUGGESTIONS,
+  BEAR_WIDGET_PREVIEW_SRC,
   CANVAS_KIND,
   DEFAULT_INK_FALLBACK,
   EMPTY_NODE_STYLES,
   LAYOUT_BLOCKS,
+  LAYOUT_PREVIEW,
   STYLE_FIELD_KEYS,
 } from './BuilderPages.const';
-import type { BuilderInspectorTab, CanvasNode } from './BuilderPages.types';
+import type { BuilderInspectorTab, BuilderPagesProps, CanvasNode } from './BuilderPages.types';
 import { nodeStyleObject, updateNodeCss, updateNodeHtml, updateNodeJs, updateNodeLabel, updateNodeStyles } from './BuilderPages.utils';
 import { BuilderBoardNiche } from './BuilderBoardNiche';
 import { BuilderCodeField } from './BuilderCodeField';
+import { WidgetPaletteChip } from './helpers/WidgetPaletteChip';
 import { useBuilderPages } from './hooks';
 
-export const BuilderPages: FC = () => {
+export const BuilderPages: FC<BuilderPagesProps> = (props) => {
+  const { boundDocId, embedded, saveRef, treeRef } = props;
   const {
     t,
     installed,
+    marketingInstalled,
     tree,
     selectedId,
     setSelectedId,
@@ -87,7 +92,27 @@ export const BuilderPages: FC = () => {
     onInspectorResize,
     isContainerKind,
     navigate,
-  } = useBuilderPages();
+  } = useBuilderPages({ boundDocId });
+
+  useEffect(() => {
+    if (!saveRef) {
+      return undefined;
+    }
+    saveRef.current = onSave;
+    return () => {
+      saveRef.current = null;
+    };
+  }, [saveRef, onSave]);
+
+  useEffect(() => {
+    if (!treeRef) {
+      return undefined;
+    }
+    treeRef.current = tree;
+    return () => {
+      treeRef.current = null;
+    };
+  }, [tree, treeRef]);
 
   const renderNode = (node: CanvasNode) => {
 
@@ -169,26 +194,36 @@ export const BuilderPages: FC = () => {
     );
   };
 
-  const stageViewportClass =
-    viewport === BUILDER_VIEWPORT.TABLET
-      ? ' bifrost-cms-builder__stage--tablet'
-      : viewport === BUILDER_VIEWPORT.MOBILE
-        ? ' bifrost-cms-builder__stage--mobile'
-        : '';
+  const stageViewportClass = (() => {
+    if (viewport === BUILDER_VIEWPORT.TABLET) {
+      return ' bifrost-cms-builder__stage--tablet';
+    }
+    if (viewport === BUILDER_VIEWPORT.MOBILE) {
+      return ' bifrost-cms-builder__stage--mobile';
+    }
+    return '';
+  })();
   const stagePreviewClass = preview ? ' bifrost-cms-builder__stage--preview' : '';
 
-  return (
-    <CmsShell activeNavId={CMS_NAV_IDS.BUILDER}>
-      <Flex direction="column" gap={4} className="bifrost-cms-builder">
+  const workspace = (
+      <Flex
+        direction="column"
+        gap={4}
+        className={embedded ? 'bifrost-cms-builder bifrost-cms-builder--embedded' : 'bifrost-cms-builder'}
+      >
+        {!embedded ? (
+          <>
         <div>
           <Typography variant="h2" className="mb-1">
-            {t.cmsBuilder.title}
+            {marketingInstalled ? t.cmsBuilder.marketingTitle : t.cmsBuilder.title}
           </Typography>
           <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {t.cmsBuilder.subtitle}
+            {marketingInstalled ? t.cmsBuilder.marketingSubtitle : t.cmsBuilder.subtitle}
           </Typography>
         </div>
         <BuilderBoardNiche />
+          </>
+        ) : null}
         {!installed ? (
           <Card padding="md" className="bifrost-cms-card">
             <Typography variant="h4" className="mb-2">
@@ -221,43 +256,6 @@ export const BuilderPages: FC = () => {
               <Typography variant="caption" className="bifrost-cms__muted mb-3 block">
                 {t.cmsBuilder.layoutHint}
               </Typography>
-              <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
-                {t.cmsBuilder.paletteGroupLayout}
-              </Typography>
-              <div className="bifrost-cms-widget-grid mb-4">
-                {LAYOUT_BLOCKS.map((block) => (
-                  <button
-                    key={block.id}
-                    type="button"
-                    className="bifrost-cms-widget-chip"
-                    draggable
-                    onDragStart={(event) => onDragStartLayout(event, block.id)}
-                    onClick={() => addLayout(block.id)}
-                  >
-                    <Typography variant="body2" className="mb-0 font-medium">
-                      {block.label}
-                    </Typography>
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className="bifrost-cms-widget-chip"
-                  onClick={() => addColumns(BUILDER_TWO_COLUMNS)}
-                >
-                  <Typography variant="body2" className="mb-0 font-medium">
-                    {t.cmsBuilder.presetTwoColumns}
-                  </Typography>
-                </button>
-                <button
-                  type="button"
-                  className="bifrost-cms-widget-chip"
-                  onClick={() => addColumns(BUILDER_THREE_COLUMNS)}
-                >
-                  <Typography variant="body2" className="mb-0 font-medium">
-                    {t.cmsBuilder.presetThreeColumns}
-                  </Typography>
-                </button>
-              </div>
               {marketingWidgets.length > 0 ? (
                 <>
                   <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
@@ -265,39 +263,53 @@ export const BuilderPages: FC = () => {
                   </Typography>
                   <div className="bifrost-cms-widget-grid mb-4">
                     {marketingWidgets.map((widget) => (
-                      <button
+                      <WidgetPaletteChip
                         key={widget.id}
-                        type="button"
-                        className="bifrost-cms-widget-chip"
-                        draggable
+                        label={widget.label}
+                        previewSrc={widget.previewSrc}
                         onDragStart={(event) => onDragStartWidget(event, widget.id)}
                         onClick={() => addWidget(widget.id)}
-                      >
-                        <Typography variant="body2" className="mb-0 font-medium">
-                          {widget.label}
-                        </Typography>
-                      </button>
+                      />
                     ))}
                   </div>
                 </>
               ) : null}
               <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
+                {t.cmsBuilder.paletteGroupLayout}
+              </Typography>
+              <div className="bifrost-cms-widget-grid mb-4">
+                {LAYOUT_BLOCKS.map((block) => (
+                  <WidgetPaletteChip
+                    key={block.id}
+                    label={block.label}
+                    previewSrc={block.previewSrc}
+                    onDragStart={(event) => onDragStartLayout(event, block.id)}
+                    onClick={() => addLayout(block.id)}
+                  />
+                ))}
+                <WidgetPaletteChip
+                  label={t.cmsBuilder.presetTwoColumns}
+                  previewSrc={LAYOUT_PREVIEW.TWO_COL}
+                  onClick={() => addColumns(BUILDER_TWO_COLUMNS)}
+                />
+                <WidgetPaletteChip
+                  label={t.cmsBuilder.presetThreeColumns}
+                  previewSrc={LAYOUT_PREVIEW.THREE_COL}
+                  onClick={() => addColumns(BUILDER_THREE_COLUMNS)}
+                />
+              </div>
+              <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
                 {t.cmsBuilder.paletteGroupContent}
               </Typography>
               <div className="bifrost-cms-widget-grid mb-4">
                 {contentWidgets.map((widget) => (
-                  <button
+                  <WidgetPaletteChip
                     key={widget.id}
-                    type="button"
-                    className="bifrost-cms-widget-chip"
-                    draggable
+                    label={widget.label}
+                    previewSrc={widget.previewSrc || BEAR_WIDGET_PREVIEW_SRC}
                     onDragStart={(event) => onDragStartWidget(event, widget.id)}
                     onClick={() => addWidget(widget.id)}
-                  >
-                    <Typography variant="body2" className="mb-0 font-medium">
-                      {widget.label}
-                    </Typography>
-                  </button>
+                  />
                 ))}
               </div>
               <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
@@ -305,20 +317,15 @@ export const BuilderPages: FC = () => {
               </Typography>
               <div className="bifrost-cms-widget-grid mb-4">
                 {formWidgets.map((widget) => (
-                  <button
+                  <WidgetPaletteChip
                     key={widget.id}
-                    type="button"
-                    className="bifrost-cms-widget-chip"
-                    draggable
+                    label={widget.label}
+                    previewSrc={widget.previewSrc || BEAR_WIDGET_PREVIEW_SRC}
                     onDragStart={(event) => onDragStartWidget(event, widget.id)}
                     onClick={() => addWidget(widget.id)}
-                  >
-                    <Typography variant="body2" className="mb-0 font-medium">
-                      {widget.label}
-                    </Typography>
-                  </button>
+                  />
                 ))}
-                  </div>
+              </div>
                   <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
                     {t.cmsBuilder.customWidget}
                   </Typography>
@@ -417,6 +424,7 @@ export const BuilderPages: FC = () => {
                   >
                     {t.cmsBuilder.viewportMobile}
                   </Button>
+                  {!boundDocId ? (
                   <Dropdown
                     placement="bottom-end"
                     trigger={
@@ -431,6 +439,7 @@ export const BuilderPages: FC = () => {
                       onClick: () => onTargetChange(option.value),
                     }))}
                   />
+                  ) : null}
                   <Dropdown
                     placement="bottom-end"
                     trigger={
@@ -712,6 +721,14 @@ export const BuilderPages: FC = () => {
           </div>
         ) : null}
       </Flex>
+  );
+
+  if (embedded) {
+    return workspace;
+  }
+  return (
+    <CmsShell activeNavId={CMS_NAV_IDS.BUILDER}>
+      {workspace}
     </CmsShell>
   );
 };
