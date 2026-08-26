@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { Button, Flex, Modal, Snackbar, Typography } from '@forgedevstack/bear';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { useI18n } from '@i18n/index';
@@ -39,6 +39,10 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
   const isOpen = !hidden && !dismissed;
   const notes = previewNotes(result?.notes, whatsNew, t.cmsShell.updateChangelog);
 
+  useEffect(() => {
+    void fetchWhatsNew().then(setWhatsNew);
+  }, []);
+
   const onDismiss = () => {
     saveDismissedVersion(TARGET_CMS_VERSION);
     setHidden(true);
@@ -74,7 +78,8 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
         open={isOpen}
         severity={CMS_UPDATE_SNACKBAR_SEVERITY}
         message={t.cmsShell.updateHello.replace('{version}', TARGET_CMS_VERSION)}
-        description={t.cmsShell.updateChangelog}
+        description={notes}
+        className="bifrost-cms-update-snackbar"
         autoHideDuration={CMS_UPDATE_SNACKBAR_STICKY}
         closeOnClickOutside={CMS_UPDATE_SNACKBAR_CLOSE_ON_OUTSIDE}
         showCloseButton

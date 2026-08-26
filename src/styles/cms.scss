@@ -438,6 +438,11 @@ html.bifrost-cms-host #root {
   z-index: 20 !important;
 }
 
+.bifrost-cms-update-snackbar,
+.Bear-Snackbar {
+  z-index: 100 !important;
+}
+
 .Bear-Modal,
 .Bear-Drawer {
   isolation: isolate;
