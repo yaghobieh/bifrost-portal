@@ -1,10 +1,12 @@
-import { useState, type FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { Button, Flex, Modal, Snackbar, Typography } from '@forgedevstack/bear';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { useI18n } from '@i18n/index';
 import { ROUTES } from '@const/index';
+import { EMPTY_STRING } from '@const/strings.const';
 import {
   EMPTY_WHATS_NEW,
+  fetchVersionInfo,
   fetchWhatsNew,
   requestUpdateCms,
   TARGET_CMS_VERSION,
@@ -20,9 +22,11 @@ import {
 } from './CmsUpdateBanner.const';
 import type { CmsUpdateBannerProps } from './CmsUpdateBanner.types';
 import {
+  isBehindHub,
   loadDismissedVersion,
   previewNotes,
   saveDismissedVersion,
+  versionFromInfo,
 } from './CmsUpdateBanner.utils';
 
 export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
@@ -34,9 +38,17 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [whatsNew, setWhatsNew] = useState<WhatsNewCopy>(EMPTY_WHATS_NEW);
   const [result, setResult] = useState<CmsUpdateResult | null>(null);
+  const [behind, setBehind] = useState(false);
+
+  useEffect(() => {
+    void fetchVersionInfo().then((info) => {
+      const current = versionFromInfo(info.portal, info.version);
+      setBehind(isBehindHub(current) || current === EMPTY_STRING);
+    });
+  }, []);
 
   const dismissed = loadDismissedVersion() === TARGET_CMS_VERSION;
-  const isOpen = !hidden && !dismissed;
+  const isOpen = behind && !hidden && !dismissed;
   const notes = previewNotes(result?.notes, whatsNew, t.cmsShell.updateChangelog);
 
   const onDismiss = () => {

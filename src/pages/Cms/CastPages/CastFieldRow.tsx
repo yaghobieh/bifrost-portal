@@ -55,11 +55,12 @@ export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
           size="sm"
           fullWidth
           onChange={(value) => {
-            if (!isCastFieldType(String(value))) {
+            const nextType = String(value);
+            if (!isCastFieldType(nextType)) {
               return;
             }
-            typeField.actions.setValue(value);
-            onFieldChange(field.id, { type: value });
+            typeField.actions.setValue(nextType);
+            onFieldChange(field.id, { type: nextType });
           }}
         />
         <Input

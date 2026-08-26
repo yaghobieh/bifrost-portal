@@ -236,6 +236,8 @@ export const SETTINGS_SITE_INPUT_IDS = {
 
 export const SETTINGS_MEDIA_INPUT_IDS = {
   CLOUD_NAME: 'bifrost-cms-media-cloud-name',
+  API_KEY: 'bifrost-cms-media-api-key',
+  API_SECRET: 'bifrost-cms-media-api-secret',
 } as const;
 
 export const SETTINGS_API_ERROR_MODES = {

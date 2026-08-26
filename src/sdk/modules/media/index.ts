@@ -18,6 +18,7 @@ export {
   DEFAULT_MEDIA_FOLDER,
   DEFAULT_MEDIA_RESOURCE_TYPE,
 } from './media.const';
+export { parseCloudinaryCloudName, parseCloudinaryCredentials, rewriteHtmlImages, toCloudinarySrc } from './media.utils';
 export type {
   CloudinarySignResponse,
   CloudinaryUploadResult,

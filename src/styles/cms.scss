@@ -2477,23 +2477,61 @@ html.bifrost-cms-host #root {
 .bifrost-cms-canvas-menu {
   position: fixed;
   z-index: 40;
+  width: 230px;
   min-width: 180px;
   padding: 0.35rem;
   border: 1px solid var(--bifrost-cms-border);
-  border-radius: 0.5rem;
+  border-radius: 0.65rem;
   background: var(--bifrost-cms-surface);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  box-shadow: 0 16px 40px rgb(20 22 28 / 0.22);
 }
 
+.bifrost-cms-canvas-menu__section {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.6rem 0.25rem;
+  color: var(--bifrost-cms-muted, #8d92a1);
+}
+
+.bifrost-cms-canvas-menu__item,
 .bifrost-cms-canvas-menu button {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   text-align: left;
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 0.6rem;
   border: 0;
+  border-radius: 0.45rem;
   background: transparent;
   color: inherit;
   cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.bifrost-cms-canvas-menu__item:hover,
+.bifrost-cms-canvas-menu button:hover {
+  background: rgb(138 63 212 / 0.08);
+}
+
+.bifrost-cms-canvas-menu__item:disabled {
+  color: var(--bifrost-cms-muted, #8d92a1);
+  cursor: default;
+}
+
+.bifrost-cms-canvas-menu__item--danger {
+  color: #c4302b;
+}
+
+.bifrost-cms-canvas-menu__kbd {
+  margin-left: auto;
+  font-size: 0.65rem;
+  opacity: 0.55;
+}
+
+.bifrost-cms-canvas-menu__divider {
+  height: 1px;
+  margin: 0.3rem 0.4rem;
+  background: var(--bifrost-cms-border);
 }
 
 .bifrost-cms-widget-form {

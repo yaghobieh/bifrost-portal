@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState, type FC } from 'react';
+import { useNucleus } from '@forgedevstack/synapse';
 import { Avatar, Badge, Button, Flex, Typography } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
+import { EMPTY_STRING } from '@const/index';
 import { NUMBER_ZERO } from '@const/numbers.const';
+import { mediaNucleus } from '@sdk/index';
+import { toCloudinarySrc } from '@sdk/modules/media';
 import { CMS_AVATAR_INITIALS_LENGTH } from '../CmsShell.const';
 import { CMS_ONLINE_PAGE_SIZE } from './CmsOnlineStatus.const';
 import type { CmsOnlineStatusProps } from './CmsOnlineStatus.types';
@@ -12,6 +16,7 @@ const initialsFromName = (name: string): string =>
 export const CmsOnlineStatus: FC<CmsOnlineStatusProps> = (props) => {
   const { users, currentUserId, onOpenUser } = props;
   const { t } = useI18n();
+  const { cloudName } = useNucleus(mediaNucleus);
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(CMS_ONLINE_PAGE_SIZE);
@@ -75,7 +80,7 @@ export const CmsOnlineStatus: FC<CmsOnlineStatusProps> = (props) => {
                   }}
                 >
                   <span className="bifrost-cms-online-status__live" />
-                  <Avatar src={person.avatar || undefined} initials={initialsFromName(person.name)} size="sm" />
+                  <Avatar src={toCloudinarySrc(person.avatar || EMPTY_STRING, cloudName) || undefined} initials={initialsFromName(person.name)} size="sm" />
                   <Flex direction="column" gap={0}>
                     <span>{person.name}</span>
                     {person.locationLabel && (

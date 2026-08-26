@@ -6,6 +6,7 @@ import { useI18n } from '@i18n/index';
 import { EMPTY_STRING } from '@const/index';
 import { NUMBER_ZERO } from '@const/numbers.const';
 import { authNucleus, mediaNucleus } from '@sdk/index';
+import { toCloudinarySrc } from '@sdk/modules/media';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { MEDIA_ACCEPT, MEDIA_FILE_INPUT_ID } from './MediaPages.const';
 
@@ -13,7 +14,7 @@ export const MediaPages: FC = () => {
   const { t } = useI18n();
   const { token: providerToken } = useAuth();
   const { token } = useNucleus(authNucleus);
-  const { items, source, loading, uploading, error, uploadError, fetchMedia, uploadMedia } =
+  const { items, source, cloudName, loading, uploading, error, uploadError, fetchMedia, uploadMedia } =
     useNucleus(mediaNucleus);
   const activeToken = token || providerToken;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -126,7 +127,7 @@ export const MediaPages: FC = () => {
             <Card padding="md" key={item.id} className="bifrost-cms-media-card">
               {item.secureUrl || item.url ? (
                 <img
-                  src={item.secureUrl || item.url}
+                  src={toCloudinarySrc(item.secureUrl || item.url, cloudName)}
                   alt={item.publicId}
                   className="bifrost-cms-media-card__thumb"
                 />

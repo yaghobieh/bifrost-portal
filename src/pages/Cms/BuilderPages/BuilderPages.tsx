@@ -1,16 +1,19 @@
 import { type DragEvent, type FC, type MouseEvent } from 'react';
-import { BearIcons, Button, Card, Dropdown, Flex, Input, Tab, TabList, TabPanel, Tabs, Typography } from '@forgedevstack/bear';
+import { Alert, BearIcons, Button, Card, Dropdown, Flex, Input, Tab, TabList, TabPanel, Tabs, Typography } from '@forgedevstack/bear';
 import { InkEditor } from '@forgedevstack/ink';
 import { cmsInkAiProps } from '@/ai/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { ROUTES } from '@const/index';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
+import { useCmsLive } from '../CmsShell/CmsLiveProvider';
+import { currentLiveLocation } from '../CmsShell/CmsLive.utils';
+import { isPageSubmitLocked, locationOwner } from '../CmsShell/helpers/LiveEditors';
+import { CanvasContextMenu } from './helpers/CanvasContextMenu';
 import {
   BUILDER_INK_MIN_HEIGHT_PX,
   BUILDER_INSPECTOR_NONE,
   BUILDER_INSPECTOR_TAB,
   BUILDER_LAYER_MAX_DEPTH,
-  BUILDER_MENU_ACTION,
   BUILDER_MENU_OFFSET_PX,
   BUILDER_PREVIEW_MIN_WIDTH_PX,
   BUILDER_STAGE_TAB,
@@ -67,7 +70,8 @@ export const BuilderPages: FC = () => {
     targetOptions,
     contentWidgets,
     formWidgets,
-    marketingWidgets,
+    marketingGroups,
+    canPasteStyles,
     layers,
     apply,
     addLayout,
@@ -88,6 +92,14 @@ export const BuilderPages: FC = () => {
     isContainerKind,
     navigate,
   } = useBuilderPages();
+  const { onlineUsers, selfId } = useCmsLive();
+  const liveLocation = currentLiveLocation().location;
+  const pageLocked = isPageSubmitLocked({
+    users: onlineUsers,
+    currentUserId: selfId,
+    location: liveLocation,
+  });
+  const pageOwner = locationOwner({ users: onlineUsers, location: liveLocation });
 
   const renderNode = (node: CanvasNode) => {
 
@@ -211,9 +223,37 @@ export const BuilderPages: FC = () => {
               <Typography variant="h4" className="mb-1">
                 {t.cmsBuilder.palette}
               </Typography>
+              {pageLocked && pageOwner && (
+                <Alert severity="warning">
+                  {t.cmsShell.pageLocked.replace('{name}', pageOwner.name)}
+                </Alert>
+              )}
               <Typography variant="caption" className="bifrost-cms__muted mb-3 block">
                 {t.cmsBuilder.layoutHint}
               </Typography>
+              {marketingGroups.map((group) => (
+                <div key={group.id}>
+                  <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
+                    {group.label}
+                  </Typography>
+                  <div className="bifrost-cms-widget-grid mb-4">
+                    {group.widgets.map((widget) => (
+                      <button
+                        key={widget.id}
+                        type="button"
+                        className="bifrost-cms-widget-chip"
+                        draggable
+                        onDragStart={(event) => onDragStartWidget(event, widget.id)}
+                        onClick={() => addWidget(widget.id)}
+                      >
+                        <Typography variant="body2" className="mb-0 font-medium">
+                          {widget.label}
+                        </Typography>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
               <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
                 {t.cmsBuilder.paletteGroupLayout}
               </Typography>
@@ -251,29 +291,6 @@ export const BuilderPages: FC = () => {
                   </Typography>
                 </button>
               </div>
-              {marketingWidgets.length > 0 ? (
-                <>
-                  <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
-                    {t.cmsBuilder.paletteGroupMarketing}
-                  </Typography>
-                  <div className="bifrost-cms-widget-grid mb-4">
-                    {marketingWidgets.map((widget) => (
-                      <button
-                        key={widget.id}
-                        type="button"
-                        className="bifrost-cms-widget-chip"
-                        draggable
-                        onDragStart={(event) => onDragStartWidget(event, widget.id)}
-                        onClick={() => addWidget(widget.id)}
-                      >
-                        <Typography variant="body2" className="mb-0 font-medium">
-                          {widget.label}
-                        </Typography>
-                      </button>
-                    ))}
-                  </div>
-                </>
-              ) : null}
               <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
                 {t.cmsBuilder.paletteGroupContent}
               </Typography>
@@ -432,6 +449,7 @@ export const BuilderPages: FC = () => {
                         variant="primary"
                         icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
                         aria-label={t.cmsBuilder.saveCanvas}
+                        disabled={pageLocked}
                       >
                         {targetId ? t.cmsBuilder.saveToContent : t.cmsBuilder.saveCanvas}
                       </Button>
@@ -440,12 +458,18 @@ export const BuilderPages: FC = () => {
                       {
                         key: 'save',
                         label: targetId ? t.cmsBuilder.saveToContent : t.cmsBuilder.saveCanvas,
-                        onClick: () => void onSave(),
+                        onClick: () => {
+                          if (pageLocked) return;
+                          void onSave();
+                        },
                       },
                       {
                         key: 'template',
                         label: t.cmsBuilder.saveAsTemplate,
-                        onClick: () => void onSaveAsTemplate(),
+                        onClick: () => {
+                          if (pageLocked) return;
+                          void onSaveAsTemplate();
+                        },
                       },
                     ]}
                   />
@@ -667,41 +691,40 @@ export const BuilderPages: FC = () => {
             </div>
           </div>
         )}
-        {menu ? (
+        {menu && menu.nodeId ? (
+          <CanvasContextMenu
+            x={menu.x}
+            y={menu.y}
+            title={selected?.id === menu.nodeId ? selected.label : t.cmsBuilder.canvas}
+            canPasteStyles={canPasteStyles}
+            labels={{
+              edit: t.cmsBuilder.menuEditContent,
+              duplicate: t.cmsBuilder.menuDuplicate,
+              moveUp: t.cmsBuilder.menuMoveUp,
+              moveDown: t.cmsBuilder.menuMoveDown,
+              copyStyles: t.cmsBuilder.menuCopyStyles,
+              pasteStyles: t.cmsBuilder.menuPasteStyles,
+              saveReusable: t.cmsBuilder.menuSaveReusable,
+              remove: t.cmsBuilder.menuDelete,
+              kbdEdit: t.cmsBuilder.menuKbdEdit,
+              kbdDuplicate: t.cmsBuilder.menuKbdDuplicate,
+              kbdUp: t.cmsBuilder.menuKbdUp,
+              kbdDown: t.cmsBuilder.menuKbdDown,
+              kbdCopy: t.cmsBuilder.menuKbdCopy,
+              kbdDelete: t.cmsBuilder.menuKbdDelete,
+            }}
+            onAction={runMenu}
+          />
+        ) : null}
+        {menu && !menu.nodeId ? (
           <div
             className="bifrost-cms-canvas-menu"
             style={{ left: menu.x, top: menu.y }}
             onClick={(event) => event.stopPropagation()}
           >
-            {menu.nodeId ? (
-              <>
-                <button type="button" onClick={() => runMenu(BUILDER_MENU_ACTION.DUPLICATE)}>
-                  {t.cmsBuilder.menuDuplicate}
-                </button>
-                <button type="button" onClick={() => runMenu(BUILDER_MENU_ACTION.WRAP_FLEX)}>
-                  {t.cmsBuilder.menuWrapFlex}
-                </button>
-                <button type="button" onClick={() => runMenu(BUILDER_MENU_ACTION.WRAP_GRID)}>
-                  {t.cmsBuilder.menuWrapGrid}
-                </button>
-                <button type="button" onClick={() => runMenu(BUILDER_MENU_ACTION.ADD_SECTION)}>
-                  {t.cmsBuilder.menuAddSection}
-                </button>
-                <button type="button" onClick={() => runMenu(BUILDER_MENU_ACTION.MOVE_UP)}>
-                  {t.cmsBuilder.menuMoveUp}
-                </button>
-                <button type="button" onClick={() => runMenu(BUILDER_MENU_ACTION.MOVE_DOWN)}>
-                  {t.cmsBuilder.menuMoveDown}
-                </button>
-                <button type="button" onClick={() => runMenu(BUILDER_MENU_ACTION.DELETE)}>
-                  {t.cmsBuilder.menuDelete}
-                </button>
-              </>
-            ) : (
-              <button type="button" onClick={() => addLayout(CANVAS_KIND.SECTION)}>
-                {t.cmsBuilder.menuAddSection}
-              </button>
-            )}
+            <button type="button" onClick={() => addLayout(CANVAS_KIND.SECTION)}>
+              {t.cmsBuilder.menuAddSection}
+            </button>
           </div>
         ) : null}
       </Flex>

@@ -143,6 +143,10 @@ export const BUILDER_MENU_ACTION = {
   ADD_SECTION: 'add-section',
   MOVE_UP: 'move-up',
   MOVE_DOWN: 'move-down',
+  EDIT_CONTENT: 'edit-content',
+  COPY_STYLES: 'copy-styles',
+  PASTE_STYLES: 'paste-styles',
+  SAVE_REUSABLE: 'save-reusable',
 } as const;
 export const BUILDER_MOVE_BACK = -1;
 export const BUILDER_MOVE_FORWARD = 1;

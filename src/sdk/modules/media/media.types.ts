@@ -52,10 +52,13 @@ export type RegisterMediaInput = {
 export type MediaState = {
   items: MediaItem[];
   source: string | null;
+  cloudName: string;
+  configured: boolean;
   loading: boolean;
   uploading: boolean;
   error: boolean;
   uploadError: boolean;
+  loadConfig: (token: string) => Promise<boolean>;
   fetchMedia: (token: string) => Promise<boolean>;
   uploadMedia: (token: string, file: File) => Promise<MediaItem | null>;
   reset: () => void;

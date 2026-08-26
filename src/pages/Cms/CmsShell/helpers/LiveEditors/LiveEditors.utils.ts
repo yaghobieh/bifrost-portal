@@ -1,5 +1,15 @@
 import { EMPTY_STRING } from '@const/index';
-import type { CmsPresenceUser } from '../../../CmsLive.types';
+import type { CmsPresenceUser } from '@pages/Cms/CmsShell/CmsLive.types';
+
+const matchesLocation = (person: CmsPresenceUser, location: string): boolean => {
+  if (!person.location) {
+    return false;
+  }
+  if (person.location === location) {
+    return true;
+  }
+  return person.location.includes(location);
+};
 
 export const usersAtLocation = (params: {
   users: CmsPresenceUser[];
@@ -14,14 +24,39 @@ export const usersAtLocation = (params: {
     if (person.id === currentUserId) {
       return false;
     }
-    if (!person.location) {
-      return false;
-    }
-    if (person.location === location) {
-      return true;
-    }
-    return person.location.includes(location);
+    return matchesLocation(person, location);
   });
+};
+
+export const locationOwner = (params: {
+  users: CmsPresenceUser[];
+  location: string;
+}): CmsPresenceUser | null => {
+  const { users, location } = params;
+  if (!location) {
+    return null;
+  }
+  const owner = users.find((person) => matchesLocation(person, location));
+  if (!owner) {
+    return null;
+  }
+  return owner;
+};
+
+export const isPageSubmitLocked = (params: {
+  users: CmsPresenceUser[];
+  currentUserId: string;
+  location: string;
+}): boolean => {
+  const { currentUserId } = params;
+  const owner = locationOwner(params);
+  if (!owner) {
+    return false;
+  }
+  if (!currentUserId) {
+    return false;
+  }
+  return owner.id !== currentUserId;
 };
 
 export const editorInitials = (name: string, length: number): string => {

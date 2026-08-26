@@ -1,4 +1,4 @@
-import { NUMBER_TWO } from '@const/numbers.const';
+import { NUMBER_EIGHT, NUMBER_TWO } from '@const/numbers.const';
 
 export const CREW_CHAT_INPUT_ID = 'bifrost-cms-crew-chat-input';
 export const CREW_CHAT_TAG_ID = 'bifrost-cms-crew-chat-tag';
@@ -15,7 +15,7 @@ export const CREW_CHANNEL_SLUG_SPACE = /\s+/g;
 export const CREW_CHANNEL_SLUG_KEEP = /[^a-z0-9-]/g;
 export const CREW_CHANNEL_SLUG_DASH = '-';
 export const CREW_DEFAULT_EMOJI = '🙂';
-export const CREW_SCROLL_STICK_PX = 64;
+export const CREW_SCROLL_STICK_PX = NUMBER_EIGHT;
 export const CREW_EMOJI_PICKER_MAX_HEIGHT = 220;
 export const CREW_EMOJI_PICKER_SIZE = 'sm' as const;
 export const CREW_BLOB_CLASS = 'bifrost-cms-crew-blob';

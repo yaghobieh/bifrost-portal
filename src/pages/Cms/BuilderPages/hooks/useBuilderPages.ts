@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type DragEvent, type MouseEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type DragEvent, type MouseEvent } from 'react';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import { useAuth } from '@hooks/index';
@@ -49,7 +49,7 @@ import {
   LAYOUT_BLOCKS,
   LAYOUT_MIME,
 } from '../BuilderPages.const';
-import { MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
+import { MARKETING_WIDGET_GROUPS, MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
 import type {
   BuilderInspectorTab,
   BuilderStageTab,
@@ -58,6 +58,7 @@ import type {
   CanvasMenuAction,
   CanvasMenuState,
   CanvasNode,
+  CanvasNodeStyles,
   PageCode,
 } from '../BuilderPages.types';
 import {
@@ -77,6 +78,7 @@ import {
   moveNode,
   removeNode,
   saveBuilderTree,
+  updateNodeStyles,
   withCanvasPayload,
   wrapNode,
 } from '../BuilderPages.utils';
@@ -94,6 +96,8 @@ export const useBuilderPages = () => {
   const [selectedId, setSelectedId] = useState(BUILDER_INSPECTOR_NONE);
   const [dropParentId, setDropParentId] = useState(BUILDER_INSPECTOR_NONE);
   const [menu, setMenu] = useState<CanvasMenuState | null>(null);
+  const styleClipboardRef = useRef<CanvasNodeStyles | null>(null);
+  const [canPasteStyles, setCanPasteStyles] = useState(false);
   const [saved, setSaved] = useState(false);
   const [targetId, setTargetId] = useState(BUILDER_INSPECTOR_NONE);
   const [viewport, setViewport] = useState<BuilderViewport>(BUILDER_VIEWPORT.DESKTOP);
@@ -266,6 +270,33 @@ export const useBuilderPages = () => {
     if (action === BUILDER_MENU_ACTION.MOVE_DOWN) {
       apply(moveNode(tree, menu.nodeId, BUILDER_MOVE_FORWARD));
     }
+    if (action === BUILDER_MENU_ACTION.EDIT_CONTENT) {
+      setSelectedId(menu.nodeId);
+      setInspectorTab(BUILDER_INSPECTOR_TAB.CONTENT);
+    }
+    if (action === BUILDER_MENU_ACTION.COPY_STYLES) {
+      const node = findNode(tree, menu.nodeId);
+      if (node?.styles) {
+        styleClipboardRef.current = node.styles;
+        setCanPasteStyles(true);
+      }
+    }
+    if (action === BUILDER_MENU_ACTION.PASTE_STYLES) {
+      const copied = styleClipboardRef.current;
+      if (copied) {
+        apply(updateNodeStyles(tree, menu.nodeId, { ...EMPTY_NODE_STYLES, ...copied }));
+      }
+    }
+    if (action === BUILDER_MENU_ACTION.SAVE_REUSABLE) {
+      const node = findNode(tree, menu.nodeId);
+      if (node?.html) {
+        const widget = createCustomWidget(node.label, node.html);
+        const next = [...customWidgets, widget];
+        setCustomWidgets(next);
+        saveCustomWidgets(next);
+      }
+    }
+    setMenu(null);
   };
 
   const onSave = useCallback(async () => {
@@ -369,16 +400,37 @@ export const useBuilderPages = () => {
   const catalog = [...BEAR_WIDGET_CATALOG, ...customWidgets];
   const contentWidgets = catalog.filter((widget) => widget.id !== CAST_WIDGET_ID);
   const formWidgets = BEAR_WIDGET_CATALOG.filter((widget) => widget.id === CAST_WIDGET_ID);
-  const marketingLabels = {
+  const marketingLabels: Record<string, string> = {
     [MARKETING_WIDGET_IDS.HERO]: t.cmsBuilder.marketingHero,
+    [MARKETING_WIDGET_IDS.HERO_SPLIT]: t.cmsBuilder.marketingHeroSplit,
+    [MARKETING_WIDGET_IDS.HERO_MINIMAL]: t.cmsBuilder.marketingHeroMinimal,
     [MARKETING_WIDGET_IDS.SPLIT_AUTH]: t.cmsBuilder.marketingSplitAuth,
+    [MARKETING_WIDGET_IDS.CREDENTIALS]: t.cmsBuilder.marketingCredentials,
+    [MARKETING_WIDGET_IDS.OAUTH_ROW]: t.cmsBuilder.marketingOauth,
+    [MARKETING_WIDGET_IDS.TESTIMONIAL]: t.cmsBuilder.marketingTestimonial,
     [MARKETING_WIDGET_IDS.FEATURE_GRID]: t.cmsBuilder.marketingFeatureGrid,
+    [MARKETING_WIDGET_IDS.BRIDGE]: t.cmsBuilder.marketingBridge,
+    [MARKETING_WIDGET_IDS.CODE]: t.cmsBuilder.marketingCode,
+    [MARKETING_WIDGET_IDS.STAT_STRIP]: t.cmsBuilder.marketingStat,
     [MARKETING_WIDGET_IDS.CTA_BAND]: t.cmsBuilder.marketingCtaBand,
+    [MARKETING_WIDGET_IDS.GRADIENT_BUTTON]: t.cmsBuilder.marketingGradientButton,
     [MARKETING_WIDGET_IDS.FOOTER]: t.cmsBuilder.marketingFooter,
   };
   const marketingWidgets = MARKETING_WIDGETS.map((widget) => ({
     ...widget,
-    label: marketingLabels[widget.id],
+    label: marketingLabels[widget.id] || widget.label,
+  }));
+  const marketingGroupLabels: Record<string, string> = {
+    hero: t.cmsBuilder.paletteGroupHero,
+    auth: t.cmsBuilder.paletteGroupAuth,
+    content: t.cmsBuilder.paletteGroupMktContent,
+    conversion: t.cmsBuilder.paletteGroupConversion,
+    footer: t.cmsBuilder.paletteGroupFooter,
+  };
+  const marketingGroups = MARKETING_WIDGET_GROUPS.map((group) => ({
+    id: group,
+    label: marketingGroupLabels[group],
+    widgets: marketingWidgets.filter((widget) => widget.group === group),
   }));
   const layers = flattenLayers(tree);
 
@@ -418,6 +470,8 @@ export const useBuilderPages = () => {
     contentWidgets,
     formWidgets,
     marketingWidgets,
+    marketingGroups,
+    canPasteStyles,
     layers,
     apply,
     addLayout,

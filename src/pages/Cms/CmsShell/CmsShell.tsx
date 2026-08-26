@@ -36,7 +36,8 @@ import {
 } from '@const/index';
 import { NUMBER_ONE } from '@const/numbers.const';
 import { CMS_LOGO_SIZE_PX } from '@const/numbers.const';
-import { authNucleus } from '@sdk/index';
+import { authNucleus, mediaNucleus } from '@sdk/index';
+import { toCloudinarySrc } from '@sdk/modules/media';
 import { setDefaultApiErrorMode } from '@sdk/http';
 import {
   applyCmsThemeColors,
@@ -114,6 +115,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     setToken,
   } = useAuth();
   const { token, user, logout } = useNucleus(authNucleus);
+  const { cloudName, loadConfig } = useNucleus(mediaNucleus);
   const [collapsed, setCollapsed] = useState(() => loadSidebarCollapsed());
   const [sidebarWidth, setSidebarWidth] = useState(() => loadSidebarWidth());
   const [modePreference, setModePreference] = useState<CmsModePreference>(() =>
@@ -281,16 +283,17 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const avatarInitials =
     initialsFromName(displayName) ||
     t.cmsShell.accountFallback.slice(0, CMS_AVATAR_INITIALS_LENGTH);
-  const avatarSrc = profile.avatarDataUrl || undefined;
+  const avatarSrc = toCloudinarySrc(profile.avatarDataUrl || EMPTY_STRING, cloudName) || undefined;
   const activeToken = token || providerToken || EMPTY_STRING;
 
   useEffect(() => {
+    void loadConfig(activeToken);
     if (!activeToken) {
       return;
     }
     void hydrateCmsSiteRemote(activeToken);
     void hydrateExtensionsRemote(activeToken);
-  }, [activeToken]);
+  }, [activeToken, loadConfig]);
 
   const onCollapsedChange = (next: boolean) => {
     setCollapsed(next);
@@ -589,7 +592,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
           <Flex direction="column" gap={2} className="bifrost-cms__brand-block">
             <Flex align="center" gap={2}>
               <img
-                src={site.logoDataUrl || BIFROST_ICON_SRC}
+                src={toCloudinarySrc(site.logoDataUrl || BIFROST_ICON_SRC, cloudName)}
                 alt={site.siteName || t.cmsShell.brand}
                 className="bifrost-cms__logo"
                 width={CMS_LOGO_SIZE_PX}

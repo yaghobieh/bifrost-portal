@@ -63,6 +63,21 @@ export interface Messages {
     toggleTheme: string;
     github: string;
     signIn: string;
+    status: string;
+  };
+  status: {
+    title: string;
+    lead: string;
+    health: string;
+    healthOk: string;
+    healthDown: string;
+    dbOk: string;
+    dbDown: string;
+    service: string;
+    serviceHint: string;
+    version: string;
+    updateAvailable: string;
+    updateCurrent: string;
   };
   landing: {
     navProduct: string;

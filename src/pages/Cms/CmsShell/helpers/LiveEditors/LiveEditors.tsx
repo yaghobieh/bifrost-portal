@@ -1,11 +1,16 @@
 import type { FC } from 'react';
 import { Avatar, Flex, Tooltip } from '@forgedevstack/bear';
-import { CMS_AVATAR_INITIALS_LENGTH } from '../../../CmsShell.const';
+import { useNucleus } from '@forgedevstack/synapse';
+import { EMPTY_STRING } from '@const/index';
+import { CMS_AVATAR_INITIALS_LENGTH } from '@const/numbers.const';
+import { mediaNucleus } from '@sdk/index';
+import { toCloudinarySrc } from '@sdk/modules/media';
 import { editorInitials, usersAtLocation } from './LiveEditors.utils';
 import type { LiveEditorsProps } from './LiveEditors.types';
 
 export const LiveEditors: FC<LiveEditorsProps> = (props) => {
   const { users, currentUserId, location } = props;
+  const { cloudName } = useNucleus(mediaNucleus);
   const others = usersAtLocation({ users, currentUserId, location });
   if (others.length === 0) {
     return null;
@@ -16,7 +21,7 @@ export const LiveEditors: FC<LiveEditorsProps> = (props) => {
         <Tooltip key={person.id} content={person.name} placement="bottom">
           <span className="bifrost-cms-live-editors__item">
             <Avatar
-              src={person.avatar || undefined}
+              src={toCloudinarySrc(person.avatar || EMPTY_STRING, cloudName) || undefined}
               initials={editorInitials(person.name, CMS_AVATAR_INITIALS_LENGTH)}
               size="sm"
             />

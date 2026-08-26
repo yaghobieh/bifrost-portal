@@ -32,7 +32,7 @@ import { dispatchCmsSave } from '@sdk/cmsSave';
 import { useApi } from '@sdk/http';
 import { setDefaultApiErrorMode } from '@sdk/http';
 import { uploadAndRegisterMedia, fetchMediaConfig, saveMediaCloudName } from '@sdk/index';
-import { parseCloudinaryCloudName } from '@sdk/modules/media/media.utils';
+import { parseCloudinaryCloudName, parseCloudinaryCredentials } from '@sdk/modules/media/media.utils';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { DeveloperPanel } from '../DeveloperPages';
 import {
@@ -131,6 +131,8 @@ export const SettingsPages: FC = () => {
   const [avatarError, setAvatarError] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [cloudName, setCloudName] = useState(SETTINGS_PROFILE_EMPTY);
+  const [cloudApiKey, setCloudApiKey] = useState(SETTINGS_PROFILE_EMPTY);
+  const [cloudApiSecret, setCloudApiSecret] = useState(SETTINGS_PROFILE_EMPTY);
   const [mediaConfigured, setMediaConfigured] = useState(false);
   const [mediaHasKey, setMediaHasKey] = useState(false);
   const [sitePanel, setSitePanel] = useState<SettingsSitePanelId>(SETTINGS_SITE_PANELS.GENERAL);
@@ -186,7 +188,7 @@ export const SettingsPages: FC = () => {
     }
     setLocale(site.locale);
     if (token && cloudName) {
-      const ok = await saveMediaCloudName(token, cloudName);
+      const ok = await saveMediaCloudName(token, cloudName, cloudApiKey, cloudApiSecret);
       if (ok) setMediaConfigured(true);
     }
     setDefaultApiErrorMode(site.apiErrorMode);
@@ -879,13 +881,42 @@ export const SettingsPages: FC = () => {
                     label={t.settings.cloudName}
                     value={cloudName}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                      setCloudName(parseCloudinaryCloudName(event.target.value) || event.target.value);
+                      const next = event.target.value;
+                      const parsed = parseCloudinaryCredentials(next);
+                      setCloudName(parsed.cloudName || parseCloudinaryCloudName(next) || next);
+                      if (parsed.apiKey) {
+                        setCloudApiKey(parsed.apiKey);
+                      }
+                      if (parsed.apiSecret) {
+                        setCloudApiSecret(parsed.apiSecret);
+                      }
+                      setMediaConfigured(false);
+                      markDirty();
+                    }}
+                  />
+                  <Input
+                    id={`${SETTINGS_MEDIA_INPUT_IDS.API_KEY}-site`}
+                    label={t.settings.cloudApiKey}
+                    value={cloudApiKey}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setCloudApiKey(event.target.value);
+                      setMediaConfigured(false);
+                      markDirty();
+                    }}
+                  />
+                  <Input
+                    id={`${SETTINGS_MEDIA_INPUT_IDS.API_SECRET}-site`}
+                    label={t.settings.cloudApiSecret}
+                    type="password"
+                    value={cloudApiSecret}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setCloudApiSecret(event.target.value);
                       setMediaConfigured(false);
                       markDirty();
                     }}
                   />
                   <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                    {t.settings.cloudNameHint}
+                    {t.settings.cloudUrlHint}
                   </Typography>
                   {mediaHasKey && cloudName && mediaConfigured ? (
                     <Alert severity="success">{t.settings.mediaReady}</Alert>
@@ -1087,13 +1118,42 @@ export const SettingsPages: FC = () => {
                     label={t.settings.cloudName}
                     value={cloudName}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                      setCloudName(parseCloudinaryCloudName(event.target.value) || event.target.value);
+                      const next = event.target.value;
+                      const parsed = parseCloudinaryCredentials(next);
+                      setCloudName(parsed.cloudName || parseCloudinaryCloudName(next) || next);
+                      if (parsed.apiKey) {
+                        setCloudApiKey(parsed.apiKey);
+                      }
+                      if (parsed.apiSecret) {
+                        setCloudApiSecret(parsed.apiSecret);
+                      }
+                      setMediaConfigured(false);
+                      markDirty();
+                    }}
+                  />
+                  <Input
+                    id={SETTINGS_MEDIA_INPUT_IDS.API_KEY}
+                    label={t.settings.cloudApiKey}
+                    value={cloudApiKey}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setCloudApiKey(event.target.value);
+                      setMediaConfigured(false);
+                      markDirty();
+                    }}
+                  />
+                  <Input
+                    id={SETTINGS_MEDIA_INPUT_IDS.API_SECRET}
+                    label={t.settings.cloudApiSecret}
+                    type="password"
+                    value={cloudApiSecret}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setCloudApiSecret(event.target.value);
                       setMediaConfigured(false);
                       markDirty();
                     }}
                   />
                   <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                    {t.settings.cloudNameHint}
+                    {t.settings.cloudUrlHint}
                   </Typography>
                   {mediaHasKey && cloudName && mediaConfigured ? (
                     <Alert severity="success">{t.settings.mediaReady}</Alert>

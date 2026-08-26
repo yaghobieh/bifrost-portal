@@ -9,6 +9,7 @@ import { Demo } from '@pages/Demo';
 import { AskAi } from '@pages/AskAi';
 import { Changelog } from '@pages/Changelog';
 import { Plans } from '@pages/Plans';
+import { StatusPage } from '@pages/Status';
 import { CmsPagesRoute } from '@pages/CmsPagesRoute';
 import {
   BuilderPages,
@@ -41,6 +42,7 @@ const routes = [
   { path: ROUTES.DEMO, name: 'demo', component: Demo },
   { path: ROUTES.ASK_AI, name: 'ask-ai', component: AskAi },
   { path: ROUTES.CHANGELOG, name: 'changelog', component: Changelog },
+  { path: ROUTES.STATUS, name: 'status', component: StatusPage },
   { path: ROUTES.PLANS, name: 'plans', component: Plans },
   { path: ROUTES.CMS_LOGIN, name: 'cms-login', component: CmsLogin },
   { path: ROUTES.CMS, name: 'cms', component: withCmsGate(Dashboard) },

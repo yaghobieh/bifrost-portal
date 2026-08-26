@@ -20,7 +20,7 @@ import type {
   MediaListResponse,
   RegisterMediaInput,
 } from './media.types';
-import { fileToDataUrl, parseCloudinaryCloudName } from './media.utils';
+import { fileToDataUrl, parseCloudinaryCloudName, parseCloudinaryCredentials } from './media.utils';
 
 export { CMS_MEDIA_PATH, CMS_MEDIA_SIGN_PATH, CMS_MEDIA_UPLOAD_PATH, CMS_MEDIA_CONFIG_PATH };
 
@@ -159,10 +159,9 @@ export const uploadViaServer = async (
 export const fetchMediaConfig = async (
   token: string,
 ): Promise<{ cloudName: string; configured: boolean; hasKey: boolean; hasSecret: boolean } | null> => {
-  if (!token) return null;
   const response = await useApi(
     `${INK_API_URL}${CMS_MEDIA_CONFIG_PATH}`,
-    { headers: authHeaders(token) },
+    token ? { headers: authHeaders(token) } : {},
     { message: 'Failed to load media config' },
   );
   if (!response.ok) return null;
@@ -177,8 +176,11 @@ export const fetchMediaConfig = async (
 export const saveMediaCloudName = async (
   token: string,
   cloudName: string,
+  apiKey = EMPTY_STRING,
+  apiSecret = EMPTY_STRING,
 ): Promise<boolean> => {
   if (!token) return false;
+  const parsed = parseCloudinaryCredentials(cloudName);
   const response = await useApi(
     `${INK_API_URL}${CMS_MEDIA_CONFIG_PATH}`,
     {
@@ -187,9 +189,13 @@ export const saveMediaCloudName = async (
         ...authHeaders(token),
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ cloudName: parseCloudinaryCloudName(cloudName) }),
+      body: JSON.stringify({
+        cloudName: parsed.cloudName || parseCloudinaryCloudName(cloudName),
+        apiKey: apiKey || parsed.apiKey,
+        apiSecret: apiSecret || parsed.apiSecret,
+      }),
     },
-    { mode: 'modal', message: 'Failed to save Cloudinary cloud name' },
+    { mode: 'modal', message: 'Failed to save Cloudinary config' },
   );
   return response.ok;
 };

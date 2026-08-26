@@ -52,6 +52,7 @@ export type CanvasNode = {
 
 export type StageCanvasProps = {
   nodes: CanvasNode[];
+  cloudName?: string;
 };
 
 export type NodeColorStyle = {

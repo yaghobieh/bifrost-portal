@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { BearIcons, Button, Flex, Input, Typography } from '@forgedevstack/bear';
+import { Alert, BearIcons, Button, Flex, Input, Typography } from '@forgedevstack/bear';
 import { ForgeForm, useField, useForm, Validators } from '@forgedevstack/forge-form';
 import { NUMBER_ZERO } from '@const/numbers.const';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
@@ -17,6 +17,8 @@ const CastFormFields: FC<Omit<CastFormProps, 'formKey'>> = (props) => {
     onFieldChange,
     onAddField,
     onRemoveField,
+    submitLocked,
+    lockedHint,
   } = props;
   const { t } = useI18n();
   const { handleSubmit } = useForm();
@@ -33,6 +35,10 @@ const CastFormFields: FC<Omit<CastFormProps, 'formKey'>> = (props) => {
     <form
       className="bifrost-cms-cast__form"
       onSubmit={(event) => {
+        if (submitLocked) {
+          event.preventDefault();
+          return;
+        }
         void handleSubmit(event);
       }}
     >
@@ -76,10 +82,12 @@ const CastFormFields: FC<Omit<CastFormProps, 'formKey'>> = (props) => {
           variant="primary"
           type="submit"
           icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
+          disabled={submitLocked}
         >
           {t.cmsCast.save}
         </Button>
       </Flex>
+      {submitLocked && lockedHint && <Alert severity="warning">{lockedHint}</Alert>}
       {saved ? (
         <Typography variant="caption" className="bifrost-cms-save-ok mb-0">
           {t.cmsCast.saved}
@@ -97,6 +105,9 @@ export const CastForm: FC<CastFormProps> = (props) => {
       initialValues={{ [CAST_TITLE_FIELD]: initialTitle }}
       validateOnSubmit
       onSubmit={(values) => {
+        if (props.submitLocked) {
+          return;
+        }
         void onSave(String(values[CAST_TITLE_FIELD] ?? ''));
       }}
     >

@@ -1,11 +1,11 @@
 import { useLayoutEffect, useRef, type FC } from 'react';
 import { Avatar, BearIcons, Button, Flex, Typography } from '@forgedevstack/bear';
 import { EMPTY_STRING } from '@const/index';
-import { NUMBER_ZERO } from '@const/numbers.const';
-import { CMS_AVATAR_INITIALS_LENGTH, CMS_ICON_SIZE } from '../../../CmsShell.const';
+import { CMS_AVATAR_INITIALS_LENGTH, CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
 import { CREW_SCROLL_STICK_PX } from '../../CmsCrewChat.const';
 import type { CrewChatPaneProps } from '../../CmsCrewChat.types';
 import { formatChatTime, initialsFromName } from '../../CmsCrewChat.utils';
+import { isThreadStuck, lastMessageId, threadDistanceFromBottom } from './CrewChatPane.utils';
 
 export const CrewChatPane: FC<CrewChatPaneProps> = (props) => {
   const {
@@ -33,13 +33,13 @@ export const CrewChatPane: FC<CrewChatPaneProps> = (props) => {
   const threadRef = useRef<HTMLDivElement>(null);
   const stickRef = useRef(true);
   const roomIdRef = useRef(room?.id);
+  const lastIdRef = useRef(lastMessageId(room?.messages));
 
   useLayoutEffect(() => {
     const thread = threadRef.current;
     if (!thread) return undefined;
     const onScroll = () => {
-      const distance = thread.scrollHeight - thread.scrollTop - thread.clientHeight;
-      stickRef.current = distance <= CREW_SCROLL_STICK_PX;
+      stickRef.current = isThreadStuck(threadDistanceFromBottom(thread), CREW_SCROLL_STICK_PX);
     };
     thread.addEventListener('scroll', onScroll, { passive: true });
     return () => thread.removeEventListener('scroll', onScroll);
@@ -48,12 +48,24 @@ export const CrewChatPane: FC<CrewChatPaneProps> = (props) => {
   useLayoutEffect(() => {
     const thread = threadRef.current;
     if (!thread) return;
+    const nextLastId = lastMessageId(room?.messages);
     const roomChanged = roomIdRef.current !== room?.id;
+    const newMessage = nextLastId !== lastIdRef.current;
     roomIdRef.current = room?.id;
-    if (!roomChanged && !stickRef.current) return;
+    lastIdRef.current = nextLastId;
+    if (roomChanged) {
+      thread.scrollTop = thread.scrollHeight;
+      stickRef.current = true;
+      return;
+    }
+    if (!newMessage) {
+      return;
+    }
+    if (!stickRef.current) {
+      return;
+    }
     thread.scrollTop = thread.scrollHeight;
-    stickRef.current = true;
-  }, [room?.id, room?.messages.length]);
+  }, [room?.id, room?.messages]);
 
   if (!room) {
     return (

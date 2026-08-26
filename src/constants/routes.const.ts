@@ -16,6 +16,7 @@ export const ROUTES = {
   PLAYGROUND: '/playground',
   GET_STARTED: '/get-started',
   CHANGELOG: '/changelog',
+  STATUS: '/status',
   AI: '/ai',
   ASK_AI: '/ai',
   PRICING: '/pricing',

@@ -9,6 +9,9 @@ import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
+import { useCmsLive } from '../CmsShell/CmsLiveProvider';
+import { currentLiveLocation } from '../CmsShell/CmsLive.utils';
+import { isPageSubmitLocked, locationOwner } from '../CmsShell/helpers/LiveEditors';
 import { DOCUMENT_DEFAULT_LOCALE } from '../ContentPages/ContentPages.const';
 import { isCastInstalled } from '../ExtensionsPages';
 import {
@@ -31,6 +34,7 @@ export const CastPages: FC = () => {
   const { t } = useI18n();
   const { navigate } = useNavigate();
   const { token: providerToken } = useAuth();
+  const { onlineUsers, selfId } = useCmsLive();
   const { token } = useNucleus(authNucleus);
   const { items, fetchContent } = useNucleus(contentNucleus);
   const activeToken = token || providerToken;
@@ -47,6 +51,15 @@ export const CastPages: FC = () => {
   }, [activeToken, fetchContent]);
 
   const groups = items.filter((item) => item.collection === CAST_COLLECTION);
+  const liveLocation = currentLiveLocation().location;
+  const pageLocked = isPageSubmitLocked({
+    users: onlineUsers,
+    currentUserId: selfId,
+    location: liveLocation,
+  });
+  const pageOwner = locationOwner({ users: onlineUsers, location: liveLocation });
+  const lockedHint =
+    pageLocked && pageOwner ? t.cmsShell.pageLocked.replace('{name}', pageOwner.name) : CAST_NONE;
   const targetOptions = [
     { value: CAST_NONE, label: t.cmsCast.newGroup },
     ...groups.map((item) => ({
@@ -99,6 +112,7 @@ export const CastPages: FC = () => {
 
   const onSave = async (nextTitle: string) => {
     if (!activeToken) return;
+    if (pageLocked) return;
     const resolvedTitle = nextTitle.trim();
     if (!resolvedTitle) return;
     const existing = items.find((entry) => entry.id === targetId);
@@ -167,6 +181,8 @@ export const CastPages: FC = () => {
                 onAddField={onAddField}
                 onRemoveField={onRemoveField}
                 onSave={onSave}
+                submitLocked={pageLocked}
+                lockedHint={lockedHint}
               />
             </Card>
           </div>

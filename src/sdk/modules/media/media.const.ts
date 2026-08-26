@@ -17,3 +17,4 @@ export const CLOUDINARY_FORM_KEYS = {
 
 export const DEFAULT_MEDIA_RESOURCE_TYPE = 'image';
 export const DEFAULT_MEDIA_FOLDER = 'bifrost-cms';
+export const HTML_IMG_SRC = /(<img\b[^>]*?\bsrc=)(["'])([^"']+)\2/gi;

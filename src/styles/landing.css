@@ -569,6 +569,16 @@
   border-color: rgba(234, 10, 142, 0.28);
 }
 
+.Bl-status {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 64px 32px 88px;
+}
+.Bl-status__card {
+  flex: 1 1 240px;
+  min-width: 220px;
+}
+
 .Bl .Bear-Typography {
   color: inherit;
 }

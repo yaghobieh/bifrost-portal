@@ -41,6 +41,9 @@ export const PortalNav: FC<PortalNavProps> = (props) => {
           <Link className="Bl-nav__link" to={ROUTES.CHANGELOG}>
             {t('nav.changelog')}
           </Link>
+          <Link className="Bl-nav__link" to={ROUTES.STATUS}>
+            {t('nav.status')}
+          </Link>
         </nav>
         <div className="Bl-nav__right">
           <a className="Bl-nav__gh" href={BIFROST_REPO_URL} target="_blank" rel="noreferrer">

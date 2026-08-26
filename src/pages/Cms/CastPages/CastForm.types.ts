@@ -12,4 +12,6 @@ export type CastFormProps = {
   onAddField: () => void;
   onRemoveField: (fieldId: string) => void;
   onSave: (title: string) => Promise<void>;
+  submitLocked: boolean;
+  lockedHint: string;
 };

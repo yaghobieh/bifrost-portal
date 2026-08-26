@@ -8,9 +8,12 @@
 - Cursor workers in `.cursor/workers` — commit as `Worker: {name}`.
 
 ### Fixed
-- Online / green Online and chat delivery between two logged-in agents.
-- Health comes from the live socket, not HTTP polling.
-- Public site topbar links are white on the dark nav.
+- Crew chat no longer jumps the thread after messages are already read.
+- Save and submit stay disabled when another editor already owns the page.
+- Design nav and canvas are Marketing Pages (plugin blocks + right-click menu), not Stage.
+- Cloudinary cloud name, API key, and secret come from Settings, installment, and `CLOUDINARY_URL`. Image loads go through that cloud.
+- Public `/status` shows health, service status, and whether a newer CMS version is available.
+- Update banner shows when the installed CMS is behind hub `1.1.10`.
 
 ### Planned for 1.1.11
 - Chat read receipts (blue ticks), configurable
@@ -20,7 +23,7 @@
 - Live agent AI on login
 - Email and SMS send
 - Cleaner roles (site admin, editor, manager)
-- Changeable chat status
+- Tag a page or task from the Tasks board
 
 ### Changed
 - CMS Cards use Bear `padding="md"` ([Bear Card](https://bearui.com/components/card)).
@@ -32,5 +35,5 @@
 ### Added
 - Update banner changelog line even when already on this version.
 - Content fields pick their input type (text, select, rich editor, and more) instead of a widget drawer.
-- Stage marketing blocks use CMS blue `#2951C4`.
+- Marketing Pages blocks use CMS blue `#2951C4`.
 - The 1.1.10 update uses Bear `Snackbar` instead of a custom banner.

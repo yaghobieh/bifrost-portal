@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent, type DragEvent, type FC } from '
 import { useNavigate, useParams } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import {
+  Alert,
   Badge,
   BearIcons,
   Button,
@@ -25,6 +26,7 @@ import type { ContentStatus } from '@sdk/modules/content';
 import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING, LiveEditors } from '../CmsShell';
 import { useCmsLive } from '../CmsShell/CmsLiveProvider';
 import { currentLiveLocation } from '../CmsShell/CmsLive.utils';
+import { isPageSubmitLocked, locationOwner } from '../CmsShell/helpers/LiveEditors';
 import { loadStoredWidth, saveStoredWidth, startHorizontalResize } from '../CmsShell/CmsShell.utils';
 import {
   BEAR_WIDGET_CATALOG,
@@ -167,6 +169,13 @@ export const ContentEdit: FC = () => {
   }, [activeToken, fetchContent, fetchPages]);
 
   const target = id ? resolveEditTarget(id, pages, items) : null;
+  const liveLocation = currentLiveLocation().location;
+  const pageLocked = isPageSubmitLocked({
+    users: onlineUsers,
+    currentUserId: selfId,
+    location: liveLocation,
+  });
+  const pageOwner = locationOwner({ users: onlineUsers, location: liveLocation });
 
   useEffect(() => {
     if (!target) {
@@ -299,6 +308,7 @@ export const ContentEdit: FC = () => {
 
   const onSave = async () => {
     if (!activeToken || !target) return;
+    if (pageLocked) return;
     setSaveOk(false);
     pushRevision();
     const extras = {
@@ -437,12 +447,18 @@ export const ContentEdit: FC = () => {
               variant="primary"
               icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
               onClick={() => void onSave()}
-              disabled={!target || saving}
+              disabled={!target || saving || pageLocked}
             >
               {saving ? t.dashboard.saving : t.dashboard.save}
             </Button>
           </Flex>
         </Flex>
+
+        {pageLocked && pageOwner && (
+          <Alert severity="warning">
+            {t.cmsShell.pageLocked.replace('{name}', pageOwner.name)}
+          </Alert>
+        )}
 
         {loading && !hydrated ? (
           <Flex align="center" gap={2}>

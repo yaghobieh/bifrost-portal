@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Avatar, Badge, BearIcons, Button, Flex, Input, Typography } from '@forgedevstack/bear';
-import { NUMBER_ZERO } from '@const/numbers.const';
-import { CMS_AVATAR_INITIALS_LENGTH, CMS_ICON_SIZE, CMS_KEY_ENTER } from '../../../CmsShell.const';
+import { CMS_AVATAR_INITIALS_LENGTH, CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
+import { CMS_KEY_ENTER } from '@pages/Cms/CmsShell/CmsShell.const';
 import { CREW_JUMP_INPUT_ID, CREW_NEW_ROOM_INPUT_ID } from '../../CmsCrewChat.const';
 import type { CrewChatSidebarProps } from '../../CmsCrewChat.types';
 import {

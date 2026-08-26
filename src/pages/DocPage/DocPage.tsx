@@ -9,7 +9,7 @@ import { NUMBER_ZERO, NUMBER_ONE } from '@const/numbers.const';
 import { usePublicPage } from '@hooks/usePublicPage';
 import { mapCmsDoc } from '@data/docs.mapper';
 import { PageLoader } from '@components/PageLoader';
-import { StageCanvas, readCanvas } from '@components/StageCanvas';
+import { PublicPageCanvas } from '@components/PublicPageCanvas';
 import { DOC_CRUMB_SEP } from './DocPage.const';
 import { docPageTab, renderDocNext, renderDocPrev, renderInline } from './DocPage.utils';
 
@@ -19,7 +19,6 @@ export const DocPage: FC = () => {
   const slug = params.slug || DEFAULT_DOC_SLUG;
   const { item, loading } = usePublicPage(slug);
   const doc = item ? mapCmsDoc({ slug: item.slug, title: item.title, payload: item.payload }) : null;
-  const canvas = item ? readCanvas(item.payload) : [];
   const tab = docPageTab(slug);
 
   if (loading) {
@@ -48,11 +47,7 @@ export const DocPage: FC = () => {
         </div>
         <Typography variant="h1">{doc.title}</Typography>
         <Typography variant="body1">{doc.lead}</Typography>
-        {canvas.length > NUMBER_ZERO && (
-          <div className="Bp-stage">
-            <StageCanvas nodes={canvas} />
-          </div>
-        )}
+        <PublicPageCanvas payload={item?.payload} />
         {doc.sections.map((section) => (
           <section key={section.id} id={section.id}>
             <Typography variant="h2">{section.heading}</Typography>

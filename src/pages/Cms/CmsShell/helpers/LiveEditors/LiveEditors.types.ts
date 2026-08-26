@@ -1,4 +1,4 @@
-import type { CmsPresenceUser } from '../../../CmsLive.types';
+import type { CmsPresenceUser } from '@pages/Cms/CmsShell/CmsLive.types';
 
 export type LiveEditorsProps = {
   users: CmsPresenceUser[];

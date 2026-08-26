@@ -62,7 +62,11 @@ export type CanvasMenuAction =
   | 'wrap-grid'
   | 'add-section'
   | 'move-up'
-  | 'move-down';
+  | 'move-down'
+  | 'edit-content'
+  | 'copy-styles'
+  | 'paste-styles'
+  | 'save-reusable';
 
 export type CanvasMenuState = {
   nodeId: string;
