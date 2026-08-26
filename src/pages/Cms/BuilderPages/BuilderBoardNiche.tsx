@@ -30,7 +30,7 @@ export const BuilderBoardNiche: FC = () => {
   };
 
   return (
-    <Card padding="md" className="bifrost-cms-card bifrost-cms-builder__board-niche">
+    <Card padding="md" className="bifrost-cms-builder__board-niche">
       <Typography variant="h4" className="mb-1">
         {t.cmsBuilder.boardNiche}
       </Typography>

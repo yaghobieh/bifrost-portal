@@ -26,7 +26,7 @@ import {
   updateCrewRoleRequest,
   updateCrewUserRoleRequest,
 } from '@sdk/modules/cms';
-import { CmsGridTable, CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsGridTable, CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   CREW_PAGE_TABS,
   CREW_PERMISSION_GROUPS,
@@ -198,15 +198,8 @@ export const CrewPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.CREW}>
-      <Flex direction="column" gap={4}>
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.cmsCrew.pageTitle}
-          </Typography>
-          <Typography variant="body2" color="secondary" className="mb-0">
-            {t.cmsCrew.subtitle}
-          </Typography>
-        </div>
+      <Flex direction="column" gap={6}>
+        <CmsPageHeader title={t.cmsCrew.pageTitle} subtitle={t.cmsCrew.subtitle} />
         {loadError ? (
           <Typography variant="body2" color="danger" className="mb-0">
             {t.cmsCrew.loadError}

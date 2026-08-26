@@ -24,7 +24,7 @@ export const CmsErrorPage: FC<CmsErrorPageProps> = (props) => {
 
   return (
     <div className="bifrost-cms-error-page">
-      <Card padding="md" className="bifrost-cms-card bifrost-cms-error-page__card">
+      <Card padding="md" className="bifrost-cms-error-page__card">
         <Flex direction="column" gap={3} align="center">
           <Typography variant="h2" className="mb-0">
             {unauthorized ? t.cmsErrors.unauthorizedTitle : t.cmsErrors.oopsTitle}

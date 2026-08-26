@@ -33,7 +33,7 @@ import { useApi } from '@sdk/http';
 import { setDefaultApiErrorMode } from '@sdk/http';
 import { uploadAndRegisterMedia, fetchMediaConfig, saveMediaCloudName } from '@sdk/index';
 import { parseCloudinaryCloudName } from '@sdk/modules/media/media.utils';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { DeveloperPanel } from '../DeveloperPages';
 import {
   SETTINGS_AVATAR_ACCEPT,
@@ -334,17 +334,10 @@ export const SettingsPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.SETTINGS}>
-      <Flex direction="column" gap={0} className="bifrost-cms-page">
-        <div>
-          <Typography variant="h2" className="bifrost-cms-page__title mb-0">
-            {t.settings.title}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms-page__sub mb-0">
-            {t.settings.subtitle}
-          </Typography>
-        </div>
+      <Flex direction="column" gap={6} className="bifrost-cms-page">
+        <CmsPageHeader title={t.settings.title} subtitle={t.settings.subtitle} />
 
-        <Card padding="md" className="bifrost-cms-card bifrost-cms-settings">
+        <Card variant="elevated" padding="md">
           <Tabs defaultTab={SETTINGS_TABS.PROFILE} variant="line">
             <TabList className="mb-4" wrap>
               <Tab id={SETTINGS_TABS.PROFILE}>{t.settings.tabProfile}</Tab>

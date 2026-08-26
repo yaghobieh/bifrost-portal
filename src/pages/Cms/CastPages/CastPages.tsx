@@ -8,7 +8,7 @@ import { ROUTES } from '@const/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { DOCUMENT_DEFAULT_LOCALE } from '../ContentPages/ContentPages.const';
 import { isCastInstalled } from '../ExtensionsPages';
 import {
@@ -119,17 +119,10 @@ export const CastPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.CAST}>
-      <Flex direction="column" gap={4}>
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.cmsCast.title}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {t.cmsCast.subtitle}
-          </Typography>
-        </div>
+      <Flex direction="column" gap={6}>
+        <CmsPageHeader title={t.cmsCast.title} subtitle={t.cmsCast.subtitle} />
         {!installed ? (
-          <Card padding="md" className="bifrost-cms-card">
+          <Card padding="md">
             <Typography variant="h4" className="mb-2">
               {t.cmsCast.lockedTitle}
             </Typography>
@@ -147,7 +140,7 @@ export const CastPages: FC = () => {
           </Card>
         ) : (
           <div className="bifrost-cms-cast">
-            <Card padding="md" className="bifrost-cms-card">
+            <Card padding="md">
               <Typography variant="h4" className="mb-2">
                 {t.cmsCast.groups}
               </Typography>
@@ -159,7 +152,7 @@ export const CastPages: FC = () => {
                 onChange={onTargetChange}
               />
             </Card>
-            <Card padding="md" className="bifrost-cms-card">
+            <Card padding="md">
               <CastForm
                 formKey={targetId || 'new'}
                 initialTitle={title}

@@ -462,7 +462,7 @@ export const ContentEdit: FC = () => {
             className="bifrost-cms-edit__layout"
             style={{ gridTemplateColumns: `minmax(0, 1fr) ${sideWidth}px` }}
           >
-            <Card className="bifrost-cms-card bifrost-cms-edit__main" padding={CMS_CARD_PADDING}>
+            <Card className="bifrost-cms-edit__main" padding={CMS_CARD_PADDING}>
               <Flex direction="column" gap={3}>
                 <Input
                   id={CONTENT_EDIT_TITLE_ID}
@@ -582,7 +582,7 @@ export const ContentEdit: FC = () => {
               }}
             />
             <aside className="bifrost-cms-edit__side">
-              <Card className="bifrost-cms-card mb-3" padding={CMS_CARD_PADDING}>
+              <Card className="mb-3" padding={CMS_CARD_PADDING}>
                 <button
                   type="button"
                   className="bifrost-cms-edit__seo-toggle"
@@ -721,7 +721,7 @@ export const ContentEdit: FC = () => {
                 }}
               />
 
-              <Card className="bifrost-cms-card mb-3" padding={CMS_CARD_PADDING}>
+              <Card className="mb-3" padding={CMS_CARD_PADDING}>
                 <Typography variant="h4" className="mb-1">
                   {t.contentEdit.revisionsTitle}
                 </Typography>

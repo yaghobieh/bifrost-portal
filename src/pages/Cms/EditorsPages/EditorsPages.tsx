@@ -105,7 +105,7 @@ export const EditorsPages: FC = () => {
           ))}
         </div>
 
-        <Card padding="md" className="bifrost-cms-card bifrost-cms-editor-preview">
+        <Card padding="md" className="bifrost-cms-editor-preview">
           <Flex justify="between" align="center" className="mb-3">
             <Typography variant="h4" className="mb-0">
               {t.dashboard.editorsLivePreview}: {activeVariant}

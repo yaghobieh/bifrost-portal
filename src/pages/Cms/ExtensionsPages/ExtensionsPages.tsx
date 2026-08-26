@@ -16,7 +16,7 @@ import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { ROUTES } from '@const/routes.const';
 import { CMS_CREW_OPEN_EVENT } from '@const/index';
 import { authNucleus } from '@sdk/index';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   BIF_DYNAMIC_EXTENSION_ID,
   CALENDAR_EXTENSION_ID,
@@ -177,13 +177,8 @@ export const ExtensionsPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.BUNDLES}>
-      <Flex direction="column" gap={0} className="bifrost-cms-page">
-        <Typography variant="h2" className="bifrost-cms-page__title mb-0">
-          {t.cmsExtensions.title}
-        </Typography>
-        <Typography variant="body2" className="bifrost-cms-page__sub mb-0">
-          {t.cmsExtensions.subtitle}
-        </Typography>
+      <Flex direction="column" gap={6} className="bifrost-cms-page">
+        <CmsPageHeader title={t.cmsExtensions.title} subtitle={t.cmsExtensions.subtitle} />
         <div className="bifrost-cms-store-filter">
           <Input
             id={EXTENSION_SEARCH_INPUT_ID}
@@ -259,7 +254,7 @@ export const ExtensionsPages: FC = () => {
               const onCardClick = () => setSelected(item);
               return (
                 <div key={item.id} className="bifrost-cms-ext-hit" onClick={onCardClick}>
-                <Card padding="md" className="bifrost-cms-card bifrost-cms-ext">
+                <Card padding="md" className="bifrost-cms-ext">
                   <div className="bifrost-cms-ext__head">
                     <span className={`bifrost-cms-ext__mark${installed ? ' bifrost-cms-ext__mark--in' : ''}`}>
                       {mark}

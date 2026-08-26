@@ -7,7 +7,7 @@ import { useI18n } from '@i18n/index';
 import { NUMBER_ZERO } from '@const/numbers.const';
 import { CMS_KPI_ICON_SIZE, ROUTES } from '@const/index';
 import { authNucleus, cmsNucleus } from '@sdk/index';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { loadOnboardingDone, saveOnboardingDone } from '@utils';
 import { loadCmsSite } from '../SettingsPages';
 import { CMS_NAV_ROUTES } from '../CmsShell/CmsShell.const';
@@ -62,16 +62,11 @@ export const Dashboard: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.DASHBOARD}>
-      <Flex direction="column" gap={0} className="bifrost-cms-page">
-        <Typography variant="h2" className="bifrost-cms-page__title mb-0">
-          {t.dashboard.title}
-        </Typography>
-        <Typography variant="body2" className="bifrost-cms-page__sub mb-0">
-          {t.dashboard.subtitle}
-        </Typography>
+      <Flex direction="column" gap={6} className="bifrost-cms-page">
+        <CmsPageHeader title={t.dashboard.title} subtitle={t.dashboard.subtitle} />
 
         {showOnboarding ? (
-          <Card padding="md" className="bifrost-cms-card bifrost-cms-onboarding-banner">
+          <Card variant="elevated" padding="md" className="bifrost-cms-onboarding-banner">
             <Flex justify="between" align="center" gap={3} className="bifrost-cms-onboarding-banner__row">
               <div>
                 <Typography variant="h4" className="mb-1">
@@ -103,7 +98,7 @@ export const Dashboard: FC = () => {
         ) : null}
 
         <div className="bifrost-cms-stat-row">
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.PAGES}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.PAGES}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.documents}</span>
               <span className="bifrost-cms-stat__ic">
@@ -112,7 +107,7 @@ export const Dashboard: FC = () => {
             </div>
             <div className="bifrost-cms-stat__num">{formatNumber(data.documents)}</div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.PUBLISHED}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.PUBLISHED}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.publishedCount}</span>
               <span className="bifrost-cms-stat__ic">
@@ -123,7 +118,7 @@ export const Dashboard: FC = () => {
               {formatNumber(data.published)}
             </div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.DRAFTS}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.DRAFTS}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.drafts}</span>
               <span className="bifrost-cms-stat__ic">
@@ -134,7 +129,7 @@ export const Dashboard: FC = () => {
               {formatNumber(data.drafts)}
             </div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.TEMPLATES}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.TEMPLATES}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.templatesCount}</span>
               <span className="bifrost-cms-stat__ic">
@@ -143,7 +138,7 @@ export const Dashboard: FC = () => {
             </div>
             <div className="bifrost-cms-stat__num">{formatNumber(data.templates)}</div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.MEDIA}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.MEDIA}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.mediaCount}</span>
               <span className="bifrost-cms-stat__ic">
@@ -152,7 +147,7 @@ export const Dashboard: FC = () => {
             </div>
             <div className="bifrost-cms-stat__num">{formatNumber(data.media)}</div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.TOKENS}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.TOKENS}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.tokens}</span>
               <span className="bifrost-cms-stat__ic">
@@ -161,7 +156,7 @@ export const Dashboard: FC = () => {
             </div>
             <div className="bifrost-cms-stat__num">{formatNumber(data.tokensUsed)}</div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.TABLES}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.TABLES}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.tablesCount}</span>
               <span className="bifrost-cms-stat__ic">
@@ -170,7 +165,7 @@ export const Dashboard: FC = () => {
             </div>
             <div className="bifrost-cms-stat__num">{formatNumber(data.tables)}</div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.CREW}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.CREW}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.crewCount}</span>
               <span className="bifrost-cms-stat__ic">
@@ -179,7 +174,7 @@ export const Dashboard: FC = () => {
             </div>
             <div className="bifrost-cms-stat__num">{formatNumber(data.crew)}</div>
           </Card>
-          <Card padding="md" className={`bifrost-cms-card bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.ALERTS}`}>
+          <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.ALERTS}`}>
             <div className="bifrost-cms-stat__top">
               <span className="bifrost-cms-stat__label">{t.dashboard.unreadAlerts}</span>
               <span className="bifrost-cms-stat__ic">
@@ -191,7 +186,7 @@ export const Dashboard: FC = () => {
         </div>
 
         <div className="bifrost-cms-dash-row">
-          <Card padding="md" className="bifrost-cms-card">
+          <Card padding="md">
             <div className="bifrost-cms-card__title">{t.dashboard.publishedMix}</div>
             {data.distribution.length === NUMBER_ZERO ? (
               <Typography variant="body2" className="bifrost-cms__muted mb-0">
@@ -218,7 +213,7 @@ export const Dashboard: FC = () => {
               </div>
             )}
           </Card>
-          <Card padding="md" className="bifrost-cms-card">
+          <Card padding="md">
             <Flex justify="between" align="center" className="mb-2">
               <div className="bifrost-cms-card__title">{t.dashboard.activity}</div>
               {weeklyMax > NUMBER_ZERO ? (
@@ -253,7 +248,7 @@ export const Dashboard: FC = () => {
         </div>
 
         <div className="bifrost-cms-bottom-row">
-          <Card padding="md" className="bifrost-cms-card">
+          <Card padding="md">
             <div className="bifrost-cms-card__title">{t.dashboard.aiUsageTitle}</div>
             <div className="bifrost-cms-progress">
               <span className="bifrost-cms-progress__fill" style={{ width: `${usagePercent}%` }} />
