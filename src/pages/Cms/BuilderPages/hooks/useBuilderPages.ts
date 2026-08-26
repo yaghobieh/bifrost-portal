@@ -14,7 +14,6 @@ import {
   CMS_BUILDER_PALETTE_MIN_PX,
   CMS_BUILDER_PALETTE_WIDTH_KEY,
   CMS_BUILDER_PALETTE_WIDTH_PX,
-  CMS_EXTENSIONS_EVENT,
   DRAG_WIDGET_MIME,
   ROUTES,
   cmsBuilderPath,
@@ -29,7 +28,6 @@ import {
   DOCUMENT_DEFAULT_LOCALE,
   DOCUMENT_STARTER_STATUS,
 } from '../../ContentPages/ContentPages.const';
-import { isBifDynamicInstalled, isMarketingPagesInstalled } from '../../ExtensionsPages';
 import {
   PAGE_LAYOUT_TEMPLATES,
   TEMPLATES_COLLECTION,
@@ -91,17 +89,7 @@ export const useBuilderPages = () => {
   const { token } = useNucleus(authNucleus);
   const { items, fetchContent } = useNucleus(contentNucleus);
   const activeToken = token || providerToken;
-  const [installed, setInstalled] = useState(
-    () => isBifDynamicInstalled() || isMarketingPagesInstalled(),
-  );
-  useEffect(() => {
-    const refreshPlugins = () => {
-      setInstalled(isBifDynamicInstalled() || isMarketingPagesInstalled());
-    };
-    window.addEventListener(CMS_EXTENSIONS_EVENT, refreshPlugins);
-    refreshPlugins();
-    return () => window.removeEventListener(CMS_EXTENSIONS_EVENT, refreshPlugins);
-  }, []);
+  const installed = true;
   const [tree, setTree] = useState<CanvasNode[]>(() => loadBuilderTree());
   const [selectedId, setSelectedId] = useState(BUILDER_INSPECTOR_NONE);
   const [dropParentId, setDropParentId] = useState(BUILDER_INSPECTOR_NONE);
@@ -388,12 +376,10 @@ export const useBuilderPages = () => {
     [MARKETING_WIDGET_IDS.CTA_BAND]: t.cmsBuilder.marketingCtaBand,
     [MARKETING_WIDGET_IDS.FOOTER]: t.cmsBuilder.marketingFooter,
   };
-  const marketingWidgets = isMarketingPagesInstalled()
-    ? MARKETING_WIDGETS.map((widget) => ({
-        ...widget,
-        label: marketingLabels[widget.id],
-      }))
-    : [];
+  const marketingWidgets = MARKETING_WIDGETS.map((widget) => ({
+    ...widget,
+    label: marketingLabels[widget.id],
+  }));
   const layers = flattenLayers(tree);
 
   return {

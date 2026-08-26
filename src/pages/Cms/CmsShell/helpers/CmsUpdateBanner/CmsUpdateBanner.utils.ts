@@ -1,5 +1,6 @@
 import { EMPTY_STRING } from '@const/strings.const';
 import { TARGET_CMS_VERSION } from '@sdk/modules/version';
+import type { WhatsNewCopy } from '@sdk/modules/version';
 import { CMS_UPDATE_DISMISS_KEY } from './CmsUpdateBanner.const';
 
 export const versionFromInfo = (portal: string, version: string): string => {
@@ -30,4 +31,24 @@ export const saveDismissedVersion = (version: string): void => {
   } catch {
     return;
   }
+};
+
+export const previewNotes = (
+  apiNotes: string | undefined,
+  whatsNew: WhatsNewCopy,
+  fallback: string,
+): string => {
+  if (apiNotes) {
+    return apiNotes;
+  }
+  if (whatsNew.lead) {
+    return whatsNew.lead;
+  }
+  if (whatsNew.body) {
+    return whatsNew.body;
+  }
+  if (whatsNew.title) {
+    return whatsNew.title;
+  }
+  return fallback;
 };

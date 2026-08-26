@@ -20,3 +20,4 @@ export { CastPages } from './CastPages';
 export { CmsLookPicker } from './CmsLook';
 export { CmsOnboarding } from './CmsOnboarding';
 export { DeveloperPages } from './DeveloperPages';
+export { AuditPages } from './DeveloperPages';

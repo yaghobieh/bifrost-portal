@@ -85,10 +85,10 @@ export const CREW_PERMISSION_GROUPS: readonly {
 
 export const CREW_PAGE_TABS = {
   USERS: 'users',
-  DEVELOPER: 'developer',
+  ROLES: 'roles',
 } as const;
 
-export const CREW_LAYOUT_COLS = 2 as const;
+export const CREW_LAYOUT_COLS = 1 as const;
 export const CREW_LAYOUT_GAP = 4 as const;
 
 export type CrewRole = {

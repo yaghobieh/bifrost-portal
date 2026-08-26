@@ -8,6 +8,7 @@ export type CmsUpdateCandidate = {
   to: string;
   updated: boolean;
   packages?: string[];
+  notes?: string;
 };
 
 export const isCmsUpdateResult = (value: CmsUpdateCandidate | null): boolean => {
@@ -28,6 +29,7 @@ export const optimisticUpdateResult = async (): Promise<CmsUpdateResult> => {
     from,
     to: TARGET_CMS_VERSION,
     updated: from !== TARGET_CMS_VERSION,
-    packages: [],
+    packages: Object.entries(info.packages).map((entry) => `${entry[0]}@${entry[1]}`),
+    notes: info.notes,
   };
 };

@@ -14,7 +14,6 @@ import {
   Tabs,
   Typography,
 } from '@forgedevstack/bear';
-import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
 import { EMPTY_STRING } from '@const/index';
 import { authNucleus } from '@sdk/index';
@@ -27,9 +26,7 @@ import {
   updateCrewRoleRequest,
   updateCrewUserRoleRequest,
 } from '@sdk/modules/cms';
-import { loadUserDevPrefs } from '../SettingsPages/SettingsPages.utils';
 import { CmsGridTable, CmsShell, CMS_NAV_IDS } from '../CmsShell';
-import { DeveloperPanel } from '../DeveloperPages';
 import {
   CREW_PAGE_TABS,
   CREW_PERMISSION_GROUPS,
@@ -44,7 +41,6 @@ import {
 
 export const CrewPages: FC = () => {
   const { t } = useI18n();
-  const { user } = useAuth();
   const { token } = useNucleus(authNucleus);
   const [users, setUsers] = useState<CrewUser[]>([]);
   const [roles, setRoles] = useState<CrewRole[]>(DEFAULT_CREW_ROLES);
@@ -63,7 +59,6 @@ export const CrewPages: FC = () => {
   const [editingUserId, setEditingUserId] = useState(EMPTY_STRING);
   const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [showDeveloper, setShowDeveloper] = useState(true);
 
   const loadCrew = async () => {
     if (!token) return;
@@ -84,10 +79,6 @@ export const CrewPages: FC = () => {
   useEffect(() => {
     void loadCrew();
   }, [token]);
-
-  useEffect(() => {
-    setShowDeveloper(loadUserDevPrefs(user?.username || EMPTY_STRING).showDeveloperPage);
-  }, [user?.username]);
 
   const togglePermission = (permission: CrewPermission) => {
     setSelectedPermissions((current) =>
@@ -225,9 +216,7 @@ export const CrewPages: FC = () => {
         <Tabs defaultTab={CREW_PAGE_TABS.USERS} variant="pills">
           <TabList wrap>
             <Tab id={CREW_PAGE_TABS.USERS}>{t.cmsCrew.tabUsers}</Tab>
-            {showDeveloper ? (
-              <Tab id={CREW_PAGE_TABS.DEVELOPER}>{t.cmsCrew.tabDeveloper}</Tab>
-            ) : null}
+            <Tab id={CREW_PAGE_TABS.ROLES}>{t.cmsCrew.tabRoles}</Tab>
           </TabList>
           <TabPanel tabId={CREW_PAGE_TABS.USERS}>
             <Grid cols={CREW_LAYOUT_COLS} gap={CREW_LAYOUT_GAP}>
@@ -332,7 +321,10 @@ export const CrewPages: FC = () => {
                     ]}
                   />
                 </Card>
-
+            </Grid>
+          </TabPanel>
+          <TabPanel tabId={CREW_PAGE_TABS.ROLES}>
+            <Grid cols={CREW_LAYOUT_COLS} gap={CREW_LAYOUT_GAP}>
                 <Card padding="md">
                   <Typography variant="h4" className="mb-1">
                     {t.cmsCrew.rolesTitle}
@@ -402,7 +394,6 @@ export const CrewPages: FC = () => {
                       id: role.id,
                       name: role.name,
                       description: role.description,
-                      permissions: String(role.permissions.length),
                       userCount: String(usersForRole(role.id)),
                     }))}
                     columns={[
@@ -411,11 +402,6 @@ export const CrewPages: FC = () => {
                         id: 'description',
                         accessor: 'description',
                         header: t.cmsCrew.roleDescription,
-                      },
-                      {
-                        id: 'permissions',
-                        accessor: 'permissions',
-                        header: t.cmsCrew.permissions,
                       },
                       { id: 'userCount', accessor: 'userCount', header: t.cmsCrew.usersCount },
                       {
@@ -453,11 +439,6 @@ export const CrewPages: FC = () => {
                 </Card>
             </Grid>
           </TabPanel>
-          {showDeveloper ? (
-            <TabPanel tabId={CREW_PAGE_TABS.DEVELOPER}>
-              <DeveloperPanel />
-            </TabPanel>
-          ) : null}
         </Tabs>
       </Flex>
     </CmsShell>

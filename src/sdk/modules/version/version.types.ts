@@ -23,6 +23,8 @@ export type VersionInfo = {
   uptimeSec: number;
   docker: VersionDockerInfo;
   build: VersionBuildInfo;
+  packages: Record<string, string>;
+  notes: string;
 };
 
 export type CmsUpdateResult = {
@@ -30,4 +32,11 @@ export type CmsUpdateResult = {
   to: string;
   updated: boolean;
   packages: string[];
+  notes: string;
+};
+
+export type WhatsNewCopy = {
+  title: string;
+  lead: string;
+  body: string;
 };

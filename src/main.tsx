@@ -11,6 +11,7 @@ import { inkTheme, inkVariants } from '@config/ink-theme';
 import { bifrostTheme, bifrostVariants } from '@config/bear-theme';
 import { CMS_PATH } from '@config/cms.config';
 import { SLASH, THEME_STORAGE_KEY } from '@const/strings.const';
+import { bindWindowVersion, CONSOLE_VERSION_LABEL, fetchVersionInfo } from '@sdk/modules/version';
 import { CMS_CARD_PADDING } from './pages/Cms/CmsShell/CmsShell.const';
 import { App } from './App';
 import './styles/index.css';
@@ -25,6 +26,11 @@ if (onCmsHost) {
   void import('./styles/portal.css');
   void import('./styles/landing.css');
 }
+
+void fetchVersionInfo().then((info) => {
+  bindWindowVersion(info);
+  console.info(CONSOLE_VERSION_LABEL, info);
+});
 
 const app = (
   <I18nProvider>

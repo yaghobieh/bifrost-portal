@@ -39,6 +39,7 @@ export const CMS_NAV_IDS = {
   SETTINGS: 'settings',
   HELP: 'help',
   DEVELOPER: 'developer',
+  AUDIT: 'audit',
   TASKS: 'tasks',
   CHAT: 'chat',
   NOTIFICATIONS: 'notifications',
@@ -48,6 +49,7 @@ export const CMS_NAV_SECTIONS = {
   OVERVIEW: 'sec-overview',
   DESIGN: 'sec-design',
   GENERAL: 'sec-general',
+  DEVELOPER: 'sec-developer',
 } as const;
 
 export const CMS_NAV_ROUTES: Record<string, string> = {
@@ -69,6 +71,7 @@ export const CMS_NAV_ROUTES: Record<string, string> = {
   [CMS_NAV_IDS.SETTINGS]: ROUTES.CMS_SETTINGS,
   [CMS_NAV_IDS.HELP]: ROUTES.DOCS,
   [CMS_NAV_IDS.DEVELOPER]: ROUTES.CMS_DEVELOPER,
+  [CMS_NAV_IDS.AUDIT]: ROUTES.CMS_AUDIT,
   [CMS_NAV_IDS.TASKS]: ROUTES.CMS_TASKS,
   [CMS_NAV_IDS.NOTIFICATIONS]: ROUTES.CMS_NOTIFICATIONS,
 };

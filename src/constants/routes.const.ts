@@ -39,6 +39,7 @@ export const ROUTES = {
   CMS_CALENDAR: '/cms/calendar',
   CMS_SETTINGS: '/cms/settings',
   CMS_DEVELOPER: '/cms/developer',
+  CMS_AUDIT: '/cms/audit',
   CMS_NOTIFICATIONS: '/cms/notifications',
   CMS_TEMPLATES: '/cms/templates',
   CMS_BUILDER: '/cms/builder',

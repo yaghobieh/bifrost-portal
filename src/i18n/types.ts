@@ -390,6 +390,7 @@ export interface Messages {
     projectSettings: string;
     help: string;
     developer: string;
+    audit: string;
     tools: string;
     support: string;
     dashboard: string;
@@ -495,6 +496,10 @@ export interface Messages {
     updateRunning: string;
     updateHow: string;
     updateDismiss: string;
+    updatePreviewTitle: string;
+    updatePreviewCurrent: string;
+    updatePreviewApplied: string;
+    updatePreviewPackages: string;
     alertsAll: string;
     alertsUnseen: string;
     alertsSeen: string;
@@ -979,7 +984,7 @@ export interface Messages {
     pageTitle: string;
     subtitle: string;
     tabUsers: string;
-    tabDeveloper: string;
+    tabRoles: string;
     usersTitle: string;
     usersHint: string;
     rolesTitle: string;

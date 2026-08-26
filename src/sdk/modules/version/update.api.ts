@@ -1,5 +1,6 @@
 import { INK_API_URL } from '@const/billing.const';
 import { HTTP_METHOD_POST, HTTP_NOT_FOUND } from '@const/http.const';
+import { EMPTY_STRING } from '@const/strings.const';
 import { useApi } from '@sdk/http';
 import { authHeaders } from '../auth/auth.api';
 import { CMS_UPDATE_PATH } from './version.const';
@@ -32,5 +33,6 @@ export const requestUpdateCms = async (token: string): Promise<CmsUpdateResult |
     to: data.to,
     updated: data.updated,
     packages: Array.isArray(data.packages) ? data.packages : [],
+    notes: typeof data.notes === 'string' ? data.notes : EMPTY_STRING,
   };
 };

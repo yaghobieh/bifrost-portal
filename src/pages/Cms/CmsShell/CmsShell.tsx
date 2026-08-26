@@ -441,17 +441,39 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       icon: <BearIcons.SettingsIcon size={CMS_ICON_SIZE} />,
       children: generalChildren,
     },
-  ].filter((group) => (group.children?.length ?? 0) > 0);
+  ];
+  if (devPrefs.showDeveloperPage) {
+    sidebarGroups.push({
+      id: CMS_NAV_SECTIONS.DEVELOPER,
+      label: t.cmsShell.developer,
+      icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+      children: [
+        {
+          id: CMS_NAV_IDS.DEVELOPER,
+          label: t.cmsShell.developer,
+          icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+          href: CMS_NAV_ROUTES[CMS_NAV_IDS.DEVELOPER],
+        },
+        {
+          id: CMS_NAV_IDS.AUDIT,
+          label: t.cmsShell.audit,
+          icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+          href: CMS_NAV_ROUTES[CMS_NAV_IDS.AUDIT],
+        },
+      ].filter(visibleLeaf),
+    });
+  }
+  const visibleGroups = sidebarGroups.filter((group) => (group.children?.length ?? 0) > 0);
   const sidebarItems: CmsSidebarNavItem[] = resolveSidebarNavItems({
-    groups: sidebarGroups,
+    groups: visibleGroups,
     collapsed,
   });
-  const leafItems = sidebarGroups.flatMap((group) => group.children ?? []);
-  const flyoutGroup = sidebarGroups.find((group) => group.id === flyoutId);
+  const leafItems = visibleGroups.flatMap((group) => group.children ?? []);
+  const flyoutGroup = visibleGroups.find((group) => group.id === flyoutId);
 
   const onItemClick = (item: CmsSidebarNavItem) => {
     if (item.disabled) return;
-    if (collapsed && sidebarGroups.some((group) => group.id === item.id)) {
+    if (collapsed && visibleGroups.some((group) => group.id === item.id)) {
       setFlyoutId((current) => (current === item.id ? null : item.id));
       return;
     }
