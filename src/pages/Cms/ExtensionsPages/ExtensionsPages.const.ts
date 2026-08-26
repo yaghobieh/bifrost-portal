@@ -98,9 +98,9 @@ export const EXTENSION_CATALOG: ExtensionItem[] = [
     id: MARKETING_PAGES_EXTENSION_ID,
     name: 'Marketing Pages',
     description:
-      'Landing patterns for Stage: hero, split-auth, feature grid, CTA band, and footer. Right-click the canvas to duplicate, move, or wrap blocks.',
+      'Replaces Stage with Marketing: hero, split-auth, feature grid, CTA band, and footer — each with a preview image. Save as template and edit page-specific content on the page canvas.',
     longDescription:
-      'Install to unlock a Marketing group in Stage. Patterns use the Bifrost gradient (blue to violet to pink). Stage layout tools stay for content pages; this pack is for marketing and auth screens.',
+      'Install to replace Stage in Design. Landing widgets show thumbnails in the palette. Design the layout, mark it as a template, then use it on a page — the page editor is the visual canvas, not a rich-text field.',
     highlights: ['Hero', 'Split auth', 'Feature grid', 'CTA band', 'Footer', 'Canvas context menu'],
     previewSrc: PREVIEW_BUILDER,
     version: '1.0.0',

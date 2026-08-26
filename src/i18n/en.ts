@@ -458,6 +458,7 @@ export const en: Messages = {
     calendar: 'Calendar',
     templates: 'Templates',
     builder: 'Stage',
+    marketing: 'Marketing',
     analytics: 'Analytics',
     settings: 'Settings',
     team: 'Bifrost',
@@ -872,6 +873,8 @@ export const en: Messages = {
     collabHint:
       'Realtime multiplayer (Yjs/CRDT) ships as an Extension. Comments + track changes are available in the editor today.',
     openStage: 'Edit in Stage',
+    openMarketing: 'Edit in Marketing',
+    canvasHint: 'This page uses a marketing layout. Edit on the canvas — changes apply to this page only. Save as template to reuse it.',
     castFieldsTitle: 'Cast fields',
     castFieldsHint: 'Add a field and pick its input type — text, select, rich editor, and more. Template fields stay on every page that uses it.',
     castAddField: 'Add field',
@@ -897,6 +900,8 @@ export const en: Messages = {
   cmsBuilder: {
     title: 'Stage',
     subtitle: 'Live canvas: widgets on the left, the page in the middle, inspector on the right. Preview, then save.',
+    marketingTitle: 'Marketing',
+    marketingSubtitle: 'Landing widgets on the left, this page in the middle. Mark as template, then edit page-specific content here.',
     lockedTitle: 'Install bifDynamic',
     lockedBody: 'Stage unlocks after you install bifDynamic from the extension store.',
     openStore: 'Open store',

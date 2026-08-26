@@ -1,5 +1,5 @@
 import { CMS_BUILDER_CANVAS_KEY, EMPTY_STRING } from '@const/strings.const';
-import type { CanvasKind, CanvasNode, CanvasNodeStyles } from './BuilderPages.types';
+import type { CanvasKind, CanvasNode, CanvasNodeStyles, LayoutBlockDef } from './BuilderPages.types';
 
 export const BUILDER_CANVAS_KEY = CMS_BUILDER_CANVAS_KEY;
 export const BUILDER_CANVAS_EMPTY = EMPTY_STRING;
@@ -18,14 +18,28 @@ export const CANVAS_KIND = {
   FORM: 'form',
 } as const satisfies Record<string, CanvasKind>;
 
-export const LAYOUT_BLOCKS: readonly { id: CanvasKind; label: string }[] = [
-  { id: CANVAS_KIND.SECTION, label: 'Section' },
-  { id: CANVAS_KIND.COLUMN, label: 'Column' },
-  { id: CANVAS_KIND.FLEX, label: 'Flex' },
-  { id: CANVAS_KIND.GRID, label: 'Grid' },
-  { id: CANVAS_KIND.MASONRY, label: 'Masonry' },
-  { id: CANVAS_KIND.INK, label: 'Ink' },
-  { id: CANVAS_KIND.FORM, label: 'Form' },
+export const LAYOUT_PREVIEW = {
+  SECTION: '/cms/widgets/layout-section.svg',
+  COLUMN: '/cms/widgets/layout-column.svg',
+  FLEX: '/cms/widgets/layout-flex.svg',
+  GRID: '/cms/widgets/layout-grid.svg',
+  MASONRY: '/cms/widgets/layout-masonry.svg',
+  INK: '/cms/widgets/layout-ink.svg',
+  FORM: '/cms/widgets/layout-form.svg',
+  TWO_COL: '/cms/widgets/layout-two-col.svg',
+  THREE_COL: '/cms/widgets/layout-three-col.svg',
+} as const;
+
+export const BEAR_WIDGET_PREVIEW_SRC = '/cms/widgets/bear-widget.svg';
+
+export const LAYOUT_BLOCKS: readonly LayoutBlockDef[] = [
+  { id: CANVAS_KIND.SECTION, label: 'Section', previewSrc: LAYOUT_PREVIEW.SECTION },
+  { id: CANVAS_KIND.COLUMN, label: 'Column', previewSrc: LAYOUT_PREVIEW.COLUMN },
+  { id: CANVAS_KIND.FLEX, label: 'Flex', previewSrc: LAYOUT_PREVIEW.FLEX },
+  { id: CANVAS_KIND.GRID, label: 'Grid', previewSrc: LAYOUT_PREVIEW.GRID },
+  { id: CANVAS_KIND.MASONRY, label: 'Masonry', previewSrc: LAYOUT_PREVIEW.MASONRY },
+  { id: CANVAS_KIND.INK, label: 'Ink', previewSrc: LAYOUT_PREVIEW.INK },
+  { id: CANVAS_KIND.FORM, label: 'Form', previewSrc: LAYOUT_PREVIEW.FORM },
 ];
 
 export const BUILDER_VIEWPORT = {

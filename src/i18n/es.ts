@@ -457,6 +457,7 @@ export const es: Messages = {
     calendar: 'Calendario',
     templates: 'Plantillas',
     builder: 'Stage',
+    marketing: 'Marketing',
     analytics: 'Analítica',
     settings: 'Ajustes',
     team: 'Bifrost',
@@ -872,6 +873,8 @@ export const es: Messages = {
     collabHint:
       'Multijugador en tiempo real (Yjs/CRDT) llega como extensión. Comentarios y track changes ya están en el editor.',
     openStage: 'Editar en Stage',
+    openMarketing: 'Editar en Marketing',
+    canvasHint: 'Esta página usa un diseño de marketing. Edita en el lienzo — los cambios son solo de esta página. Guarda como plantilla para reutilizarla.',
     castFieldsTitle: 'Campos Cast',
     castFieldsHint: 'Añade un campo y elige el tipo de entrada: texto, selección, editor enriquecido, y más. Los de la plantilla aparecen en cada página que la usa.',
     castAddField: 'Añadir campo',
@@ -897,6 +900,8 @@ export const es: Messages = {
   cmsBuilder: {
     title: 'Stage',
     subtitle: 'Lienzo en vivo: widgets a la izquierda, la página en el centro, inspector a la derecha. Previsualiza y guarda.',
+    marketingTitle: 'Marketing',
+    marketingSubtitle: 'Widgets de landing a la izquierda, esta página en el centro. Márcala como plantilla y edita el contenido de la página aquí.',
     lockedTitle: 'Instala bifDynamic',
     lockedBody: 'Stage se desbloquea al instalar bifDynamic desde la tienda de extensiones.',
     openStore: 'Abrir tienda',
