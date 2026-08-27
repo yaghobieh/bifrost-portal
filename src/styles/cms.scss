@@ -958,7 +958,23 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms-login__form-panel {
+  --bear-bg-primary: #ffffff;
+  --bear-bg-secondary: #f9fafb;
+  --bear-bg-tertiary: #f3f4f6;
+  --bear-text-primary: #111827;
+  --bear-text-secondary: #4b5563;
+  --bear-text-muted: #9ca3af;
+  --bear-text-inverted: #ffffff;
+  --bear-border-default: #e5e7eb;
+  --bear-neutral-50: #fafafa;
+  --bear-neutral-100: #f5f5f5;
+  --bear-neutral-800: #262626;
+  --bear-neutral-900: #171717;
+  --bear-danger-50: #fef2f2;
+  --bear-danger-700: #b91c1c;
+  --bear-danger-800: #991b1b;
   background: #fff;
+  color: #111827;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1080,7 +1096,31 @@ html.bifrost-cms-host #root {
 .bifrost-cms-login .Bear-Input,
 .bifrost-cms-login input,
 .bifrost-cms-login .Bear-Typography {
+  color: var(--bear-text-primary, #111827);
   color-scheme: light;
+}
+
+.bifrost-cms-login__form-panel .Bear-Input input,
+.bifrost-cms-login__form-panel input:not([type='checkbox']):not([type='radio']) {
+  background-color: #ffffff;
+  color: #111827;
+  border-color: #e5e7eb;
+}
+
+.bifrost-cms-login__form-panel .Bear-Button--outline,
+.bifrost-cms-login__form-panel .Bear-Button-outline {
+  color: #111827;
+  background: #ffffff;
+}
+
+.bifrost-cms-login__form-panel .Bear-Alert .Bear-Typography,
+.bifrost-cms-login__form-panel .Bear-Alert__message {
+  color: var(--bear-danger-800, #991b1b);
+}
+
+.bifrost-cms-login__form-panel .bear-btn-outline {
+  color: #111827;
+  background: #ffffff;
 }
 
 @media (max-width: 820px) {

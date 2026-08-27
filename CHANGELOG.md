@@ -5,6 +5,13 @@
 ### Added
 - Marketing Pages builder follows the Elementor-style spec: searchable Bear widget library, hover toolbar, global colors, tablet viewport, and native HTML `<img>` (src, alt, width, height, loading).
 - Design source for Figma: `docs/cms-135/` (spec, Bear props, HTML artboards).
+- Documentation layout seeds four title/subtitle fields plus bash — page editor uses real inputs, not Ink.
+- Translation picker widget on page edit: page (Global always listed), then that page's strings.
+
+### Fixed
+- Vercel `/api/*` proxies to cms-api so login is not swallowed by the SPA rewrite.
+- Login form pane forces light Bear tokens (readable labels, inputs, alerts, outline buttons).
+- Translations land on pages, keep Global in the list, and can add strings and pages.
 
 ## 1.1.10
 

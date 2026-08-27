@@ -21,7 +21,8 @@ import {
   PAYLOAD_KEY_LAYOUT,
   PAYLOAD_KEY_TEMPLATE,
 } from '../ContentEdit/ContentEdit.const';
-import { castFieldsFromPayload } from '../ContentEdit/castFields.utils';
+import { castFieldsFromPayload, castValuesFromPayload } from '../ContentEdit/castFields.utils';
+import { isDocsLayout } from '../ContentPages/ContentPages.utils';
 import {
   PAGE_LAYOUT_TEMPLATES,
   PAGE_SLUG_PREFIX,
@@ -79,11 +80,17 @@ export const TemplatesPages: FC = () => {
       status: DOCUMENT_STARTER_STATUS,
       payload: {
         canvas: cloneCanvasTree(layout.tree),
-        layoutId: layout.id,
+        [PAYLOAD_KEY_LAYOUT]: layout.id,
+        [PAYLOAD_KEY_CAST_FIELDS]: layout.castFields,
+        [PAYLOAD_KEY_CAST_VALUES]: layout.castValues,
       },
     });
     if (!item) return;
     await fetchContent(activeToken);
+    if (isDocsLayout(layout.id)) {
+      navigate(cmsEditPath(item.id));
+      return;
+    }
     navigate(cmsBuilderPath({ doc: item.id }));
   };
 
@@ -107,8 +114,8 @@ export const TemplatesPages: FC = () => {
         canvas: fromSaved ? cloneCanvasTree(fromSaved) : [],
         [PAYLOAD_KEY_LAYOUT]: layoutId,
         [PAYLOAD_KEY_TEMPLATE]: saved.id,
-        [PAYLOAD_KEY_CAST_FIELDS]: [],
-        [PAYLOAD_KEY_CAST_VALUES]: {},
+        [PAYLOAD_KEY_CAST_FIELDS]: castFieldsFromPayload(saved.payload),
+        [PAYLOAD_KEY_CAST_VALUES]: castValuesFromPayload(saved.payload),
       },
     });
     if (!item) return;

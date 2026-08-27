@@ -21,6 +21,13 @@ export type CastField = {
   options: string;
 };
 
+export type NamedCastFieldParams = {
+  id: string;
+  name: string;
+  label: string;
+  type: CastFieldType;
+};
+
 export type CastGroupPayload = {
   fields: CastField[];
 };

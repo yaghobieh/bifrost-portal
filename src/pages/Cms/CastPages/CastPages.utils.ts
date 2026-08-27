@@ -1,5 +1,5 @@
 import { CAST_FIELD_TYPE, CAST_NONE, CAST_SLUG_EDGE, CAST_SLUG_REPLACE } from './CastPages.const';
-import type { CastField, CastFieldType, CastGroupPayload } from './CastPages.types';
+import type { CastField, CastFieldType, CastGroupPayload, NamedCastFieldParams } from './CastPages.types';
 
 const createFieldId = (): string => `f-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -14,6 +14,17 @@ export const createCastField = (): CastField => ({
   max: CAST_NONE,
   options: CAST_NONE,
 });
+
+export const createNamedCastField = (params: NamedCastFieldParams): CastField => {
+  const { id, name, label, type } = params;
+  return {
+    ...createCastField(),
+    id,
+    name,
+    label,
+    type,
+  };
+};
 
 export const slugFromLabel = (label: string): string =>
   label.trim().toLowerCase().replace(CAST_SLUG_REPLACE, '_').replace(CAST_SLUG_EDGE, '');

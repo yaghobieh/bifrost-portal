@@ -62,3 +62,5 @@ export const TRANSLATION_SEED: CmsTranslations = {
 
 export const TRANSLATION_NEW_LOCALE = EMPTY_STRING;
 export const TRANSLATION_SCOPE_GLOBAL = TRANSLATION_SCOPE.GLOBAL;
+export const TRANSLATION_GLOBAL_ID = '__global__';
+export const TRANSLATION_KEY_PATTERN = /^[a-zA-Z][a-zA-Z0-9._-]*$/;

@@ -15,6 +15,22 @@ export const CONTENT_LIST_COLLECTIONS = [
 ] as const;
 
 export const DOCUMENT_TEMPLATE_ID = 'document';
+export const DOCS_LAYOUT_IDS = {
+  DOCUMENTATION: 'documentation',
+  DOCS_ARTICLE: 'docs-article',
+} as const;
+
+export const DOCS_FIELD_NAME = {
+  TITLE_1: 'title1',
+  SUBTITLE_1: 'subtitle1',
+  TITLE_2: 'title2',
+  SUBTITLE_2: 'subtitle2',
+  TITLE_3: 'title3',
+  SUBTITLE_3: 'subtitle3',
+  TITLE_4: 'title4',
+  SUBTITLE_4: 'subtitle4',
+  BASH: 'bash',
+} as const;
 export const DOCUMENT_SLUG_PREFIX = 'document-';
 export const DOCUMENT_IMAGE_SRC =
   DOCUMENT_CLOUDINARY_IMAGE_SRC || '/docs/installation.svg';
@@ -58,6 +74,22 @@ export const DOCUMENT_STARTER_BLOCKS = [
 import '@forgedevstack/ink/styles.css';`,
   },
 ];
+
+export const DOCS_FIELD_DEFAULTS: Record<string, string> = {
+  [DOCS_FIELD_NAME.TITLE_1]: 'What you get',
+  [DOCS_FIELD_NAME.SUBTITLE_1]:
+    'Ink is a React rich-text editor that stores content as HTML and exposes structured side-channel state (comments, track changes) as JSON-friendly payloads. Install the package once, import styles once, then mount InkEditor in any form or document surface.',
+  [DOCS_FIELD_NAME.TITLE_2]: 'npm package',
+  [DOCS_FIELD_NAME.SUBTITLE_2]:
+    'Adds the editor runtime, toolbar presets, and CSS entry under @forgedevstack/ink.',
+  [DOCS_FIELD_NAME.TITLE_3]: 'Styles entry',
+  [DOCS_FIELD_NAME.SUBTITLE_3]:
+    'One import of @forgedevstack/ink/styles.css at the app root styles the chrome and content.',
+  [DOCS_FIELD_NAME.TITLE_4]: 'Controlled mount',
+  [DOCS_FIELD_NAME.SUBTITLE_4]:
+    'value / onChange keeps the parent as source of truth — ideal for forms and save APIs.',
+  [DOCS_FIELD_NAME.BASH]: 'npm install @forgedevstack/ink',
+};
 
 export const CONTENT_COLUMN_IDS = {
   TITLE: 'title',
