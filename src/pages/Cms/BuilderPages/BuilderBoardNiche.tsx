@@ -4,17 +4,12 @@ import { useI18n } from '@i18n/index';
 import { EMPTY_STRING } from '@const/index';
 import { useCmsLive } from '../CmsShell/CmsLiveProvider';
 import { defaultBoardConfig, loadBoardConfig, saveBoardConfig } from '../TasksPages/TasksPages.utils';
+import { INIT_FALLBACK } from './BuilderBoardNiche.const';
 
 export const BuilderBoardNiche: FC = () => {
   const { t } = useI18n();
   const live = useCmsLive();
-  const fallback = defaultBoardConfig({
-    todo: t.cmsTasks.todo,
-    inProgress: t.cmsTasks.inProgress,
-    decline: t.cmsTasks.decline,
-    inReview: t.cmsTasks.inReview,
-    done: t.cmsTasks.done,
-  });
+  const fallback = defaultBoardConfig(INIT_FALLBACK(t.cmsTasks));
   const [label, setLabel] = useState(EMPTY_STRING);
   const board = live.board ?? loadBoardConfig(fallback);
 
@@ -31,28 +26,26 @@ export const BuilderBoardNiche: FC = () => {
 
   return (
     <Card padding="md" className="bifrost-cms-builder__board-niche">
-      <Typography variant="h4" className="mb-1">
-        {t.cmsBuilder.boardNiche}
-      </Typography>
-      <Typography variant="caption" className="bifrost-cms__muted mb-2 block">
-        {t.cmsBuilder.boardNicheHint}
-      </Typography>
-      <Flex gap={2} className="flex-wrap mb-2">
-        {board.statuses.map((status) => (
-          <Typography key={status.id} variant="caption" className="mb-0">
-            {status.label}
-          </Typography>
-        ))}
-      </Flex>
-      <Flex gap={2} align="end">
-        <Input
-          label={t.cmsTasks.addStatus}
-          value={label}
-          onChange={(event) => setLabel(event.target.value)}
-        />
-        <Button size="sm" variant="primary" disabled={!label.trim()} onClick={addStatus}>
-          {t.cmsTasks.addStatus}
-        </Button>
+      <Flex direction="column" gap={2}>
+        <Typography variant="h4">{t.cmsBuilder.boardNiche}</Typography>
+        <Typography variant="caption">{t.cmsBuilder.boardNicheHint}</Typography>
+        <Flex gap={2} wrap="wrap">
+          {board.statuses.map((status) => (
+            <Typography key={status.id} variant="caption">
+              {status.label}
+            </Typography>
+          ))}
+        </Flex>
+        <Flex gap={2} align="end">
+          <Input
+            label={t.cmsTasks.addStatus}
+            value={label}
+            onChange={(event) => setLabel(event.target.value)}
+          />
+          <Button size="sm" variant="primary" disabled={!label.trim()} onClick={addStatus}>
+            {t.cmsTasks.addStatus}
+          </Button>
+        </Flex>
       </Flex>
     </Card>
   );

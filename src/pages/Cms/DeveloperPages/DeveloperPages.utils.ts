@@ -85,6 +85,22 @@ export const buildDeveloperRows = (params: {
 export const formatAuditAt = (value: string): string =>
   value.slice(NUMBER_ZERO, NUMBER_NINETEEN).replace(ISO_DATE_SEP, DEVELOPER_SPACE);
 
+const auditDetail = (metadata: Record<string, unknown>, emptyLabel: string): string => {
+  const images = metadata.images;
+  if (Array.isArray(images) && images.length > NUMBER_ZERO) {
+    return String(images[NUMBER_ZERO]);
+  }
+  const title = metadata.title;
+  if (typeof title === 'string' && title) {
+    return title;
+  }
+  const fileName = metadata.fileName;
+  if (typeof fileName === 'string' && fileName) {
+    return fileName;
+  }
+  return emptyLabel;
+};
+
 export const mapAuditRows = (
   items: AuditLogRecord[],
   emptyLabel: string,
@@ -93,6 +109,7 @@ export const mapAuditRows = (
     id: item.id,
     action: item.action,
     resource: item.resource || emptyLabel,
+    detail: auditDetail(item.metadata, emptyLabel),
     userId: item.userId || emptyLabel,
     ipAddress: item.ipAddress || emptyLabel,
     createdAt: formatAuditAt(item.createdAt),

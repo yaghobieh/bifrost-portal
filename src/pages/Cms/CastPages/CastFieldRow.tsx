@@ -1,7 +1,8 @@
-import type { FC } from 'react';
-import { Button, Flex, Input, Select, Switch } from '@forgedevstack/bear';
+import type { ChangeEvent, FC } from 'react';
+import { Button, Card, Flex, Input, Select, Switch } from '@forgedevstack/bear';
 import { useField, Validators } from '@forgedevstack/forge-form';
 import { useI18n } from '@i18n/index';
+import { EMPTY_STRING } from '@const/strings.const';
 import {
   CAST_FIELD_TYPE,
   CAST_LABEL_PREFIX,
@@ -40,62 +41,65 @@ export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
     initialValue: field.type,
     validators: [Validators.required(t.cmsCast.typeRequired)],
   });
-  const labelError = labelField.field.touched ? labelField.field.errors[0]?.message : undefined;
-  const nameError = nameField.field.touched ? nameField.field.errors[0]?.message : undefined;
+  const onTypeChange = (value: string | number) => {
+    const nextType = String(value);
+    if (!isCastFieldType(nextType)) {
+      return;
+    }
+    typeField.actions.setValue(nextType);
+    onFieldChange(field.id, { type: nextType });
+  };
+  const onLabelBlur = () => {
+    labelField.actions.setTouched(true);
+    nameField.actions.setTouched(true);
+  };
+  const onLabelChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const label = event.target.value;
+    const name = slugFromLabel(label);
+    labelField.actions.setValue(label);
+    nameField.actions.setValue(name);
+    onFieldChange(field.id, { label, name });
+  };
   const isEmail = field.type === CAST_FIELD_TYPE.EMAIL;
   const isNumber = field.type === CAST_FIELD_TYPE.NUMBER;
+  const labelError = labelField.field.touched ? labelField.field.errors[0]?.message : undefined;
+  const nameError = nameField.field.touched ? nameField.field.errors[0]?.message : undefined;
 
   return (
-    <div className="bifrost-cms-cast__item">
-      <div className="bifrost-cms-cast__item-main">
+    <Card padding="sm" className="bifrost-cms-cast__item">
+      <Flex gap={2} align="start" wrap="wrap">
         <Select
           id={`bifrost-cms-cast-type-${field.id}`}
           options={[...typeOptions]}
           value={String(typeField.field.value ?? field.type)}
           size="sm"
           fullWidth
-          onChange={(value) => {
-            const nextType = String(value);
-            if (!isCastFieldType(nextType)) {
-              return;
-            }
-            typeField.actions.setValue(nextType);
-            onFieldChange(field.id, { type: nextType });
-          }}
+          onChange={onTypeChange}
         />
         <Input
           placeholder={t.cmsCast.fieldLabel}
-          value={String(labelField.field.value ?? '')}
+          value={String(labelField.field.value ?? EMPTY_STRING)}
           error={labelError || nameError}
           size="sm"
           fullWidth
-          onBlur={() => {
-            labelField.actions.setTouched(true);
-            nameField.actions.setTouched(true);
-          }}
-          onChange={(event) => {
-            const label = event.target.value;
-            const name = slugFromLabel(label);
-            labelField.actions.setValue(label);
-            nameField.actions.setValue(name);
-            onFieldChange(field.id, { label, name });
-          }}
+          onBlur={onLabelBlur}
+          onChange={onLabelChange}
         />
-        <Flex direction="column" gap={2} className="bifrost-cms-cast__rules">
+        <Flex direction="column" gap={2}>
           <Switch
             label={t.cmsCast.fieldRequired}
             checked={field.required}
             onCheckedChange={(checked) => onFieldChange(field.id, { required: checked })}
           />
-          {isEmail ? (
+          {isEmail && (
             <Switch
               label={t.cmsCast.emailFormat}
               checked={field.emailFormat}
               onCheckedChange={(checked) => onFieldChange(field.id, { emailFormat: checked })}
             />
-          ) : null}
-          {isNumber ? (
-            <Flex gap={2} className="flex-wrap">
+          )}
+          {isNumber && (
+            <Flex gap={2} wrap="wrap">
               <Input
                 placeholder={t.cmsCast.numberMin}
                 value={field.min}
@@ -111,7 +115,7 @@ export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
                 onChange={(event) => onFieldChange(field.id, { max: event.target.value })}
               />
             </Flex>
-          ) : null}
+          )}
           {field.type === CAST_FIELD_TYPE.SELECT && (
             <Input
               label={t.cmsCast.fieldOptions}
@@ -122,10 +126,10 @@ export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
             />
           )}
         </Flex>
-      </div>
-      <Button size="sm" variant="outline" onClick={onRemove}>
-        {t.cmsCast.removeField}
-      </Button>
-    </div>
+        <Button size="sm" variant="outline" onClick={onRemove}>
+          {t.cmsCast.removeField}
+        </Button>
+      </Flex>
+    </Card>
   );
 };

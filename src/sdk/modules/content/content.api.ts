@@ -1,5 +1,5 @@
 import { INK_API_URL } from '@const/billing.const';
-import { ROUTES, CONTENT_TYPE_JSON, HTTP_METHOD_POST, HTTP_METHOD_PUT } from '@const/index';
+import { ROUTES, CONTENT_TYPE_JSON, HTTP_METHOD_DELETE, HTTP_METHOD_POST, HTTP_METHOD_PUT } from '@const/index';
 import { useApi } from '@sdk/http';
 import { authHeaders } from '../auth/auth.api';
 import type {
@@ -11,6 +11,8 @@ import type {
 } from './content.types';
 import {
   CMS_CONTENT_PATH,
+  CMS_CONTENT_DELETE_PATH,
+  CMS_CONTENT_DELETE_ID,
   CMS_PAGES_PATH,
   CMS_PAGE_CONTENT_PATH,
   CMS_PAGE_UPDATE_PATH,
@@ -107,6 +109,20 @@ export const saveContentRequest = async (
   if (!response.ok) return null;
   const data = (await response.json()) as { item?: ContentItem };
   return data.item ?? null;
+};
+
+export const deleteContentRequest = async (token: string, id: string): Promise<boolean> => {
+  if (!token || !id) return false;
+  const params = new URLSearchParams({ [CMS_CONTENT_DELETE_ID]: id });
+  const response = await useApi(
+    `${INK_API_URL}${CMS_CONTENT_DELETE_PATH}?${params.toString()}`,
+    {
+      method: HTTP_METHOD_DELETE,
+      headers: authHeaders(token),
+    },
+    { message: 'Failed to delete content' },
+  );
+  return response.ok;
 };
 
 export const updatePageRequest = async (

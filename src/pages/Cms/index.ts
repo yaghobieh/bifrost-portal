@@ -16,6 +16,7 @@ export { TasksPages } from './TasksPages';
 export { TemplatesPages } from './TemplatesPages';
 export { CmsGate, withCmsGate } from './CmsGate';
 export { BuilderPages } from './BuilderPages';
+export { TranslationsPages } from './TranslationsPages';
 export { CastPages } from './CastPages';
 export { CmsLookPicker } from './CmsLook';
 export { CmsOnboarding } from './CmsOnboarding';

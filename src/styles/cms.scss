@@ -1598,6 +1598,17 @@ html.bifrost-cms-host #root {
   gap: 0.5rem;
 }
 
+.bifrost-cms-builder {
+  --bifrost-cms-builder-select: #8a3fd4;
+}
+
+.bifrost-cms-builder__palette .Bear-Button {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 0.45rem;
+  font-weight: 600;
+}
+
 .bifrost-cms-widget-chip {
   display: flex;
   flex-direction: column;
@@ -2076,9 +2087,41 @@ html.bifrost-cms-host #root {
   }
 }
 
+.bifrost-cms-builder {
+  --bifrost-cms-blue: var(--bear-primary-600, #2951C4);
+  --bifrost-cms-violet: #8A3FD4;
+  --bifrost-cms-pink: #EA0A8E;
+  --bifrost-cms-ink: #14161C;
+  --bifrost-cms-paper: #ffffff;
+  --bifrost-cms-canvas-fill: #F5F6FA;
+  --bifrost-cms-gradient: linear-gradient(
+    90deg,
+    var(--bifrost-cms-blue),
+    var(--bifrost-cms-violet),
+    var(--bifrost-cms-pink)
+  );
+}
+
+.bifrost-cms-inspector-style__gradient {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  background: var(--bifrost-cms-gradient);
+  cursor: pointer;
+}
+
+.bifrost-cms-code-field {
+  background: #1d1b22;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
 .bifrost-cms-builder__layout {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 280px;
+  grid-template-columns: var(--bifrost-cms-palette-w, 240px) minmax(0, 1fr) var(--bifrost-cms-inspector-w, 280px);
   gap: 1rem;
   align-items: stretch;
 }
@@ -2088,9 +2131,17 @@ html.bifrost-cms-host #root {
   min-width: 0;
 }
 
+.bifrost-cms-builder__palette .Bear-Accordion__content-wrapper--open {
+  max-height: none;
+}
+
 .bifrost-cms-builder__palette,
 .bifrost-cms-builder__inspector {
   height: 100%;
+}
+
+.bifrost-cms-builder__sandbox {
+  margin-top: 1rem;
 }
 
 .bifrost-cms-panel-resize {
@@ -2381,15 +2432,12 @@ html.bifrost-cms-host #root {
   border-radius: 0.75rem;
   background: #fff;
   box-shadow: 0 4px 16px rgb(15 23 42 / 0.06);
+  max-width: var(--bifrost-cms-stage-max, none);
+  width: var(--bifrost-cms-stage-w, auto);
 }
 
-.bifrost-cms-builder__stage--tablet {
-  max-width: 768px;
-  margin-inline: auto;
-}
-
+.bifrost-cms-builder__stage--tablet,
 .bifrost-cms-builder__stage--mobile {
-  max-width: 390px;
   margin-inline: auto;
 }
 
@@ -2466,7 +2514,7 @@ html.bifrost-cms-host #root {
 
 .bifrost-cms-canvas-node--selected {
   outline: none;
-  border-color: var(--bifrost-cms-accent);
+  border-color: var(--bifrost-cms-builder-select, var(--bifrost-cms-accent));
   border-style: solid;
   background: var(--bifrost-cms-surface);
 }
@@ -2488,8 +2536,8 @@ html.bifrost-cms-host #root {
 
 .bifrost-cms-canvas-node--selected .bifrost-cms-canvas-node__label {
   color: #fff;
-  background: var(--bifrost-cms-accent);
-  border-color: var(--bifrost-cms-accent);
+  background: var(--bifrost-cms-builder-select, var(--bifrost-cms-accent));
+  border-color: var(--bifrost-cms-builder-select, var(--bifrost-cms-accent));
 }
 
 .bifrost-cms-canvas-node--flex {
@@ -2523,6 +2571,8 @@ html.bifrost-cms-host #root {
 .bifrost-cms-canvas-menu {
   position: fixed;
   z-index: 40;
+  left: var(--bifrost-cms-menu-x);
+  top: var(--bifrost-cms-menu-y);
   width: 230px;
   min-width: 180px;
   padding: 0.35rem;
@@ -2537,6 +2587,11 @@ html.bifrost-cms-host #root {
   text-transform: uppercase;
   padding: 0.4rem 0.6rem 0.25rem;
   color: var(--bifrost-cms-muted, #8d92a1);
+}
+
+.bifrost-cms-canvas-menu .Bear-Button {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .bifrost-cms-canvas-menu__item,
@@ -2556,7 +2611,13 @@ html.bifrost-cms-host #root {
 
 .bifrost-cms-canvas-menu__item:hover,
 .bifrost-cms-canvas-menu button:hover {
-  background: rgb(138 63 212 / 0.08);
+  background: #f1ecfb;
+  color: #8a3fd4;
+}
+
+.bifrost-cms-canvas-menu button:hover .bifrost-cms-canvas-menu__kbd {
+  color: #8a3fd4;
+  opacity: 1;
 }
 
 .bifrost-cms-canvas-menu__item:disabled {
@@ -2564,7 +2625,14 @@ html.bifrost-cms-host #root {
   cursor: default;
 }
 
-.bifrost-cms-canvas-menu__item--danger {
+.bifrost-cms-canvas-menu__item--danger,
+.bifrost-cms-canvas-menu .Bear-Button.bifrost-cms-canvas-menu__item--danger {
+  color: #c4302b;
+}
+
+.bifrost-cms-canvas-menu__item--danger:hover,
+.bifrost-cms-canvas-menu .Bear-Button.bifrost-cms-canvas-menu__item--danger:hover {
+  background: rgb(196 48 43 / 0.08);
   color: #c4302b;
 }
 

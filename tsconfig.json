@@ -37,7 +37,9 @@
       "@store": ["src/store"],
       "@store/*": ["src/store/*"],
       "@sdk": ["src/sdk"],
-      "@sdk/*": ["src/sdk/*"]
+      "@sdk/*": ["src/sdk/*"],
+      "@icons": ["src/icons"],
+      "@icons/*": ["src/icons/*"]
     }
   },
   "include": ["src"],

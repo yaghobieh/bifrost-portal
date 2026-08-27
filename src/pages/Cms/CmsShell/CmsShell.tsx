@@ -124,7 +124,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [crewRoomId, setCrewRoomId] = useState<string | null>(null);
   const [flyoutId, setFlyoutId] = useState<string | null>(null);
-  const { onlineUsers, rooms, createRoom, sendChat, selfId, tasks } = useCmsLive();
+  const { onlineUsers, rooms, createRoom, sendChat, selfId, tasks, availability, setAvailability } = useCmsLive();
   const [site, setSite] = useState(() => loadCmsSite());
   const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
   const resolvedMode = resolveCmsMode(modePreference);
@@ -373,6 +373,12 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       label: t.cmsShell.contentTypeBuilder,
       icon: <BearIcons.GridIcon size={CMS_ICON_SIZE} />,
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.BUILDER],
+    },
+    {
+      id: CMS_NAV_IDS.TRANSLATIONS,
+      label: t.cmsShell.translations,
+      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.TRANSLATIONS],
     },
     {
       id: CMS_NAV_IDS.CAST,
@@ -862,6 +868,8 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             }
             side={site.chatSide}
             color={chatPrefs.color}
+            availability={availability}
+            onAvailability={setAvailability}
             roomSoundOn={
               Boolean(crewRoomId) &&
               crewRoomId !== CMS_CREW_DRAWER_OPEN &&

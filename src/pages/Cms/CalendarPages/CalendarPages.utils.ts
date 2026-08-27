@@ -1,5 +1,6 @@
 import type { CalendarEvent, CalendarPerson } from '@forgedevstack/calendar';
 import type { CmsMeeting } from '@sdk/modules/cms';
+import { EMPTY_STRING } from '@const/strings.const';
 import type { CrewUser } from '../CrewPages/CrewPages.const';
 import { CALENDAR_DEFAULT_DURATION_MS } from './CalendarPages.const';
 
@@ -27,10 +28,10 @@ export const eventToInput = (event: CalendarEvent) => {
   const end = event.end ? new Date(event.end) : new Date(start.getTime() + CALENDAR_DEFAULT_DURATION_MS);
   return {
     title: event.title,
-    description: event.description || '',
+    description: event.description || EMPTY_STRING,
     startAt: start.toISOString(),
     endAt: end.toISOString(),
-    meetingUrl: event.meetingUrl || '',
+    meetingUrl: event.meetingUrl || EMPTY_STRING,
     peopleIds: event.peopleIds ?? [],
   };
 };

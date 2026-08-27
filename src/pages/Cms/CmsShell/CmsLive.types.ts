@@ -8,12 +8,15 @@ export type CmsLiveHealth = {
   db: boolean;
 };
 
+export type CmsPresenceStatus = 'online' | 'away' | 'busy' | 'not_there';
+
 export type CmsPresenceUser = {
   id: string;
   name: string;
   avatar: string;
   location: string;
   locationLabel: string;
+  availability: CmsPresenceStatus;
 };
 
 export type CmsChatMessage = {
@@ -40,6 +43,8 @@ export type CmsLiveContextValue = {
   tasks: CmsTask[] | null;
   board: TaskBoardConfig | null;
   rooms: CmsChatRoom[];
+  availability: CmsPresenceStatus;
+  setAvailability: (status: CmsPresenceStatus) => void;
   markRead: (id: string) => void;
   markAllRead: () => void;
   publishTasks: (tasks: CmsTask[], board: TaskBoardConfig) => void;

@@ -1,187 +1,77 @@
-import { useEffect, useState, type FC } from 'react';
+import type { FC } from 'react';
 import { Calendar } from '@forgedevstack/calendar';
-import type { CalendarEvent } from '@forgedevstack/calendar';
+import { Button, Card, Dropdown, Flex, Input, Typography } from '@forgedevstack/bear';
+import { CmsGridTable, CmsShell, CMS_NAV_IDS } from '@pages/Cms/CmsShell';
 import {
-  Badge,
-  Button,
-  Card,
-  Dropdown,
-  Flex,
-  Input,
-  Typography,
-  useBearMode,
-} from '@forgedevstack/bear';
-import { useAuth } from '@hooks/index';
-import { useI18n } from '@i18n/index';
-import { EMPTY_STRING } from '@const/index';
-import {
-  createMeetingRequest,
-  fetchCrewUsers,
-  fetchMeetings,
-  updateMeetingRequest,
-} from '@sdk/modules/cms';
-import type { CrewUser } from '../CrewPages/CrewPages.const';
-import { CmsGridTable, CmsShell, CMS_NAV_IDS } from '../CmsShell';
-import { loadCmsThemeColors } from '../SettingsPages';
-import {
-  CALENDAR_DEFAULT_DURATION_MS,
-  CALENDAR_EMPTY,
   CALENDAR_PAGE_ID,
-  CALENDAR_THEME_DARK,
-  CALENDAR_THEME_LIGHT,
   CALENDAR_TITLE_INPUT_ID,
+  CALENDAR_VIEW_WEEK,
 } from './CalendarPages.const';
-import { eventToInput, toCalendarEvents, toCalendarPeople } from './CalendarPages.utils';
-
-type MeetingRow = {
-  id: string;
-  title: string;
-  start: string;
-  people: number;
-};
+import { CalendarDraftUsers } from './helpers/CalendarDraftUsers';
+import { useCalendarPages } from './hooks';
 
 export const CalendarPages: FC = () => {
-  const { t } = useI18n();
-  const { token } = useAuth();
-  const { mode } = useBearMode();
-  const colors = loadCmsThemeColors();
-  const calendarMode = mode === 'dark' ? 'dark' : 'light';
-  const [users, setUsers] = useState<CrewUser[]>([]);
-  const [meetings, setMeetings] = useState<CalendarEvent[]>([]);
-  const [draftTitle, setDraftTitle] = useState(CALENDAR_EMPTY);
-  const [draftUserIds, setDraftUserIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!token) return;
-    void Promise.all([fetchCrewUsers(token), fetchMeetings(token)]).then(
-      ([nextUsers, nextMeetings]) => {
-        if (nextUsers) setUsers(nextUsers);
-        if (nextMeetings) setMeetings(toCalendarEvents(nextMeetings));
-      },
-    );
-  }, [token]);
-
-  const persistEvent = async (event: CalendarEvent) => {
-    if (!token) return;
-    const input = eventToInput(event);
-    if (event.id && meetings.some((item) => item.id === event.id)) {
-      const updated = await updateMeetingRequest(token, event.id, input);
-      if (updated) {
-        setMeetings((current) =>
-          current.map((item) => (item.id === updated.id ? toCalendarEvents([updated])[0] : item)),
-        );
-      }
-      return;
-    }
-    const created = await createMeetingRequest(token, input);
-    if (created) {
-      setMeetings((current) => [...current, ...toCalendarEvents([created])]);
-    }
-  };
-
-  const toggleUser = (id: string) => {
-    setDraftUserIds((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
-    );
-  };
-
-  const onGenerate = async () => {
-    if (!token || !draftTitle.trim()) return;
-    const start = new Date();
-    const created = await createMeetingRequest(token, {
-      title: draftTitle.trim(),
-      description: EMPTY_STRING,
-      startAt: start.toISOString(),
-      endAt: new Date(start.getTime() + CALENDAR_DEFAULT_DURATION_MS).toISOString(),
-      meetingUrl: EMPTY_STRING,
-      peopleIds: draftUserIds,
-    });
-    if (created) {
-      setMeetings((current) => [...current, ...toCalendarEvents([created])]);
-      setDraftTitle(CALENDAR_EMPTY);
-      setDraftUserIds([]);
-    }
-  };
-
-  const people = toCalendarPeople(users);
-  const rows: MeetingRow[] = meetings.map((meeting) => ({
-    id: meeting.id,
-    title: meeting.title,
-    start: new Date(meeting.start).toLocaleString(),
-    people: (meeting.peopleIds ?? []).length,
-  }));
-  const accent = colors.accent || colors.primary;
-  const surface = calendarMode === 'dark' ? CALENDAR_THEME_DARK : CALENDAR_THEME_LIGHT;
-  const calendarTheme = {
-    primary: accent,
-    today: accent,
-    event: accent,
-    background: surface.background,
-    text: surface.text,
-    muted: surface.muted,
-    border: surface.border,
-  };
+  const {
+    t,
+    users,
+    meetings,
+    draftTitle,
+    setDraftTitle,
+    draftUserIds,
+    people,
+    rows,
+    calendarMode,
+    calendarTheme,
+    columns,
+    persistEvent,
+    toggleUser,
+    onGenerate,
+  } = useCalendarPages();
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.CALENDAR}>
       <Flex direction="column" gap={4} id={CALENDAR_PAGE_ID}>
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.cmsCalendar.title}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {t.cmsCalendar.subtitle}
-          </Typography>
-        </div>
+        <Flex direction="column" gap={1}>
+          <Typography variant="h2">{t.cmsCalendar.title}</Typography>
+          <Typography variant="body2">{t.cmsCalendar.subtitle}</Typography>
+        </Flex>
         <Card padding="md">
-          <Typography variant="h4" className="mb-2">
-            {t.cmsCalendar.generateMeeting}
-          </Typography>
-          <Typography variant="caption" className="bifrost-cms__muted mb-3 block">
-            {t.cmsCalendar.notifyHint}
-          </Typography>
-          <Flex gap={2} align="end" wrap="wrap">
-            <Input
-              id={CALENDAR_TITLE_INPUT_ID}
-              label={t.cmsCalendar.titleLabel}
-              value={draftTitle}
-              onChange={(event) => setDraftTitle(event.target.value)}
-            />
-            <Dropdown
-              searchable
-              closeOnSelect={false}
-              placement="bottom-start"
-              trigger={
-                <Button size="sm" variant="outline">
-                  {t.cmsCalendar.addUser}
-                </Button>
-              }
-              items={users.map((user) => ({
-                key: user.id,
-                label: user.name || user.username || user.email,
-                selected: draftUserIds.includes(user.id),
-                onClick: () => toggleUser(user.id),
-              }))}
-            />
-            <Button variant="primary" onClick={() => void onGenerate()} disabled={!draftTitle.trim()}>
-              {t.cmsCalendar.create}
-            </Button>
-          </Flex>
-          <Flex gap={1} className="flex-wrap mt-2">
-            {draftUserIds.map((id) => {
-              const user = users.find((item) => item.id === id);
-              if (!user) return null;
-              return (
-                <Badge key={id} variant="info" className="text-xs">
-                  {user.name || user.username || user.email}
-                </Badge>
-              );
-            })}
+          <Flex direction="column" gap={2}>
+            <Typography variant="h4">{t.cmsCalendar.generateMeeting}</Typography>
+            <Typography variant="caption">{t.cmsCalendar.notifyHint}</Typography>
+            <Flex gap={2} align="end" wrap="wrap">
+              <Input
+                id={CALENDAR_TITLE_INPUT_ID}
+                label={t.cmsCalendar.titleLabel}
+                value={draftTitle}
+                onChange={(event) => setDraftTitle(event.target.value)}
+              />
+              <Dropdown
+                searchable
+                closeOnSelect={false}
+                placement="bottom-start"
+                trigger={
+                  <Button size="sm" variant="outline">
+                    {t.cmsCalendar.addUser}
+                  </Button>
+                }
+                items={users.map((user) => ({
+                  key: user.id,
+                  label: user.name || user.username || user.email,
+                  selected: draftUserIds.includes(user.id),
+                  onClick: () => toggleUser(user.id),
+                }))}
+              />
+              <Button variant="primary" onClick={() => void onGenerate()} disabled={!draftTitle.trim()}>
+                {t.cmsCalendar.create}
+              </Button>
+            </Flex>
+            <CalendarDraftUsers ids={draftUserIds} users={users} />
           </Flex>
         </Card>
         <Card padding="md">
           <Calendar
-            defaultView="week"
+            defaultView={CALENDAR_VIEW_WEEK}
             events={meetings}
             people={people}
             mode={calendarMode}
@@ -192,18 +82,10 @@ export const CalendarPages: FC = () => {
           />
         </Card>
         <Card padding="md">
-          <Typography variant="h4" className="mb-2">
-            {t.cmsCalendar.meetings}
-          </Typography>
-          <CmsGridTable
-            data={rows}
-            columns={[
-              { id: 'title', header: t.cmsCalendar.titleLabel, accessor: 'title' },
-              { id: 'start', header: t.cmsCalendar.start, accessor: 'start' },
-              { id: 'people', header: t.cmsCalendar.taggedUsers, accessor: 'people' },
-            ]}
-            emptyContent={t.cmsCalendar.empty}
-          />
+          <Flex direction="column" gap={2}>
+            <Typography variant="h4">{t.cmsCalendar.meetings}</Typography>
+            <CmsGridTable data={rows} columns={columns} emptyContent={t.cmsCalendar.empty} />
+          </Flex>
         </Card>
       </Flex>
     </CmsShell>

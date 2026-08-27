@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { CmsChatRoom, CmsPresenceUser } from '../CmsLive.types';
+import type { CmsChatRoom, CmsPresenceStatus, CmsPresenceUser } from '../CmsLive.types';
 import type { CmsTask } from '../../TasksPages/TasksPages.types';
 
 export type CrewMentionPerson = {
@@ -30,6 +30,8 @@ export type CmsCrewChatProps = {
   color: string;
   roomSoundOn: boolean;
   onToggleRoomSound: () => void;
+  availability: CmsPresenceStatus;
+  onAvailability: (status: CmsPresenceStatus) => void;
 };
 
 export type CrewChatSidebarProps = {
@@ -57,6 +59,12 @@ export type CrewChatSidebarProps = {
   emptyPreview: string;
   onlineLabel: string;
   offlineLabel: string;
+  statusOnlineLabel: string;
+  statusAwayLabel: string;
+  statusBusyLabel: string;
+  statusNotThereLabel: string;
+  availability: CmsPresenceStatus;
+  onAvailability: (status: CmsPresenceStatus) => void;
   onJump: (value: string) => void;
   onToggleNewRoom: () => void;
   onNewRoomChange: (value: string) => void;

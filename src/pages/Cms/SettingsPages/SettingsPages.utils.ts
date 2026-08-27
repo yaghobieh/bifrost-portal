@@ -67,8 +67,10 @@ import type {
   CmsProfile,
   CmsSite,
   CmsThemeColors,
+  CmsTranslations,
 } from './SettingsPages.types';
-import { fetchSettingsValue, putSettingsValue, SETTINGS_KV_SITE } from '@sdk/modules/settings';
+import { fetchSettingsValue, putSettingsValue, SETTINGS_KV_SITE, SETTINGS_KV_TRANSLATIONS } from '@sdk/modules/settings';
+import { CMS_TRANSLATIONS_EVENT, CMS_TRANSLATIONS_STORAGE_KEY } from '@const/strings.const';
 
 const isHexColor = (value: unknown): value is string =>
   typeof value === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value);
@@ -375,6 +377,56 @@ export const loadCmsCatalog = (): CmsCatalog => {
 
 export const saveCmsCatalog = (catalog: CmsCatalog): void => {
   localStorage.setItem(SETTINGS_CATALOG_STORAGE_KEY, JSON.stringify(catalog));
+};
+
+const isTranslations = (value: unknown): value is CmsTranslations => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const record = value as CmsTranslations;
+  return typeof record.sourceLocale === 'string' && Boolean(record.locales) && typeof record.locales === 'object';
+};
+
+export const loadCmsTranslationsLocal = (): CmsTranslations | null => {
+  try {
+    const raw = localStorage.getItem(CMS_TRANSLATIONS_STORAGE_KEY);
+    if (!raw) {
+      return null;
+    }
+    const parsed: unknown = JSON.parse(raw);
+    if (!isTranslations(parsed)) {
+      return null;
+    }
+    return {
+      sourceLocale: parsed.sourceLocale,
+      locales: parsed.locales,
+      suggested: parsed.suggested || {},
+    };
+  } catch {
+    return null;
+  }
+};
+
+export const saveCmsTranslationsLocal = (bag: CmsTranslations): void => {
+  localStorage.setItem(CMS_TRANSLATIONS_STORAGE_KEY, JSON.stringify(bag));
+  window.dispatchEvent(new Event(CMS_TRANSLATIONS_EVENT));
+};
+
+export const loadCmsTranslationsRemote = async (token: string): Promise<CmsTranslations | null> => {
+  const value = await fetchSettingsValue(token, SETTINGS_KV_TRANSLATIONS);
+  if (!isTranslations(value)) {
+    return null;
+  }
+  return {
+    sourceLocale: value.sourceLocale,
+    locales: value.locales,
+    suggested: value.suggested || {},
+  };
+};
+
+export const saveCmsTranslationsRemote = async (token: string, bag: CmsTranslations): Promise<boolean> => {
+  saveCmsTranslationsLocal(bag);
+  return putSettingsValue(token, SETTINGS_KV_TRANSLATIONS, bag);
 };
 
 export const loadCmsMcp = (): CmsMcp => {

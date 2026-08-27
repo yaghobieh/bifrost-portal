@@ -1,6 +1,5 @@
 import { NUMBER_EIGHT_HUNDRED } from '@const/numbers.const';
 import {
-  EMPTY_STRING,
   HERO_IMG_SRC,
   HTML_TAG_DIV,
   HTML_TAG_IMG,
@@ -40,23 +39,13 @@ export const IMAGE_ATTR_KEYS = [
 
 export type ImageAttrKey = (typeof IMAGE_ATTR_KEYS)[number];
 
-export const readImgAttr = (html: string, name: ImageAttrKey): string => {
-  const match = html.match(new RegExp(`${name}="([^"]*)"`));
-  return match ? match[1] : EMPTY_STRING;
-};
-
-export const writeImgAttr = (html: string, name: ImageAttrKey, value: string): string => {
-  if (new RegExp(`${name}="`).test(html)) {
-    return html.replace(new RegExp(`${name}="[^"]*"`), `${name}="${value}"`);
-  }
-  if (!html.includes(IMAGE_OPEN_TAG)) {
-    return html;
-  }
-  return html.replace(IMAGE_OPEN_TAG, `${IMAGE_OPEN_TAG} ${name}="${value}"`);
-};
-
-export const htmlHasImg = (html?: string): boolean =>
-  Boolean(html && html.includes(IMAGE_OPEN_TAG));
+export const IMAGE_ATTR_BY_FIELD = {
+  src: IMAGE_ATTR_SRC,
+  alt: IMAGE_ATTR_ALT,
+  width: IMAGE_ATTR_WIDTH,
+  height: IMAGE_ATTR_HEIGHT,
+  loading: IMAGE_ATTR_LOADING,
+} as const;
 
 const wrap = (component: string, inner: string): string =>
   bearWidgetHtml(component, inner, HTML_TAG_DIV);

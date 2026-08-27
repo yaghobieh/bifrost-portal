@@ -2,16 +2,16 @@ import { HERO_IMG_SRC } from '@const/strings.const';
 import { NUMBER_EIGHT_HUNDRED } from '@const/numbers.const';
 import { BEAR_IMAGE_ALT, IMAGE_LOADING_LAZY } from './BearPalette.const';
 
-export const MARKETING_BLUE = '#2951C4';
-export const MARKETING_VIOLET = '#8A3FD4';
-export const MARKETING_PINK = '#EA0A8E';
-export const MARKETING_WHITE = '#ffffff';
-export const MARKETING_INK = '#14161C';
-export const MARKETING_MUTED = '#5B5F6A';
-export const MARKETING_CANVAS = '#F5F6FA';
+export const MARKETING_BLUE = 'var(--bifrost-cms-blue)';
+export const MARKETING_VIOLET = 'var(--bifrost-cms-violet)';
+export const MARKETING_PINK = 'var(--bifrost-cms-pink)';
+export const MARKETING_WHITE = 'var(--bifrost-cms-paper)';
+export const MARKETING_INK = 'var(--bifrost-cms-ink)';
+export const MARKETING_MUTED = 'var(--bifrost-cms-muted)';
+export const MARKETING_CANVAS = 'var(--bifrost-cms-canvas-fill)';
 export const MARKETING_SPACER_HEIGHT = '2rem';
 export const MARKETING_HEADING_SIZE = '2rem';
-export const MARKETING_GRADIENT = `linear-gradient(90deg,${MARKETING_BLUE},${MARKETING_VIOLET},${MARKETING_PINK})`;
+export const MARKETING_GRADIENT = 'var(--bifrost-cms-gradient)';
 
 export const MARKETING_WIDGET_IDS = {
   HERO: 'mkt-hero',
@@ -76,7 +76,7 @@ export const MARKETING_WIDGETS: readonly MarketingWidgetDef[] = [
     id: MARKETING_WIDGET_IDS.HEADING,
     group: MARKETING_WIDGET_GROUP.BASIC,
     label: 'Heading',
-    html: `<h1 style="margin:0;color:${MARKETING_INK};font-size:${MARKETING_HEADING_SIZE}">Heading</h1>`,
+    html: `<h1 data-i18n-key="marketing.heading" style="margin:0;color:${MARKETING_INK};font-size:${MARKETING_HEADING_SIZE}">Heading</h1>`,
   },
   {
     id: MARKETING_WIDGET_IDS.IMAGE,

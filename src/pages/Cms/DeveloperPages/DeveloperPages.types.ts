@@ -21,6 +21,7 @@ export type DeveloperAuditRow = {
   id: string;
   action: string;
   resource: string;
+  detail: string;
   userId: string;
   ipAddress: string;
   createdAt: string;

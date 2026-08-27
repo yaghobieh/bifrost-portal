@@ -1,6 +1,7 @@
 export { contentNucleus } from './content.reducer';
 export {
   CMS_CONTENT_PATH,
+  CMS_CONTENT_DELETE_PATH,
   CMS_PAGES_PATH,
   CMS_PAGE_CONTENT_PATH,
   CMS_PAGE_UPDATE_PATH,
@@ -11,6 +12,7 @@ export {
   fetchPageContentRequest,
   fetchPagesRequest,
   saveContentRequest,
+  deleteContentRequest,
   updatePageRequest,
 } from './content.api';
 export type {

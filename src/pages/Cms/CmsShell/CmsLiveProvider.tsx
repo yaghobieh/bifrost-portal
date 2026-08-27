@@ -28,16 +28,19 @@ import type {
   CmsChatRoom,
   CmsLiveContextValue,
   CmsLiveHealth,
+  CmsPresenceStatus,
   CmsPresenceUser,
 } from './CmsLive.types';
 import {
   mergeChatRooms,
+  loadStoredAvailability,
   parseLiveSocketPayload,
   presencePingBody,
   resolveChatRoom,
   resolveChatRooms,
   resolvePresenceUsers,
   sameMembers,
+  saveStoredAvailability,
   toCmsLiveWsUrl,
 } from './CmsLive.utils';
 
@@ -52,6 +55,8 @@ const idleLive = (): CmsLiveContextValue => ({
   tasks: null,
   board: null,
   rooms: [],
+  availability: 'online',
+  setAvailability: () => undefined,
   markRead: () => undefined,
   markAllRead: () => undefined,
   publishTasks: () => undefined,
@@ -84,6 +89,9 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
   const [tasks, setTasks] = useState<CmsTask[] | null>(null);
   const [board, setBoard] = useState<TaskBoardConfig | null>(null);
   const [rooms, setRooms] = useState<CmsChatRoom[]>([]);
+  const [availability, setAvailabilityState] = useState<CmsPresenceStatus>(loadStoredAvailability);
+  const availabilityRef = useRef(availability);
+  availabilityRef.current = availability;
   const roomsRef = useRef<CmsChatRoom[]>([]);
   roomsRef.current = rooms;
 
@@ -105,6 +113,7 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
       presencePingBody({
         name: pingName,
         avatar: loadCmsProfile().avatarDataUrl || EMPTY_STRING,
+        availability: availabilityRef.current,
       });
 
     const clearPing = () => {
@@ -330,6 +339,23 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
     );
   };
 
+  const setAvailability = (status: CmsPresenceStatus) => {
+    saveStoredAvailability(status);
+    availabilityRef.current = status;
+    setAvailabilityState(status);
+    const socket = socketRef.current;
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      return;
+    }
+    socket.send(
+      presencePingBody({
+        name: user?.name || user?.username || EMPTY_STRING,
+        avatar: loadCmsProfile().avatarDataUrl || EMPTY_STRING,
+        availability: status,
+      }),
+    );
+  };
+
   return (
     <CmsLiveContext.Provider
       value={{
@@ -341,6 +367,8 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
         tasks,
         board,
         rooms,
+        availability,
+        setAvailability,
         markRead,
         markAllRead,
         publishTasks,

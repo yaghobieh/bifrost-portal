@@ -4,6 +4,7 @@ import type { CrewUser } from '../../CrewPages/CrewPages.const';
 import type { CmsTask } from '../../TasksPages/TasksPages.types';
 import { userDisplayName } from '../../TasksPages/TasksPages.utils';
 import type { CmsChatRoom, CmsPresenceUser } from '../CmsLive.types';
+import { isChatPresent } from '../CmsLive.utils';
 import {
   CREW_CHANNEL_SLUG_DASH,
   CREW_CHANNEL_SLUG_KEEP,
@@ -83,10 +84,10 @@ export const collectMentionPeople = (
   currentUserId: string,
 ): CrewMentionPerson[] => {
   const byId = new Map<string, CrewMentionPerson>();
-  const onlineIds = new Set(onlineUsers.map((user) => user.id));
+  const onlineIds = new Set(onlineUsers.filter(isChatPresent).map((user) => user.id));
   onlineUsers.forEach((user) => {
     if (user.id === currentUserId) return;
-    byId.set(user.id, { id: user.id, name: user.name, online: true });
+    byId.set(user.id, { id: user.id, name: user.name, online: isChatPresent(user) });
   });
   crew.forEach((user) => {
     if (user.id === currentUserId) return;
@@ -158,11 +159,11 @@ export const partnerOnline = (
   currentUserId: string,
 ): boolean => {
   if (room.tag) {
-    return room.userIds.some((id) => id !== currentUserId && onlineUsers.some((user) => user.id === id));
+    return room.userIds.some((id) => id !== currentUserId && onlineUsers.some((user) => user.id === id && isChatPresent(user)));
   }
   return room.userIds
     .filter((id) => id !== currentUserId)
-    .some((id) => onlineUsers.some((user) => user.id === id));
+    .some((id) => onlineUsers.some((user) => user.id === id && isChatPresent(user)));
 };
 
 export const fillName = (template: string, name: string, token: string): string => template.replace(token, name);

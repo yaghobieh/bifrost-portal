@@ -1,7 +1,14 @@
 import type { FC } from 'react';
-import { Avatar, Badge, BearIcons, Button, Flex, Input, Typography } from '@forgedevstack/bear';
+import { Avatar, Badge, BearIcons, Button, Dropdown, Flex, Input, Typography } from '@forgedevstack/bear';
 import { CMS_AVATAR_INITIALS_LENGTH, CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
 import { CMS_KEY_ENTER } from '@pages/Cms/CmsShell/CmsShell.const';
+import { isChatPresent } from '@pages/Cms/CmsShell/CmsLive.utils';
+import {
+  CMS_PRESENCE_AWAY,
+  CMS_PRESENCE_BUSY,
+  CMS_PRESENCE_NOT_THERE,
+  CMS_PRESENCE_ONLINE,
+} from '@pages/Cms/CmsShell/CmsLive.const';
 import { CREW_JUMP_INPUT_ID, CREW_NEW_ROOM_INPUT_ID } from '../../CmsCrewChat.const';
 import type { CrewChatSidebarProps } from '../../CmsCrewChat.types';
 import {
@@ -38,6 +45,12 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
     emptyPreview,
     onlineLabel,
     offlineLabel,
+    statusOnlineLabel,
+    statusAwayLabel,
+    statusBusyLabel,
+    statusNotThereLabel,
+    availability,
+    onAvailability,
     onJump,
     onToggleNewRoom,
     onNewRoomChange,
@@ -52,15 +65,43 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
   const visibleRooms = directRooms.filter((room) => matchesJump(roomTitleFor(room), jumpQuery));
   const visiblePeople = leftoverPeople.filter((person) => matchesJump(person.name, jumpQuery));
 
+  const statusLabel =
+    availability === CMS_PRESENCE_AWAY
+      ? statusAwayLabel
+      : availability === CMS_PRESENCE_BUSY
+        ? statusBusyLabel
+        : availability === CMS_PRESENCE_NOT_THERE
+          ? statusNotThereLabel
+          : statusOnlineLabel;
   return (
     <Flex direction="column" gap={2} className="bifrost-cms-crew__nav">
       <Flex align="center" justify="between" gap={2}>
         <Typography variant="h4" className="mb-0">
           {title}
         </Typography>
-        <Button size="sm" variant="ghost" onClick={onToggleNewRoom} aria-label={newRoomLabel}>
-          <BearIcons.PlusIcon size={CMS_ICON_SIZE} />
-        </Button>
+        <Flex align="center" gap={1}>
+          <Dropdown
+            placement="bottom-start"
+            trigger={
+              <Button size="sm" variant="outline" aria-label={statusLabel}>
+                {statusLabel}
+              </Button>
+            }
+            items={[
+              { key: CMS_PRESENCE_ONLINE, label: statusOnlineLabel, onClick: () => onAvailability(CMS_PRESENCE_ONLINE) },
+              { key: CMS_PRESENCE_AWAY, label: statusAwayLabel, onClick: () => onAvailability(CMS_PRESENCE_AWAY) },
+              { key: CMS_PRESENCE_BUSY, label: statusBusyLabel, onClick: () => onAvailability(CMS_PRESENCE_BUSY) },
+              {
+                key: CMS_PRESENCE_NOT_THERE,
+                label: statusNotThereLabel,
+                onClick: () => onAvailability(CMS_PRESENCE_NOT_THERE),
+              },
+            ]}
+          />
+          <Button size="sm" variant="ghost" onClick={onToggleNewRoom} aria-label={newRoomLabel}>
+            <BearIcons.PlusIcon size={CMS_ICON_SIZE} />
+          </Button>
+        </Flex>
       </Flex>
       {newRoomOpen && (
         <Flex direction="column" gap={2} className="bifrost-cms-crew__create">
@@ -162,7 +203,7 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
         {visibleRooms.map((room) => {
           const name = roomTitleFor(room);
           const live = room.userIds.some(
-            (id) => id !== currentUserId && onlineUsers.some((user) => user.id === id),
+            (id) => id !== currentUserId && onlineUsers.some((user) => user.id === id && isChatPresent(user)),
           );
           const unread =
             room.id === activeRoomId ? NUMBER_ZERO : trailingOtherCount(room, currentUserId);

@@ -34,6 +34,7 @@ export default defineConfig(({ command, mode }) => {
         '@hooks': resolve(portalSrc, 'hooks'),
         '@utils': resolve(portalSrc, 'utils'),
         '@sdk': resolve(portalSrc, 'sdk'),
+        '@icons': resolve(portalSrc, 'icons'),
         '@forgedevstack/anvil': anvilStub,
         vue: vueStub,
         ...(aliasLocalInk

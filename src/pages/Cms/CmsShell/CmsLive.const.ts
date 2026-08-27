@@ -11,6 +11,17 @@ export const CMS_LIVE_TYPE_NOTIFICATIONS = 'notifications';
 export const CMS_LIVE_TYPE_NOTIFICATION = 'notification';
 export const CMS_LIVE_TYPE_PRESENCE = 'presence';
 export const CMS_LIVE_TYPE_PRESENCE_PING = 'presence:ping';
+export const CMS_PRESENCE_ONLINE = 'online';
+export const CMS_PRESENCE_AWAY = 'away';
+export const CMS_PRESENCE_BUSY = 'busy';
+export const CMS_PRESENCE_NOT_THERE = 'not_there';
+export const CMS_PRESENCE_STATUSES = [
+  CMS_PRESENCE_ONLINE,
+  CMS_PRESENCE_AWAY,
+  CMS_PRESENCE_BUSY,
+  CMS_PRESENCE_NOT_THERE,
+] as const;
+export const CMS_PRESENCE_STORAGE_KEY = 'cms-chat-status';
 export const CMS_LIVE_PATH_SEP = '/';
 export const CMS_LIVE_TYPE_TASKS = 'tasks';
 export const CMS_LIVE_TYPE_TASKS_UPDATE = 'tasks:update';
