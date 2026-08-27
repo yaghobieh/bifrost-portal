@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.12
+
+### Planned
+- Marketing more flexible and custom-made
+- Real page editor, real landing page, real public FE — design a real site from the CMS
+
 ## 1.1.11
 
 ### Added
