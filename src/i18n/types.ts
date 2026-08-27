@@ -1042,6 +1042,11 @@ export interface Messages {
     pageKeys: string;
     pagesEmpty: string;
     backToPages: string;
+    localeEn: string;
+    localeFr: string;
+    localeEs: string;
+    localeDe: string;
+    localeJa: string;
   };
   cmsCast: {
     title: string;
@@ -1240,6 +1245,9 @@ export interface Messages {
     translationsStatusAi: string;
     translationsAccept: string;
     translationsReject: string;
+    translationsTargetEmpty: string;
+    translationsTranslateOne: string;
+    translationsFillJson: string;
     translationsSaved: string;
     tabUpdate: string;
     themeTitle: string;

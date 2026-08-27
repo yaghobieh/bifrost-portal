@@ -1,10 +1,11 @@
 import { useEffect, useState, type FC } from 'react';
-import { Alert, Button, CodeEditor, Flex, Input, Typography } from '@forgedevstack/bear';
+import { Alert, Button, Flex, Typography } from '@forgedevstack/bear';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
 import { CONTENT_TYPE_JSON, EMPTY_STRING, HEADER_CONTENT_TYPE } from '@const/strings.const';
 import { HTTP_METHOD_POST, HTTP_NOT_IMPLEMENTED } from '@const/http.const';
 import { INK_API_URL } from '@const/billing.const';
+import { NUMBER_ZERO } from '@const/numbers.const';
 import { TRANSLATE_CATALOGS_PATH } from '@pages/Plans/Plans.const';
 import { CmsGridTable } from '@pages/Cms/CmsShell';
 import {
@@ -16,43 +17,54 @@ import {
 import type { CmsTranslations } from '@pages/Cms/SettingsPages/SettingsPages.types';
 import { useApi } from '@sdk/http';
 import { authHeaders } from '@sdk/modules/auth/auth.api';
-import { SettingsSection } from '@pages/Cms/SettingsPages/components/SettingsSection';
 import {
-  TRANSLATION_COL,
+  TRANSLATION_DEFAULT_TARGET,
+  TRANSLATION_EXPORT_NAME,
   TRANSLATION_JSON_INDENT,
-  TRANSLATION_LOCALES,
   TRANSLATION_PAGE_COL,
   TRANSLATION_SCOPE,
   TRANSLATION_SEED,
   TRANSLATION_SOURCE_LOCALE,
-  TRANSLATION_STATUS,
   TRANSLATION_VIEW,
 } from './TranslationsManager.const';
 import type {
   TranslationLocale,
-  TranslationRow,
+  TranslationLocaleNames,
   TranslationScopeId,
   TranslationViewId,
   TranslationsManagerProps,
 } from './TranslationsManager.types';
 import {
-  acceptSuggested,
+  acceptOneSuggested,
+  addLocaleToBag,
   buildTranslationRows,
   countDone,
   countMissing,
   countSuggested,
+  downloadJsonFile,
   emptyBag,
+  fillTemplate,
+  isLocaleCode,
+  listLocales,
+  localeLanguageName,
   parseTranslationsJson,
+  rejectSuggested,
+  resolveTranslateCatalogs,
   seedIfEmpty,
+  suggestedKeys,
   withLocaleTarget,
 } from './TranslationsManager.utils';
+import { TranslationAiBanner } from './helpers/TranslationAiBanner';
+import { TranslationJsonPanel } from './helpers/TranslationJsonPanel';
+import { TranslationTable } from './helpers/TranslationTable';
+import { TranslationToolbar } from './helpers/TranslationToolbar';
 
 export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
   const { pageId, onOpenPage, pages } = props;
   const { t } = useI18n();
   const { token } = useAuth();
   const [bag, setBag] = useState<CmsTranslations>(() => loadCmsTranslationsLocal() || emptyBag());
-  const [locale, setLocale] = useState<TranslationLocale>(TRANSLATION_LOCALES[1]);
+  const [locale, setLocale] = useState<TranslationLocale>(TRANSLATION_DEFAULT_TARGET);
   const [view, setView] = useState<TranslationViewId>(TRANSLATION_VIEW.TABLE);
   const [scope, setScope] = useState<TranslationScopeId>(
     pageId ? TRANSLATION_SCOPE.PAGE : TRANSLATION_SCOPE.GLOBAL,
@@ -62,6 +74,8 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
   const [saved, setSaved] = useState(false);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiReady, setAiReady] = useState(true);
+  const [addLocaleOpen, setAddLocaleOpen] = useState(false);
+  const [addLocaleValue, setAddLocaleValue] = useState(EMPTY_STRING);
   const seeded = seedIfEmpty(bag);
   const activePageId = scope === TRANSLATION_SCOPE.PAGE ? pageId : EMPTY_STRING;
   const rows = buildTranslationRows(seeded, locale, query, activePageId);
@@ -70,6 +84,19 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
   const suggested = countSuggested(seeded, locale, activePageId);
   const jsonValue = jsonDraft || JSON.stringify(seeded, null, TRANSLATION_JSON_INDENT);
   const showPageTable = scope === TRANSLATION_SCOPE.PAGE && !pageId;
+  const localeNames: TranslationLocaleNames = {
+    en: t.cmsTranslations.localeEn,
+    fr: t.cmsTranslations.localeFr,
+    es: t.cmsTranslations.localeEs,
+    de: t.cmsTranslations.localeDe,
+    ja: t.cmsTranslations.localeJa,
+  };
+  const language = localeLanguageName({ locale, names: localeNames });
+  const bannerMessage = fillTemplate(t.settings.translationsAiBanner, {
+    count: String(missing),
+    language,
+  });
+  const placeholder = fillTemplate(t.settings.translationsTargetEmpty, { language });
 
   useEffect(() => {
     if (pageId) {
@@ -100,14 +127,6 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
     setSaved(ok);
   };
 
-  const onCellEdit = (rowId: string | number, columnId: string, newValue: unknown) => {
-    if (columnId !== TRANSLATION_COL.TARGET) {
-      return;
-    }
-    const value = String(newValue ?? EMPTY_STRING);
-    void persist(withLocaleTarget(seeded, locale, String(rowId), value, activePageId));
-  };
-
   const onJsonChange = (value: string) => {
     setJsonDraft(value);
     const parsed = parseTranslationsJson(value);
@@ -125,11 +144,26 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
     void persist(parsed);
   };
 
-  const onPrepareAi = async () => {
-    setAiBusy(true);
-    const sourceMap = activePageId
+  const sourceMapForAi = (keys: string[]) => {
+    const full = activePageId
       ? seeded.pages?.[activePageId]?.[TRANSLATION_SOURCE_LOCALE] || {}
       : seeded.locales[TRANSLATION_SOURCE_LOCALE] || TRANSLATION_SEED.locales.en;
+    if (keys.length === NUMBER_ZERO) {
+      return full;
+    }
+    const picked: Record<string, string> = {};
+    keys.forEach((key) => {
+      const value = full[key];
+      if (value) {
+        picked[key] = value;
+      }
+    });
+    return picked;
+  };
+
+  const onPrepareAi = async (keys: string[] = []) => {
+    setAiBusy(true);
+    const sourceMap = sourceMapForAi(keys);
     const response = await useApi(
       `${INK_API_URL}${TRANSLATE_CATALOGS_PATH}`,
       {
@@ -150,169 +184,176 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
       setAiReady(false);
       return;
     }
-    const data = (await response.json()) as { catalogs?: Record<string, Record<string, string>> };
-    const catalog = data.catalogs?.[locale] || {};
+    const catalogs = resolveTranslateCatalogs(await response.json());
+    const catalog = catalogs[locale] || {};
     const next: CmsTranslations = {
       ...seeded,
       suggested: {
         ...seeded.suggested,
-        [locale]: catalog,
+        [locale]: {
+          ...(seeded.suggested[locale] || {}),
+          ...catalog,
+        },
       },
     };
     void persist(next);
     setAiReady(true);
   };
 
-  const statusLabel = (status: TranslationRow['status']): string => {
-    if (status === TRANSLATION_STATUS.DONE) {
-      return t.settings.translationsStatusDone;
+  const onAddLocale = () => {
+    const code = addLocaleValue.trim().toLowerCase();
+    setAddLocaleOpen(false);
+    setAddLocaleValue(EMPTY_STRING);
+    if (!isLocaleCode(code)) {
+      return;
     }
-    if (status === TRANSLATION_STATUS.AI) {
-      return t.settings.translationsStatusAi;
-    }
-    return t.settings.translationsStatusMissing;
+    void persist(addLocaleToBag(seeded, code));
+    setLocale(code);
   };
 
+  const onImportFile = (file: File) => {
+    void file.text().then((raw) => {
+      const parsed = parseTranslationsJson(raw);
+      if (!parsed) {
+        return;
+      }
+      void persist(parsed);
+    });
+  };
+
+  const onExport = () => {
+    downloadJsonFile({
+      filename: TRANSLATION_EXPORT_NAME,
+      body: JSON.stringify(seeded, null, TRANSLATION_JSON_INDENT),
+      mime: CONTENT_TYPE_JSON,
+    });
+  };
+
+  const showBanner = missing > NUMBER_ZERO && aiReady && !showPageTable;
+
   return (
-    <div className="bifrost-cms-settings-box bifrost-cms-translations">
-      <Flex direction="column" gap={3}>
-        <SettingsSection title={t.cmsTranslations.title} description={t.cmsTranslations.subtitle}>
-          <Flex gap={2} wrap="wrap" align="center">
-            <Button
-              size="sm"
-              variant={scope === TRANSLATION_SCOPE.GLOBAL ? 'ink' : 'outline'}
-              onClick={() => setScope(TRANSLATION_SCOPE.GLOBAL)}
-            >
-              {t.cmsTranslations.scopeGlobal}
-            </Button>
-            <Button
-              size="sm"
-              variant={scope === TRANSLATION_SCOPE.PAGE ? 'ink' : 'outline'}
-              onClick={() => setScope(TRANSLATION_SCOPE.PAGE)}
-            >
-              {t.cmsTranslations.scopePages}
-            </Button>
-            {TRANSLATION_LOCALES.map((code) => (
-              <Button
-                key={code}
-                size="sm"
-                variant={locale === code ? 'ink' : 'outline'}
-                onClick={() => setLocale(code)}
-              >
-                {code.toUpperCase()}
-                {code === seeded.sourceLocale ? ` · ${t.settings.translationsSource}` : EMPTY_STRING}
-              </Button>
-            ))}
-            <Input
-              label={t.settings.translationsSearch}
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-            <Button
-              size="sm"
-              variant={view === TRANSLATION_VIEW.TABLE ? 'ink' : 'outline'}
-              onClick={() => setView(TRANSLATION_VIEW.TABLE)}
-            >
-              {t.settings.translationsTable}
-            </Button>
-            <Button
-              size="sm"
-              variant={view === TRANSLATION_VIEW.JSON ? 'ink' : 'outline'}
-              onClick={() => setView(TRANSLATION_VIEW.JSON)}
-            >
-              {t.settings.translationsJson}
-            </Button>
-            <Button size="sm" variant="primary" disabled={aiBusy} onClick={() => void onPrepareAi()}>
-              {aiBusy ? t.settings.translationsAiPrepare : t.settings.translationsAiAll}
-            </Button>
+    <Flex direction="column" gap={3} className="bifrost-cms-translations">
+      <TranslationToolbar
+        locales={listLocales(seeded)}
+        sourceLocale={seeded.sourceLocale}
+        activeLocale={locale}
+        query={query}
+        view={view}
+        addLocaleOpen={addLocaleOpen}
+        addLocaleValue={addLocaleValue}
+        sourceLabel={t.settings.translationsSource}
+        addLocaleLabel={t.settings.translationsAddLocale}
+        searchLabel={t.settings.translationsSearch}
+        importLabel={t.settings.translationsImport}
+        exportLabel={t.settings.translationsExport}
+        tableLabel={t.settings.translationsTable}
+        jsonLabel={t.settings.translationsJson}
+        onLocale={setLocale}
+        onQuery={setQuery}
+        onView={setView}
+        onImportFile={onImportFile}
+        onExport={onExport}
+        onToggleAddLocale={() => setAddLocaleOpen(true)}
+        onAddLocaleValue={setAddLocaleValue}
+        onAddLocale={onAddLocale}
+      />
+      <Flex gap={2} wrap="wrap" align="center" className="bifrost-cms-translations__meta">
+        <Button
+          size="sm"
+          variant={scope === TRANSLATION_SCOPE.GLOBAL ? 'ink' : 'ghost'}
+          onClick={() => setScope(TRANSLATION_SCOPE.GLOBAL)}
+        >
+          {t.cmsTranslations.scopeGlobal}
+        </Button>
+        <Button
+          size="sm"
+          variant={scope === TRANSLATION_SCOPE.PAGE ? 'ink' : 'ghost'}
+          onClick={() => setScope(TRANSLATION_SCOPE.PAGE)}
+        >
+          {t.cmsTranslations.scopePages}
+        </Button>
+        {!showPageTable && (
+          <Flex gap={3} wrap="wrap" align="center" className="bifrost-cms-translations__stats">
+            <Typography variant="caption" className="mb-0">
+              {rows.length} {t.settings.translationsKeys}
+            </Typography>
+            <Typography variant="caption" className="bifrost-cms-translations__stat bifrost-cms-translations__stat--done mb-0">
+              {done} {t.settings.translationsDone}
+            </Typography>
+            <Typography variant="caption" className="bifrost-cms-translations__stat bifrost-cms-translations__stat--missing mb-0">
+              {missing} {t.settings.translationsMissing}
+            </Typography>
+            <Typography variant="caption" className="bifrost-cms-translations__stat bifrost-cms-translations__stat--ai mb-0">
+              {suggested} {t.settings.translationsSuggested}
+            </Typography>
           </Flex>
-          {showPageTable ? (
-            <CmsGridTable
-              data={pages}
-              getRowId={(row) => row.id}
-              onRowClick={(row) => onOpenPage(String(row.id))}
-              columns={[
-                { id: TRANSLATION_PAGE_COL.TITLE, header: t.cmsTranslations.pageTitle, accessor: 'title' },
-                { id: TRANSLATION_PAGE_COL.KEYS, header: t.cmsTranslations.pageKeys, accessor: 'keys' },
-              ]}
-              emptyContent={t.cmsTranslations.pagesEmpty}
+        )}
+      </Flex>
+      {!aiReady && <Alert severity="info">{t.settings.translationsAiNotReady}</Alert>}
+      {showBanner && (
+        <TranslationAiBanner
+          message={bannerMessage}
+          actionLabel={aiBusy ? t.settings.translationsAiPrepare : t.settings.translationsAiAll}
+          busy={aiBusy}
+          onTranslateAll={() => void onPrepareAi()}
+        />
+      )}
+      {showPageTable ? (
+        <CmsGridTable
+          data={pages}
+          getRowId={(row) => row.id}
+          onRowClick={(row) => onOpenPage(String(row.id))}
+          columns={[
+            { id: TRANSLATION_PAGE_COL.TITLE, header: t.cmsTranslations.pageTitle, accessor: 'title' },
+            { id: TRANSLATION_PAGE_COL.KEYS, header: t.cmsTranslations.pageKeys, accessor: 'keys' },
+          ]}
+          emptyContent={t.cmsTranslations.pagesEmpty}
+        />
+      ) : (
+        <Flex direction="column" gap={2}>
+          {activePageId && (
+            <Button size="sm" variant="ghost" onClick={() => onOpenPage(EMPTY_STRING)}>
+              {t.cmsTranslations.backToPages}
+            </Button>
+          )}
+          {view === TRANSLATION_VIEW.TABLE ? (
+            <TranslationTable
+              rows={rows}
+              keyHeader={t.settings.translationsColKey}
+              sourceHeader={t.settings.translationsColSource}
+              targetHeader={language.toUpperCase()}
+              statusHeader={t.settings.translationsColStatus}
+              placeholder={placeholder}
+              acceptLabel={t.settings.translationsAccept}
+              rejectLabel={t.settings.translationsReject}
+              translateOneLabel={t.settings.translationsTranslateOne}
+              doneLabel={t.settings.translationsStatusDone}
+              missingLabel={t.settings.translationsStatusMissing}
+              aiLabel={t.settings.translationsStatusAi}
+              busy={aiBusy}
+              onTarget={(key, value) => void persist(withLocaleTarget(seeded, locale, key, value, activePageId))}
+              onAccept={(key) => void persist(acceptOneSuggested(seeded, locale, key, activePageId))}
+              onReject={(key) => void persist(rejectSuggested(seeded, locale, key))}
+              onTranslateOne={(key) => void onPrepareAi([key])}
             />
           ) : (
-            <>
-              {activePageId && (
-                <Button size="sm" variant="ghost" onClick={() => onOpenPage(EMPTY_STRING)}>
-                  {t.cmsTranslations.backToPages}
-                </Button>
-              )}
-              <Flex gap={3} wrap="wrap">
-                <Typography variant="caption">
-                  {rows.length} {t.settings.translationsKeys}
-                </Typography>
-                <Typography variant="caption">
-                  {done} {t.settings.translationsDone}
-                </Typography>
-                <Typography variant="caption">
-                  {missing} {t.settings.translationsMissing}
-                </Typography>
-                <Typography variant="caption">
-                  {suggested} {t.settings.translationsSuggested}
-                </Typography>
-              </Flex>
-              {!aiReady && <Alert severity="info">{t.settings.translationsAiNotReady}</Alert>}
-              {missing > 0 && aiReady && (
-                <Alert severity="info">
-                  {t.settings.translationsAiBanner.replace('{count}', String(missing))}
-                </Alert>
-              )}
-              {view === TRANSLATION_VIEW.TABLE ? (
-                <CmsGridTable
-                  data={rows}
-                  getRowId={(row) => row.id}
-                  enableCellEdit
-                  onCellEdit={onCellEdit}
-                  columns={[
-                    { id: TRANSLATION_COL.KEY, header: t.settings.translationsColKey, accessor: 'key' },
-                    { id: TRANSLATION_COL.SOURCE, header: t.settings.translationsColSource, accessor: 'source' },
-                    {
-                      id: TRANSLATION_COL.TARGET,
-                      header: t.settings.translationsColTarget,
-                      accessor: 'target',
-                      editable: true,
-                    },
-                    {
-                      id: TRANSLATION_COL.STATUS,
-                      header: t.settings.translationsColStatus,
-                      accessor: 'status',
-                      render: (value) => statusLabel(value as TranslationRow['status']),
-                    },
-                  ]}
-                />
-              ) : (
-                <CodeEditor
-                  value={jsonValue}
-                  onChange={onJsonChange}
-                  language="json"
-                  theme="dark"
-                  showLineNumbers
-                  showGutter
-                  highlightActiveLine
-                />
-              )}
-              {suggested > 0 && (
-                <Button size="sm" variant="outline" onClick={() => void persist(acceptSuggested(seeded, locale))}>
-                  {t.settings.translationsAccept}
-                </Button>
-              )}
-            </>
+            <TranslationJsonPanel
+              value={jsonValue}
+              suggestedKeys={suggestedKeys(seeded, locale)}
+              fillLabel={t.settings.translationsFillJson}
+              busy={aiBusy}
+              onChange={onJsonChange}
+              onFill={() => void onPrepareAi()}
+            />
           )}
-        </SettingsSection>
-        <Flex gap={2} align="center">
-          <Button size="sm" variant="primary" onClick={onSave}>
-            {t.settings.catalogSave}
-          </Button>
-          {saved && <Typography variant="caption">{t.settings.translationsSaved}</Typography>}
         </Flex>
+      )}
+      <Flex gap={2} align="center">
+        <Button size="sm" variant="primary" onClick={onSave}>
+          {t.settings.catalogSave}
+        </Button>
+        {saved && <Typography variant="caption">{t.settings.translationsSaved}</Typography>}
       </Flex>
-    </div>
+    </Flex>
   );
 };

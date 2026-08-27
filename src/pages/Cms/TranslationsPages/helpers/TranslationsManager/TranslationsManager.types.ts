@@ -1,11 +1,11 @@
 import type { CmsTranslations } from '@pages/Cms/SettingsPages/SettingsPages.types';
-import { TRANSLATION_LOCALES, TRANSLATION_STATUS } from './TranslationsManager.const';
+import { TRANSLATION_STATUS } from './TranslationsManager.const';
 
 export type TranslationViewId = 'table' | 'json';
 
 export type TranslationScopeId = 'global' | 'page';
 
-export type TranslationLocale = (typeof TRANSLATION_LOCALES)[number];
+export type TranslationLocale = string;
 
 export type TranslationRowStatus =
   (typeof TRANSLATION_STATUS)[keyof typeof TRANSLATION_STATUS];
@@ -31,3 +31,7 @@ export type TranslationsManagerProps = {
 };
 
 export type TranslationBag = CmsTranslations;
+
+export type TranslationLocaleNames = Record<string, string>;
+
+export type FillTemplateValues = Record<string, string>;
