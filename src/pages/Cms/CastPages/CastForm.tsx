@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Alert, BearIcons, Button, Flex, Input, Typography } from '@forgedevstack/bear';
 import { ForgeForm, useField, useForm, Validators } from '@forgedevstack/forge-form';
+import type { FormValues } from '@forgedevstack/forge-form';
 import { NUMBER_ZERO } from '@const/numbers.const';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { useI18n } from '@i18n/index';
@@ -88,11 +89,11 @@ const CastFormFields: FC<Omit<CastFormProps, 'formKey'>> = (props) => {
         </Button>
       </Flex>
       {submitLocked && lockedHint && <Alert severity="warning">{lockedHint}</Alert>}
-      {saved ? (
+      {saved && (
         <Typography variant="caption" className="bifrost-cms-save-ok mb-0">
           {t.cmsCast.saved}
         </Typography>
-      ) : null}
+      )}
     </form>
   );
 };
@@ -104,7 +105,7 @@ export const CastForm: FC<CastFormProps> = (props) => {
       key={formKey}
       initialValues={{ [CAST_TITLE_FIELD]: initialTitle }}
       validateOnSubmit
-      onSubmit={(values) => {
+      onSubmit={(values: FormValues) => {
         if (props.submitLocked) {
           return;
         }

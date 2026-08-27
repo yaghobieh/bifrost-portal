@@ -1,6 +1,7 @@
 import type { ChangeEvent, FC } from 'react';
 import { Button, Card, Flex, Input, Select, Switch } from '@forgedevstack/bear';
 import { useField, Validators } from '@forgedevstack/forge-form';
+import type { FieldValue, FormValues } from '@forgedevstack/forge-form';
 import { useI18n } from '@i18n/index';
 import { EMPTY_STRING } from '@const/strings.const';
 import {
@@ -23,9 +24,11 @@ export const CastFieldRow: FC<CastFieldRowProps> = (props) => {
       Validators.required(t.cmsCast.nameRequired),
       Validators.minLength(CAST_NAME_MIN_LENGTH, t.cmsCast.nameRequired),
       Validators.pattern(CAST_NAME_PATTERN, t.cmsCast.namePattern),
-      Validators.custom((value, formValues) => {
+      Validators.custom((value: FieldValue, formValues?: FormValues) => {
         const current = String(value).trim().toLowerCase();
-        if (!current) return true;
+        if (!current) {
+          return true;
+        }
         const names = Object.entries(formValues ?? {})
           .filter(([key]) => key.startsWith(CAST_NAME_PREFIX))
           .map(([, next]) => String(next).trim().toLowerCase());
