@@ -30,7 +30,18 @@ import {
   STYLE_FIELD_KEYS,
 } from './BuilderPages.const';
 import type { BuilderInspectorTab, CanvasNode } from './BuilderPages.types';
-import { nodeStyleObject, updateNodeCss, updateNodeHtml, updateNodeJs, updateNodeLabel, updateNodeStyles } from './BuilderPages.utils';
+import { nodeStyleObject, updateNodeCss, updateNodeHtml, updateNodeJs, updateNodeLabel, updateNodeStyles, duplicateNode, removeNode } from './BuilderPages.utils';
+import {
+  htmlHasImg,
+  IMAGE_ATTR_ALT,
+  IMAGE_ATTR_HEIGHT,
+  IMAGE_ATTR_LOADING,
+  IMAGE_ATTR_SRC,
+  IMAGE_ATTR_WIDTH,
+  readImgAttr,
+  writeImgAttr,
+} from './BearPalette.const';
+import { MARKETING_GLOBAL_COLORS } from './MarketingBlocks.const';
 import { BuilderBoardNiche } from './BuilderBoardNiche';
 import { BuilderCodeField } from './BuilderCodeField';
 import { useBuilderPages } from './hooks';
@@ -71,6 +82,9 @@ export const BuilderPages: FC = () => {
     contentWidgets,
     formWidgets,
     marketingGroups,
+    bearGroups,
+    libraryQuery,
+    setLibraryQuery,
     canPasteStyles,
     layers,
     apply,
@@ -154,6 +168,29 @@ export const BuilderPages: FC = () => {
             {node.label}
           </Typography>
         )}
+        {preview ? null : (
+          <div className="bifrost-cms-canvas-node__hover">
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                apply(duplicateNode(tree, node.id));
+              }}
+            >
+              {t.cmsBuilder.menuDuplicate}
+            </button>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                apply(removeNode(tree, node.id));
+                if (selectedId === node.id) setSelectedId(BUILDER_INSPECTOR_NONE);
+              }}
+            >
+              {t.cmsBuilder.menuDelete}
+            </button>
+          </div>
+        )}
         {node.css ? <style>{`[data-node="${node.id}"]{${node.css}}`}</style> : null}
         {node.kind === CANVAS_KIND.INK ? (
           <InkEditor
@@ -220,14 +257,31 @@ export const BuilderPages: FC = () => {
           >
             <div className="bifrost-cms-builder__pane bifrost-cms-builder__pane--palette">
             <Card padding="md" className="bifrost-cms-builder__palette">
+              {selected ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mb-2"
+                  onClick={() => setSelectedId(BUILDER_INSPECTOR_NONE)}
+                >
+                  {t.cmsBuilder.backToWidgets}
+                </Button>
+              ) : null}
               <Typography variant="h4" className="mb-1">
-                {t.cmsBuilder.palette}
+                {selected ? t.cmsBuilder.inspector : t.cmsBuilder.palette}
               </Typography>
               {pageLocked && pageOwner && (
                 <Alert severity="warning">
                   {t.cmsShell.pageLocked.replace('{name}', pageOwner.name)}
                 </Alert>
               )}
+              {selected ? null : (
+                <>
+              <Input
+                label={t.cmsBuilder.librarySearch}
+                value={libraryQuery}
+                onChange={(event) => setLibraryQuery(event.target.value)}
+              />
               <Typography variant="caption" className="bifrost-cms__muted mb-3 block">
                 {t.cmsBuilder.layoutHint}
               </Typography>
@@ -310,6 +364,29 @@ export const BuilderPages: FC = () => {
                   </button>
                 ))}
               </div>
+              {bearGroups.map((group) => (
+                <div key={group.id}>
+                  <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
+                    {group.label}
+                  </Typography>
+                  <div className="bifrost-cms-widget-grid mb-4">
+                    {group.widgets.map((widget) => (
+                      <button
+                        key={widget.id}
+                        type="button"
+                        className="bifrost-cms-widget-chip"
+                        draggable
+                        onDragStart={(event) => onDragStartWidget(event, widget.id)}
+                        onClick={() => addWidget(widget.id)}
+                      >
+                        <Typography variant="body2" className="mb-0 font-medium">
+                          {widget.label}
+                        </Typography>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
               <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
                 {t.cmsBuilder.paletteGroupForm}
               </Typography>
@@ -379,6 +456,13 @@ export const BuilderPages: FC = () => {
                   ))}
                 </div>
               )}
+                </>
+              )}
+              {selected ? (
+                <Typography variant="body2" className="mb-0">
+                  {selected.label}
+                </Typography>
+              ) : null}
             </Card>
             <button
               type="button"
@@ -399,7 +483,7 @@ export const BuilderPages: FC = () => {
                     <Tab id={BUILDER_STAGE_TAB.CANVAS}>{t.cmsBuilder.canvas}</Tab>
                     <Tab id={BUILDER_STAGE_TAB.CONTENT}>{t.cmsBuilder.inspectorContent}</Tab>
                     <Tab id={BUILDER_STAGE_TAB.STYLE}>{t.cmsBuilder.inspectorStyle}</Tab>
-                    <Tab id={BUILDER_STAGE_TAB.CODE}>{t.cmsBuilder.inspectorCode}</Tab>
+                    <Tab id={BUILDER_STAGE_TAB.CODE}>{t.cmsBuilder.inspectorAdvanced}</Tab>
                   </TabList>
                 </Tabs>
                 <div className="bifrost-cms-builder__toolbar-actions">
@@ -414,6 +498,18 @@ export const BuilderPages: FC = () => {
                     }}
                   >
                     {t.cmsBuilder.viewportDesktop}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={viewport === BUILDER_VIEWPORT.TABLET ? 'ink' : 'outline'}
+                    icon={<BearIcons.TabletIcon size={CMS_ICON_SIZE} />}
+                    aria-label={t.cmsBuilder.viewportTablet}
+                    onClick={() => {
+                      setViewport(BUILDER_VIEWPORT.TABLET);
+                      setPreview(false);
+                    }}
+                  >
+                    {t.cmsBuilder.viewportTablet}
                   </Button>
                   <Button
                     size="sm"
@@ -558,7 +654,7 @@ export const BuilderPages: FC = () => {
                 <TabList className="mb-3">
                   <Tab id={BUILDER_INSPECTOR_TAB.CONTENT}>{t.cmsBuilder.inspectorContent}</Tab>
                   <Tab id={BUILDER_INSPECTOR_TAB.STYLE}>{t.cmsBuilder.inspectorStyle}</Tab>
-                  <Tab id={BUILDER_INSPECTOR_TAB.CODE}>{t.cmsBuilder.inspectorCode}</Tab>
+                  <Tab id={BUILDER_INSPECTOR_TAB.CODE}>{t.cmsBuilder.inspectorAdvanced}</Tab>
                 </TabList>
                 <TabPanel tabId={BUILDER_INSPECTOR_TAB.CONTENT}>
                   {selected ? (
@@ -570,7 +666,76 @@ export const BuilderPages: FC = () => {
                           apply(updateNodeLabel(tree, selected.id, event.target.value))
                         }
                       />
-                      {selected.html !== undefined && selected.kind !== CANVAS_KIND.INK ? (
+                      {htmlHasImg(selected.html) ? (
+                        <>
+                          <Input
+                            label={t.cmsBuilder.imageSrc}
+                            value={readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_SRC)}
+                            onChange={(event) =>
+                              apply(
+                                updateNodeHtml(
+                                  tree,
+                                  selected.id,
+                                  writeImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_SRC, event.target.value),
+                                ),
+                              )
+                            }
+                          />
+                          <Input
+                            label={t.cmsBuilder.imageAlt}
+                            value={readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_ALT)}
+                            onChange={(event) =>
+                              apply(
+                                updateNodeHtml(
+                                  tree,
+                                  selected.id,
+                                  writeImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_ALT, event.target.value),
+                                ),
+                              )
+                            }
+                          />
+                          <Input
+                            label={t.cmsBuilder.imageWidth}
+                            value={readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_WIDTH)}
+                            onChange={(event) =>
+                              apply(
+                                updateNodeHtml(
+                                  tree,
+                                  selected.id,
+                                  writeImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_WIDTH, event.target.value),
+                                ),
+                              )
+                            }
+                          />
+                          <Input
+                            label={t.cmsBuilder.imageHeight}
+                            value={readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_HEIGHT)}
+                            onChange={(event) =>
+                              apply(
+                                updateNodeHtml(
+                                  tree,
+                                  selected.id,
+                                  writeImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_HEIGHT, event.target.value),
+                                ),
+                              )
+                            }
+                          />
+                          <Input
+                            label={t.cmsBuilder.imageLoading}
+                            value={readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_LOADING)}
+                            onChange={(event) =>
+                              apply(
+                                updateNodeHtml(
+                                  tree,
+                                  selected.id,
+                                  writeImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_LOADING, event.target.value),
+                                ),
+                              )
+                            }
+                          />
+                        </>
+                      ) : null}
+                      {selected.html !== undefined && selected.kind !== CANVAS_KIND.INK && !htmlHasImg(selected.html) ? (
                         <Input
                           label={t.cmsBuilder.inspectorHtml}
                           value={selected.html}
@@ -615,6 +780,28 @@ export const BuilderPages: FC = () => {
                 <TabPanel tabId={BUILDER_INSPECTOR_TAB.STYLE}>
                   {selected ? (
                     <Flex direction="column" gap={2}>
+                      <Typography variant="caption" className="bifrost-cms-builder__group mb-0 block">
+                        {t.cmsBuilder.globalColors}
+                      </Typography>
+                      <div className="bifrost-cms-global-colors">
+                        {MARKETING_GLOBAL_COLORS.map((swatch) => (
+                          <button
+                            key={swatch.id}
+                            type="button"
+                            className="bifrost-cms-global-colors__swatch"
+                            style={{ background: swatch.value }}
+                            aria-label={t.cmsBuilder.colorLabels[swatch.id]}
+                            onClick={() =>
+                              apply(
+                                updateNodeStyles(tree, selected.id, {
+                                  ...selectedStyles,
+                                  background: swatch.value,
+                                }),
+                              )
+                            }
+                          />
+                        ))}
+                      </div>
                       {STYLE_FIELD_KEYS.map((key) => (
                         <Input
                           key={key}

@@ -1,0 +1,2499 @@
+{
+  "count": 174,
+  "catalog": [
+    {
+      "id": "accordion",
+      "label": "Accordion",
+      "bearComponent": "Accordion",
+      "group": "general",
+      "props": [
+        "children",
+        "allowMultiple",
+        "defaultOpen",
+        "className",
+        "testId",
+        "id"
+      ]
+    },
+    {
+      "id": "action-icon",
+      "label": "ActionIcon",
+      "bearComponent": "ActionIcon",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "active-bar",
+      "label": "ActiveBar",
+      "bearComponent": "ActiveBar",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "activity-item",
+      "label": "ActivityItem",
+      "bearComponent": "ActivityItem",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "affix",
+      "label": "Affix",
+      "bearComponent": "Affix",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "alert",
+      "label": "Alert",
+      "bearComponent": "Alert",
+      "group": "feedback",
+      "props": []
+    },
+    {
+      "id": "alert-dialog",
+      "label": "AlertDialog",
+      "bearComponent": "AlertDialog",
+      "group": "general",
+      "props": [
+        "id",
+        "isOpen",
+        "onClose",
+        "onConfirm",
+        "title",
+        "description",
+        "confirmText",
+        "cancelText",
+        "confirmVariant",
+        "loading",
+        "loadingText",
+        "closeOnBackdrop",
+        "closeOnEscape",
+        "icon",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "anchor",
+      "label": "Anchor",
+      "bearComponent": "Anchor",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "animated-counter",
+      "label": "AnimatedCounter",
+      "bearComponent": "AnimatedCounter",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "app-bar",
+      "label": "AppBar",
+      "bearComponent": "AppBar",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "children",
+        "position",
+        "variant",
+        "color",
+        "className",
+        "leftContent",
+        "rightContent",
+        "centerContent",
+        "elevation",
+        "dense",
+        "disableGutters",
+        "enableColorOnDark"
+      ]
+    },
+    {
+      "id": "app-shell",
+      "label": "AppShell",
+      "bearComponent": "AppShell",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "aspect-ratio",
+      "label": "AspectRatio",
+      "bearComponent": "AspectRatio",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "autocomplete",
+      "label": "Autocomplete",
+      "bearComponent": "Autocomplete",
+      "group": "form",
+      "props": [
+        "id",
+        "options",
+        "value",
+        "onChange",
+        "onSelect",
+        "placeholder",
+        "label",
+        "helperText",
+        "error",
+        "disabled",
+        "freeSolo",
+        "loading",
+        "filterOptions",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "avatar",
+      "label": "Avatar",
+      "bearComponent": "Avatar",
+      "group": "basic",
+      "props": [
+        "children",
+        "max",
+        "size",
+        "className"
+      ]
+    },
+    {
+      "id": "back-top",
+      "label": "BackTop",
+      "bearComponent": "BackTop",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "backdrop",
+      "label": "Backdrop",
+      "bearComponent": "Backdrop",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "badge",
+      "label": "Badge",
+      "bearComponent": "Badge",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "banner",
+      "label": "Banner",
+      "bearComponent": "Banner",
+      "group": "feedback",
+      "props": []
+    },
+    {
+      "id": "bear-loader",
+      "label": "BearLoader",
+      "bearComponent": "BearLoader",
+      "group": "general",
+      "props": [
+        "id",
+        "size",
+        "text",
+        "fullscreen",
+        "duration",
+        "onComplete",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "bear-logo",
+      "label": "BearLogo",
+      "bearComponent": "BearLogo",
+      "group": "general",
+      "props": [
+        "size",
+        "className",
+        "animated"
+      ]
+    },
+    {
+      "id": "biometric",
+      "label": "Biometric",
+      "bearComponent": "Biometric",
+      "group": "general",
+      "props": [
+        "id",
+        "type",
+        "size",
+        "status",
+        "label",
+        "successLabel",
+        "errorLabel",
+        "scanningLabel",
+        "onScan",
+        "onSuccess",
+        "onError",
+        "disabled",
+        "animated",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "blockquote",
+      "label": "Blockquote",
+      "bearComponent": "Blockquote",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "bottom-navigation",
+      "label": "BottomNavigation",
+      "bearComponent": "BottomNavigation",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "items",
+        "value",
+        "onChange",
+        "showLabels",
+        "variant",
+        "className"
+      ]
+    },
+    {
+      "id": "bottom-sheet",
+      "label": "BottomSheet",
+      "bearComponent": "BottomSheet",
+      "group": "overlay",
+      "props": [
+        "testId",
+        "id",
+        "isOpen",
+        "onClose",
+        "title",
+        "children",
+        "size",
+        "showCloseButton",
+        "closeOnBackdrop",
+        "closeOnEscape",
+        "showHandle",
+        "enableScroll",
+        "isSticky",
+        "className"
+      ]
+    },
+    {
+      "id": "box",
+      "label": "Box",
+      "bearComponent": "Box",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "breadcrumbs",
+      "label": "Breadcrumbs",
+      "bearComponent": "Breadcrumbs",
+      "group": "general",
+      "props": [
+        "items",
+        "separator",
+        "maxItems",
+        "itemsBeforeCollapse",
+        "itemsAfterCollapse",
+        "className",
+        "size",
+        "showHomeIcon",
+        "testId",
+        "id"
+      ]
+    },
+    {
+      "id": "button",
+      "label": "Button",
+      "bearComponent": "Button",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "button-group",
+      "label": "ButtonGroup",
+      "bearComponent": "ButtonGroup",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "calendar",
+      "label": "Calendar",
+      "bearComponent": "Calendar",
+      "group": "general",
+      "props": [
+        "testId",
+        "date",
+        "day",
+        "isCurrentMonth",
+        "isSelected",
+        "isToday",
+        "isDisabled",
+        "isHighlighted"
+      ]
+    },
+    {
+      "id": "card",
+      "label": "Card",
+      "bearComponent": "Card",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "card-skeleton",
+      "label": "CardSkeleton",
+      "bearComponent": "CardSkeleton",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "carousel",
+      "label": "Carousel",
+      "bearComponent": "Carousel",
+      "group": "media",
+      "props": [
+        "id",
+        "children",
+        "autoPlay",
+        "showDots",
+        "showArrows",
+        "loop",
+        "slidesToShow",
+        "gap",
+        "pauseOnHover",
+        "onSlideChange",
+        "transition",
+        "transitionDuration",
+        "indicator",
+        "thumbnails",
+        "thumbnailSize",
+        "keyboard",
+        "draggable",
+        "showProgress",
+        "showCounter",
+        "activeColor",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "cascader",
+      "label": "Cascader",
+      "bearComponent": "Cascader",
+      "group": "form",
+      "props": [
+        "id",
+        "options",
+        "value",
+        "onChange",
+        "placeholder",
+        "label",
+        "helperText",
+        "error",
+        "disabled",
+        "loading",
+        "clearable",
+        "size",
+        "variant",
+        "expandTrigger",
+        "showFullPath",
+        "pathSeparator",
+        "changeOnSelect",
+        "className",
+        "testId",
+        "translations",
+        "icon"
+      ]
+    },
+    {
+      "id": "chart",
+      "label": "Chart",
+      "bearComponent": "Chart",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "chat",
+      "label": "Chat",
+      "bearComponent": "Chat",
+      "group": "general",
+      "props": [
+        "id",
+        "messages",
+        "onSend",
+        "isLoading",
+        "placeholder",
+        "header",
+        "footer",
+        "showTimestamps",
+        "showStatus",
+        "showAvatars",
+        "userAvatar",
+        "botAvatar",
+        "isTyping",
+        "typingText",
+        "className",
+        "height",
+        "testId",
+        "disabled"
+      ]
+    },
+    {
+      "id": "checkbox",
+      "label": "Checkbox",
+      "bearComponent": "Checkbox",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "checkbox-card",
+      "label": "CheckboxCard",
+      "bearComponent": "CheckboxCard",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "chip",
+      "label": "Chip",
+      "bearComponent": "Chip",
+      "group": "basic",
+      "props": [
+        "testId",
+        "id",
+        "children",
+        "variant",
+        "color",
+        "size",
+        "icon",
+        "avatar",
+        "onDelete",
+        "onClick",
+        "disabled",
+        "className"
+      ]
+    },
+    {
+      "id": "chip-group",
+      "label": "ChipGroup",
+      "bearComponent": "ChipGroup",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "close-button",
+      "label": "CloseButton",
+      "bearComponent": "CloseButton",
+      "group": "general",
+      "props": [
+        "id",
+        "onClick",
+        "size",
+        "disabled",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "code-block",
+      "label": "CodeBlock",
+      "bearComponent": "CodeBlock",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "code-editor",
+      "label": "CodeEditor",
+      "bearComponent": "CodeEditor",
+      "group": "general",
+      "props": [
+        "id",
+        "value",
+        "onChange",
+        "language",
+        "theme",
+        "customTheme",
+        "placeholder",
+        "showLineNumbers",
+        "showGutter",
+        "highlightActiveLine",
+        "readOnly",
+        "fontSize",
+        "fontFamily",
+        "tabSize",
+        "autoIndent",
+        "autoCloseBrackets",
+        "wordWrap",
+        "minHeight",
+        "maxHeight",
+        "height",
+        "className",
+        "style",
+        "testId",
+        "onFocus",
+        "onBlur"
+      ]
+    },
+    {
+      "id": "collapsible",
+      "label": "Collapsible",
+      "bearComponent": "Collapsible",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "children",
+        "trigger",
+        "open",
+        "defaultOpen",
+        "onOpenChange",
+        "disabled",
+        "className",
+        "triggerClassName",
+        "contentClassName",
+        "animationDuration"
+      ]
+    },
+    {
+      "id": "color-picker",
+      "label": "ColorPicker",
+      "bearComponent": "ColorPicker",
+      "group": "form",
+      "props": [
+        "testId",
+        "id",
+        "value",
+        "onChange",
+        "presets",
+        "showInput",
+        "showPresets",
+        "disabled",
+        "label",
+        "size",
+        "className"
+      ]
+    },
+    {
+      "id": "color-swatch",
+      "label": "ColorSwatch",
+      "bearComponent": "ColorSwatch",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "columns",
+      "label": "Columns",
+      "bearComponent": "Columns",
+      "group": "layout",
+      "props": [
+        "testId",
+        "id",
+        "children",
+        "count",
+        "gap",
+        "fill",
+        "minWidth",
+        "className",
+        "style"
+      ]
+    },
+    {
+      "id": "command-palette",
+      "label": "CommandPalette",
+      "bearComponent": "CommandPalette",
+      "group": "general",
+      "props": [
+        "id",
+        "commands",
+        "open",
+        "onOpenChange",
+        "placeholder",
+        "showRecent",
+        "maxRecent",
+        "recentIds",
+        "onRecentChange",
+        "groupByCategory",
+        "filterFn",
+        "triggerKey",
+        "className",
+        "testId",
+        "translations",
+        "icon",
+        "footer"
+      ]
+    },
+    {
+      "id": "confetti",
+      "label": "Confetti",
+      "bearComponent": "Confetti",
+      "group": "general",
+      "props": [
+        "id",
+        "active",
+        "count",
+        "duration",
+        "colors",
+        "originX",
+        "originY",
+        "spread",
+        "velocity",
+        "gravity",
+        "autoHide",
+        "onComplete",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "container",
+      "label": "Container",
+      "bearComponent": "Container",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "context-menu",
+      "label": "ContextMenu",
+      "bearComponent": "ContextMenu",
+      "group": "overlay",
+      "props": [
+        "id",
+        "items",
+        "children",
+        "disabled",
+        "onOpenChange",
+        "testId"
+      ]
+    },
+    {
+      "id": "copy-button",
+      "label": "CopyButton",
+      "bearComponent": "CopyButton",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "value",
+        "children",
+        "onCopy",
+        "timeout",
+        "size",
+        "variant",
+        "className",
+        "copiedText",
+        "copyText",
+        "showText"
+      ]
+    },
+    {
+      "id": "countdown-timer",
+      "label": "CountdownTimer",
+      "bearComponent": "CountdownTimer",
+      "group": "general",
+      "props": [
+        "id",
+        "targetDate",
+        "duration",
+        "variant",
+        "size",
+        "showDays",
+        "showHours",
+        "showMinutes",
+        "showSeconds",
+        "showLabels",
+        "showSeparator",
+        "separator",
+        "labels",
+        "onComplete",
+        "onTick",
+        "paused",
+        "render",
+        "className",
+        "style",
+        "testId",
+        "digitTypographyProps",
+        "labelTypographyProps",
+        "separatorTypographyProps",
+        "narrowLayout"
+      ]
+    },
+    {
+      "id": "credit-input",
+      "label": "CreditInput",
+      "bearComponent": "CreditInput",
+      "group": "form",
+      "props": [
+        "id",
+        "value",
+        "onChange",
+        "mode",
+        "showName",
+        "size",
+        "variant",
+        "disabled",
+        "required",
+        "label",
+        "helperText",
+        "error",
+        "acceptedCards",
+        "validateOnInput",
+        "className",
+        "testId",
+        "translations",
+        "icon"
+      ]
+    },
+    {
+      "id": "cropper",
+      "label": "Cropper",
+      "bearComponent": "Cropper",
+      "group": "media",
+      "props": [
+        "src",
+        "crop",
+        "onCropChange",
+        "onCropComplete",
+        "aspectRatio",
+        "shape",
+        "zoom",
+        "onZoomChange",
+        "minZoom",
+        "maxZoom",
+        "rotation",
+        "onRotationChange",
+        "showZoomSlider",
+        "showRotationSlider",
+        "showGrid",
+        "gridOpacity",
+        "overlayColor",
+        "borderColor",
+        "borderWidth",
+        "width",
+        "height",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "currency-input",
+      "label": "CurrencyInput",
+      "bearComponent": "CurrencyInput",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "data-table",
+      "label": "DataTable",
+      "bearComponent": "DataTable",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "date-picker",
+      "label": "DatePicker",
+      "bearComponent": "DatePicker",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "date-range-picker",
+      "label": "DateRangePicker",
+      "bearComponent": "DateRangePicker",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "descriptions",
+      "label": "Descriptions",
+      "bearComponent": "Descriptions",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "diff-squares",
+      "label": "DiffSquares",
+      "bearComponent": "DiffSquares",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "diff-viewer",
+      "label": "DiffViewer",
+      "bearComponent": "DiffViewer",
+      "group": "general",
+      "props": [
+        "id",
+        "oldValue",
+        "newValue",
+        "viewMode",
+        "showLineNumbers",
+        "syntaxHighlight",
+        "language",
+        "oldTitle",
+        "newTitle",
+        "showStats",
+        "spacing",
+        "showLineHoverInfo",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "divider",
+      "label": "Divider",
+      "bearComponent": "Divider",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "dock",
+      "label": "Dock",
+      "bearComponent": "Dock",
+      "group": "general",
+      "props": [
+        "id",
+        "items",
+        "position",
+        "iconSize",
+        "magnifiedSize",
+        "magnification",
+        "magnificationDistance",
+        "showLabels",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "drawer",
+      "label": "Drawer",
+      "bearComponent": "Drawer",
+      "group": "overlay",
+      "props": [
+        "isOpen",
+        "onClose",
+        "title",
+        "children",
+        "side",
+        "anchor",
+        "variant",
+        "size",
+        "showCloseButton",
+        "closeOnBackdrop",
+        "closeOnEscape",
+        "className",
+        "container",
+        "id",
+        "testId"
+      ]
+    },
+    {
+      "id": "dropdown",
+      "label": "Dropdown",
+      "bearComponent": "Dropdown",
+      "group": "overlay",
+      "props": []
+    },
+    {
+      "id": "editable",
+      "label": "Editable",
+      "bearComponent": "Editable",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "em",
+      "label": "Em",
+      "bearComponent": "Em",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "emoji-picker",
+      "label": "EmojiPicker",
+      "bearComponent": "EmojiPicker",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "onSelect",
+        "size",
+        "maxHeight",
+        "className"
+      ]
+    },
+    {
+      "id": "empty-state",
+      "label": "EmptyState",
+      "bearComponent": "EmptyState",
+      "group": "feedback",
+      "props": [
+        "testId",
+        "id",
+        "icon",
+        "title",
+        "description",
+        "action",
+        "secondaryAction",
+        "className",
+        "size",
+        "variant"
+      ]
+    },
+    {
+      "id": "fab",
+      "label": "Fab",
+      "bearComponent": "Fab",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "fieldset",
+      "label": "Fieldset",
+      "bearComponent": "Fieldset",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "file-tree",
+      "label": "FileTree",
+      "bearComponent": "FileTree",
+      "group": "general",
+      "props": [
+        "id",
+        "items",
+        "selectedId",
+        "defaultExpandedIds",
+        "onSelect",
+        "onExpand",
+        "size",
+        "showLines",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "file-upload",
+      "label": "FileUpload",
+      "bearComponent": "FileUpload",
+      "group": "form",
+      "props": [
+        "testId",
+        "id",
+        "onFilesSelect",
+        "onFileRemove",
+        "accept",
+        "multiple",
+        "maxSize",
+        "maxFiles",
+        "disabled",
+        "label",
+        "helperText",
+        "error",
+        "files",
+        "showPreview",
+        "variant",
+        "icon",
+        "className"
+      ]
+    },
+    {
+      "id": "flex",
+      "label": "Flex",
+      "bearComponent": "Flex",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "floating-chat",
+      "label": "FloatingChat",
+      "bearComponent": "FloatingChat",
+      "group": "general",
+      "props": [
+        "id",
+        "messages",
+        "onSend",
+        "isLoading",
+        "isTyping",
+        "title",
+        "subtitle",
+        "avatar",
+        "position",
+        "bottom",
+        "side",
+        "defaultOpen",
+        "open",
+        "onOpenChange",
+        "trigger",
+        "badgeCount",
+        "header",
+        "welcomeMessage",
+        "poweredBy",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "form",
+      "label": "Form",
+      "bearComponent": "Form",
+      "group": "form",
+      "props": [
+        "name",
+        "value",
+        "onChange",
+        "onBlur"
+      ]
+    },
+    {
+      "id": "form-control",
+      "label": "FormControl",
+      "bearComponent": "FormControl",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "form-field",
+      "label": "FormField",
+      "bearComponent": "FormField",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "form-skeleton",
+      "label": "FormSkeleton",
+      "bearComponent": "FormSkeleton",
+      "group": "general",
+      "props": [
+        "fields",
+        "animation",
+        "id",
+        "testId",
+        "className"
+      ]
+    },
+    {
+      "id": "gauge",
+      "label": "Gauge",
+      "bearComponent": "Gauge",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "glow-card",
+      "label": "GlowCard",
+      "bearComponent": "GlowCard",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "gradient-text",
+      "label": "GradientText",
+      "bearComponent": "GradientText",
+      "group": "basic",
+      "props": [
+        "id",
+        "children",
+        "preset",
+        "colors",
+        "direction",
+        "animate",
+        "animationSpeed",
+        "as",
+        "weight",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "grid",
+      "label": "Grid",
+      "bearComponent": "Grid",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "heatmap",
+      "label": "Heatmap",
+      "bearComponent": "Heatmap",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "highlight",
+      "label": "Highlight",
+      "bearComponent": "Highlight",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "hover-card",
+      "label": "HoverCard",
+      "bearComponent": "HoverCard",
+      "group": "overlay",
+      "props": []
+    },
+    {
+      "id": "icon",
+      "label": "Icon",
+      "bearComponent": "Icon",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "image",
+      "label": "Image",
+      "bearComponent": "Image",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "image-annotation",
+      "label": "ImageAnnotation",
+      "bearComponent": "ImageAnnotation",
+      "group": "media",
+      "props": []
+    },
+    {
+      "id": "image-gallery",
+      "label": "ImageGallery",
+      "bearComponent": "ImageGallery",
+      "group": "media",
+      "props": [
+        "images",
+        "currentIndex",
+        "onClose",
+        "onNavigate"
+      ]
+    },
+    {
+      "id": "indicator",
+      "label": "Indicator",
+      "bearComponent": "Indicator",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "infinite-scroll",
+      "label": "InfiniteScroll",
+      "bearComponent": "InfiniteScroll",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "input",
+      "label": "Input",
+      "bearComponent": "Input",
+      "group": "form",
+      "props": [
+        "startAdornment",
+        "endAdornment"
+      ]
+    },
+    {
+      "id": "input-group",
+      "label": "InputGroup",
+      "bearComponent": "InputGroup",
+      "group": "general",
+      "props": [
+        "id",
+        "label",
+        "description",
+        "error",
+        "helperText",
+        "required",
+        "fullWidth",
+        "children",
+        "className",
+        "htmlFor",
+        "testId"
+      ]
+    },
+    {
+      "id": "json-viewer",
+      "label": "JsonViewer",
+      "bearComponent": "JsonViewer",
+      "group": "general",
+      "props": [
+        "id",
+        "data",
+        "defaultExpandDepth",
+        "expandAll",
+        "collapseAll",
+        "showDataTypes",
+        "showArrayIndices",
+        "showCopyButton",
+        "enableSearch",
+        "theme",
+        "rootName",
+        "onValueClick",
+        "onCopy",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "kanban",
+      "label": "Kanban",
+      "bearComponent": "Kanban",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "columns",
+        "onColumnsChange",
+        "onCardMove",
+        "renderCard",
+        "renderColumnHeader",
+        "disabled",
+        "className"
+      ]
+    },
+    {
+      "id": "kbd",
+      "label": "Kbd",
+      "bearComponent": "Kbd",
+      "group": "basic",
+      "props": [
+        "testId",
+        "id",
+        "children",
+        "keys",
+        "size",
+        "variant",
+        "className"
+      ]
+    },
+    {
+      "id": "link",
+      "label": "Link",
+      "bearComponent": "Link",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "list",
+      "label": "List",
+      "bearComponent": "List",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "loading-overlay",
+      "label": "LoadingOverlay",
+      "bearComponent": "LoadingOverlay",
+      "group": "feedback",
+      "props": []
+    },
+    {
+      "id": "map",
+      "label": "Map",
+      "bearComponent": "Map",
+      "group": "general",
+      "props": [
+        "id",
+        "markers",
+        "viewport",
+        "controlledViewport",
+        "onViewportChange",
+        "onMarkerClick",
+        "onMapClick",
+        "onMarkerDrag",
+        "tileProvider",
+        "customTileUrl",
+        "width",
+        "height",
+        "showZoomControls",
+        "showAttribution",
+        "scrollWheelZoom",
+        "doubleClickZoom",
+        "draggable",
+        "minZoom",
+        "maxZoom",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "mark",
+      "label": "Mark",
+      "bearComponent": "Mark",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "marquee",
+      "label": "Marquee",
+      "bearComponent": "Marquee",
+      "group": "media",
+      "props": [
+        "id",
+        "children",
+        "direction",
+        "speed",
+        "pauseOnHover",
+        "pauseOnClick",
+        "play",
+        "loop",
+        "gradient",
+        "gradientColor",
+        "gradientWidth",
+        "gap",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "masonry",
+      "label": "Masonry",
+      "bearComponent": "Masonry",
+      "group": "layout",
+      "props": [
+        "id",
+        "children",
+        "columns",
+        "gap",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "media-player",
+      "label": "MediaPlayer",
+      "bearComponent": "MediaPlayer",
+      "group": "media",
+      "props": []
+    },
+    {
+      "id": "mentions-input",
+      "label": "MentionsInput",
+      "bearComponent": "MentionsInput",
+      "group": "form",
+      "props": [
+        "testId",
+        "id",
+        "value",
+        "defaultValue",
+        "onChange",
+        "onMentionSelect",
+        "options",
+        "trigger",
+        "placeholder",
+        "disabled",
+        "maxSuggestions",
+        "filterOptions",
+        "size",
+        "fullWidth",
+        "className",
+        "multiline",
+        "rows"
+      ]
+    },
+    {
+      "id": "menu",
+      "label": "Menu",
+      "bearComponent": "Menu",
+      "group": "general",
+      "props": [
+        "className"
+      ]
+    },
+    {
+      "id": "message-list",
+      "label": "MessageList",
+      "bearComponent": "MessageList",
+      "group": "general",
+      "props": [
+        "id",
+        "testId",
+        "messages",
+        "currentUserId",
+        "groupWindowMs",
+        "showDaySeparators",
+        "showAvatars",
+        "showTimestamps",
+        "autoScroll",
+        "virtualized",
+        "overscan",
+        "height",
+        "renderMessage",
+        "emptyState",
+        "formatDayLabel",
+        "formatTimestamp",
+        "translations",
+        "onNewMessagesClick",
+        "className"
+      ]
+    },
+    {
+      "id": "modal",
+      "label": "Modal",
+      "bearComponent": "Modal",
+      "group": "overlay",
+      "props": [
+        "isOpen",
+        "onClose",
+        "title",
+        "children",
+        "size",
+        "showCloseButton",
+        "closeOnBackdrop",
+        "closeOnEscape",
+        "disableEscapeKeyDown",
+        "hideBackdrop",
+        "keepMounted",
+        "lockBodyScroll",
+        "zIndex",
+        "cancelPreventScroll",
+        "isCancelBackgroundClick",
+        "className",
+        "footer",
+        "testId",
+        "id"
+      ]
+    },
+    {
+      "id": "multi-select",
+      "label": "MultiSelect",
+      "bearComponent": "MultiSelect",
+      "group": "form",
+      "props": [
+        "id",
+        "options",
+        "value",
+        "defaultValue",
+        "onChange",
+        "placeholder",
+        "label",
+        "helperText",
+        "error",
+        "disabled",
+        "maxSelections",
+        "searchable",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "navigable-select",
+      "label": "NavigableSelect",
+      "bearComponent": "NavigableSelect",
+      "group": "form",
+      "props": [
+        "id",
+        "options",
+        "value",
+        "defaultValue",
+        "onChange",
+        "multiple",
+        "searchable",
+        "placeholder",
+        "label",
+        "helperText",
+        "error",
+        "disabled",
+        "size",
+        "fullWidth",
+        "maxVisible",
+        "maxSelections",
+        "emptyText",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "notification-center",
+      "label": "NotificationCenter",
+      "bearComponent": "NotificationCenter",
+      "group": "feedback",
+      "props": [
+        "id",
+        "notifications",
+        "onNotificationClick",
+        "onMarkAsRead",
+        "onMarkAllAsRead",
+        "onDismiss",
+        "onClearAll",
+        "maxVisible",
+        "groupByCategory",
+        "position",
+        "trigger",
+        "open",
+        "onOpenChange",
+        "className",
+        "testId",
+        "translations",
+        "icon"
+      ]
+    },
+    {
+      "id": "number-formatter",
+      "label": "NumberFormatter",
+      "bearComponent": "NumberFormatter",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "number-input",
+      "label": "NumberInput",
+      "bearComponent": "NumberInput",
+      "group": "form",
+      "props": [
+        "testId",
+        "id",
+        "value",
+        "onChange",
+        "min",
+        "max",
+        "step",
+        "disabled",
+        "label",
+        "helperText",
+        "error",
+        "placeholder",
+        "size",
+        "variant",
+        "showButtons",
+        "buttonPosition",
+        "className",
+        "precision"
+      ]
+    },
+    {
+      "id": "otpinput",
+      "label": "OTPInput",
+      "bearComponent": "OTPInput",
+      "group": "form",
+      "props": [
+        "testId",
+        "id",
+        "length",
+        "value",
+        "onChange",
+        "onComplete",
+        "onFinish",
+        "disabled",
+        "error",
+        "autoFocus",
+        "mask",
+        "size",
+        "separator",
+        "className",
+        "variant",
+        "layout",
+        "stackOnNarrow",
+        "cancelAutoJump"
+      ]
+    },
+    {
+      "id": "overlay",
+      "label": "Overlay",
+      "bearComponent": "Overlay",
+      "group": "general",
+      "props": [
+        "id",
+        "visible",
+        "opacity",
+        "color",
+        "blur",
+        "zIndex",
+        "fixed",
+        "children",
+        "onClick",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "page-header",
+      "label": "PageHeader",
+      "bearComponent": "PageHeader",
+      "group": "general",
+      "props": [
+        "id",
+        "testId",
+        "title",
+        "description",
+        "breadcrumbs",
+        "actions",
+        "className"
+      ]
+    },
+    {
+      "id": "page-nav",
+      "label": "PageNav",
+      "bearComponent": "PageNav",
+      "group": "general",
+      "props": [
+        "id",
+        "prev",
+        "next",
+        "size",
+        "variant",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "pagination",
+      "label": "Pagination",
+      "bearComponent": "Pagination",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "paper",
+      "label": "Paper",
+      "bearComponent": "Paper",
+      "group": "layout",
+      "props": []
+    },
+    {
+      "id": "password-input",
+      "label": "PasswordInput",
+      "bearComponent": "PasswordInput",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "phone-input",
+      "label": "PhoneInput",
+      "bearComponent": "PhoneInput",
+      "group": "form",
+      "props": [
+        "id",
+        "value",
+        "onChange",
+        "defaultCountry",
+        "placeholder",
+        "label",
+        "helperText",
+        "error",
+        "disabled",
+        "required",
+        "size",
+        "variant",
+        "onlyCountries",
+        "excludeCountries",
+        "preferredCountries",
+        "searchable",
+        "showFlags",
+        "showDialCode",
+        "className",
+        "testId",
+        "translations",
+        "icon"
+      ]
+    },
+    {
+      "id": "popconfirm",
+      "label": "Popconfirm",
+      "bearComponent": "Popconfirm",
+      "group": "overlay",
+      "props": [
+        "id",
+        "title",
+        "description",
+        "onConfirm",
+        "onCancel",
+        "confirmText",
+        "cancelText",
+        "icon",
+        "placement",
+        "disabled",
+        "children",
+        "variant",
+        "testId"
+      ]
+    },
+    {
+      "id": "popover",
+      "label": "Popover",
+      "bearComponent": "Popover",
+      "group": "overlay",
+      "props": [
+        "testId",
+        "id",
+        "children",
+        "content",
+        "placement",
+        "trigger",
+        "open",
+        "onOpenChange",
+        "className",
+        "contentClassName",
+        "arrow",
+        "closeOnClickOutside",
+        "closeOnEscape",
+        "offset"
+      ]
+    },
+    {
+      "id": "progress",
+      "label": "Progress",
+      "bearComponent": "Progress",
+      "group": "feedback",
+      "props": [
+        "id",
+        "value",
+        "max",
+        "bufferValue",
+        "size",
+        "color",
+        "showLabel",
+        "label",
+        "labelPosition",
+        "striped",
+        "animated",
+        "indeterminate",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "qrcode",
+      "label": "QRCode",
+      "bearComponent": "QRCode",
+      "group": "general",
+      "props": [
+        "id",
+        "value",
+        "size",
+        "level",
+        "bgColor",
+        "fgColor",
+        "includeMargin",
+        "imageUrl",
+        "imageSize",
+        "renderAs",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "radio",
+      "label": "Radio",
+      "bearComponent": "Radio",
+      "group": "form",
+      "props": [
+        "name",
+        "value",
+        "defaultValue",
+        "onChange",
+        "children",
+        "direction",
+        "size",
+        "variant",
+        "disabled",
+        "gap",
+        "label",
+        "error",
+        "helperText",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "radio-card",
+      "label": "RadioCard",
+      "bearComponent": "RadioCard",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "rating",
+      "label": "Rating",
+      "bearComponent": "Rating",
+      "group": "general",
+      "props": [
+        "size",
+        "state",
+        "color",
+        "emptyColor"
+      ]
+    },
+    {
+      "id": "resizable-panel",
+      "label": "ResizablePanel",
+      "bearComponent": "ResizablePanel",
+      "group": "layout",
+      "props": [
+        "id",
+        "first",
+        "second",
+        "direction",
+        "defaultSize",
+        "minSize",
+        "maxSize",
+        "onResize",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "resizable-textarea",
+      "label": "ResizableTextarea",
+      "bearComponent": "ResizableTextarea",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "result",
+      "label": "Result",
+      "bearComponent": "Result",
+      "group": "feedback",
+      "props": []
+    },
+    {
+      "id": "rich-editor",
+      "label": "RichEditor",
+      "bearComponent": "RichEditor",
+      "group": "general",
+      "props": [
+        "icon",
+        "title",
+        "active",
+        "onClick",
+        "disabled"
+      ]
+    },
+    {
+      "id": "ring-progress",
+      "label": "RingProgress",
+      "bearComponent": "RingProgress",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "scroll-area",
+      "label": "ScrollArea",
+      "bearComponent": "ScrollArea",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "children",
+        "className",
+        "orientation",
+        "scrollbarSize",
+        "scrollbarVariant",
+        "maxHeight",
+        "maxWidth"
+      ]
+    },
+    {
+      "id": "segmented-control",
+      "label": "SegmentedControl",
+      "bearComponent": "SegmentedControl",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "items",
+        "value",
+        "defaultValue",
+        "onChange",
+        "size",
+        "fullWidth",
+        "disabled",
+        "className"
+      ]
+    },
+    {
+      "id": "select",
+      "label": "Select",
+      "bearComponent": "Select",
+      "group": "form",
+      "props": []
+    },
+    {
+      "id": "sidebar",
+      "label": "Sidebar",
+      "bearComponent": "Sidebar",
+      "group": "general",
+      "props": [
+        "items",
+        "collapsed",
+        "onCollapsedChange",
+        "width",
+        "collapsedWidth",
+        "header",
+        "footer",
+        "showHeader",
+        "activeItemId",
+        "onItemClick",
+        "activeVariant",
+        "fullHeight",
+        "variant",
+        "position",
+        "className",
+        "style",
+        "testId",
+        "id"
+      ]
+    },
+    {
+      "id": "sign-pad",
+      "label": "SignPad",
+      "bearComponent": "SignPad",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "skeleton",
+      "label": "Skeleton",
+      "bearComponent": "Skeleton",
+      "group": "feedback",
+      "props": []
+    },
+    {
+      "id": "slider",
+      "label": "Slider",
+      "bearComponent": "Slider",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "slider-range",
+      "label": "SliderRange",
+      "bearComponent": "SliderRange",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "snackbar",
+      "label": "Snackbar",
+      "bearComponent": "Snackbar",
+      "group": "feedback",
+      "props": [
+        "open",
+        "message",
+        "description",
+        "severity",
+        "action",
+        "autoHideDuration",
+        "onClose",
+        "anchorOrigin",
+        "vertical",
+        "horizontal",
+        "offsetX",
+        "offsetY",
+        "size",
+        "progress",
+        "progressPosition",
+        "progressColor",
+        "countdownProgress",
+        "showCloseButton",
+        "closeOnClickOutside",
+        "container",
+        "className",
+        "id",
+        "testId"
+      ]
+    },
+    {
+      "id": "sparkline",
+      "label": "Sparkline",
+      "bearComponent": "Sparkline",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "speed-dial",
+      "label": "SpeedDial",
+      "bearComponent": "SpeedDial",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "spinner",
+      "label": "Spinner",
+      "bearComponent": "Spinner",
+      "group": "feedback",
+      "props": [
+        "testId",
+        "id",
+        "size",
+        "className",
+        "color",
+        "label"
+      ]
+    },
+    {
+      "id": "split-button",
+      "label": "SplitButton",
+      "bearComponent": "SplitButton",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "spoiler",
+      "label": "Spoiler",
+      "bearComponent": "Spoiler",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "spotlight",
+      "label": "Spotlight",
+      "bearComponent": "Spotlight",
+      "group": "general",
+      "props": [
+        "id",
+        "actions",
+        "open",
+        "onOpenChange",
+        "placeholder",
+        "shortcutKey",
+        "shortcutMod",
+        "nothingFoundMessage",
+        "highlightMatches",
+        "limit",
+        "filter",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "stat-card",
+      "label": "StatCard",
+      "bearComponent": "StatCard",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "statistic",
+      "label": "Statistic",
+      "bearComponent": "Statistic",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "title",
+        "value",
+        "prefix",
+        "suffix",
+        "icon",
+        "trend",
+        "description",
+        "loading",
+        "precision",
+        "className",
+        "size",
+        "variant"
+      ]
+    },
+    {
+      "id": "stepper",
+      "label": "Stepper",
+      "bearComponent": "Stepper",
+      "group": "general",
+      "props": [
+        "activeStep",
+        "totalSteps",
+        "onPrev",
+        "onNext",
+        "onComplete",
+        "disablePrev",
+        "disableNext",
+        "prevLabel",
+        "nextLabel",
+        "completeLabel",
+        "showIndicator",
+        "indicatorFormat"
+      ]
+    },
+    {
+      "id": "switch",
+      "label": "Switch",
+      "bearComponent": "Switch",
+      "group": "form",
+      "props": [
+        "value",
+        "options",
+        "onChange",
+        "size",
+        "orientation",
+        "disabled",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "table-skeleton",
+      "label": "TableSkeleton",
+      "bearComponent": "TableSkeleton",
+      "group": "general",
+      "props": [
+        "rows",
+        "columns",
+        "animation",
+        "id",
+        "testId",
+        "className"
+      ]
+    },
+    {
+      "id": "tabs",
+      "label": "Tabs",
+      "bearComponent": "Tabs",
+      "group": "general",
+      "props": [
+        "id",
+        "children",
+        "value",
+        "defaultTab",
+        "variant",
+        "onChange",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "tag-cloud",
+      "label": "TagCloud",
+      "bearComponent": "TagCloud",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "tags-input",
+      "label": "TagsInput",
+      "bearComponent": "TagsInput",
+      "group": "form",
+      "props": [
+        "testId",
+        "id",
+        "value",
+        "defaultValue",
+        "onChange",
+        "onAdd",
+        "onRemove",
+        "placeholder",
+        "disabled",
+        "maxTags",
+        "minLength",
+        "maxLength",
+        "separators",
+        "size",
+        "fullWidth",
+        "className"
+      ]
+    },
+    {
+      "id": "terminal",
+      "label": "Terminal",
+      "bearComponent": "Terminal",
+      "group": "general",
+      "props": [
+        "id",
+        "lines",
+        "onCommand",
+        "cwd",
+        "user",
+        "host",
+        "prompt",
+        "title",
+        "showHeader",
+        "showLineNumbers",
+        "showTimestamps",
+        "readOnly",
+        "height",
+        "theme",
+        "history",
+        "onHistoryChange",
+        "autoScroll",
+        "className",
+        "testId",
+        "isLoading"
+      ]
+    },
+    {
+      "id": "theme-icon",
+      "label": "ThemeIcon",
+      "bearComponent": "ThemeIcon",
+      "group": "general",
+      "props": [
+        "id",
+        "children",
+        "variant",
+        "size",
+        "radius",
+        "gradient",
+        "className",
+        "testId"
+      ]
+    },
+    {
+      "id": "time-picker",
+      "label": "TimePicker",
+      "bearComponent": "TimePicker",
+      "group": "form",
+      "props": [
+        "testId",
+        "id",
+        "selectedHour",
+        "setSelectedHour",
+        "selectedMinute",
+        "setSelectedMinute",
+        "period",
+        "setPeriod",
+        "format",
+        "hours",
+        "minutes",
+        "timeValue",
+        "clearable",
+        "onChange",
+        "onConfirm",
+        "onClose",
+        "translations"
+      ]
+    },
+    {
+      "id": "timeline",
+      "label": "Timeline",
+      "bearComponent": "Timeline",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "timeline-chart",
+      "label": "TimelineChart",
+      "bearComponent": "TimelineChart",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "toast",
+      "label": "Toast",
+      "bearComponent": "Toast",
+      "group": "feedback",
+      "props": [
+        "testId",
+        "id",
+        "message",
+        "title",
+        "severity",
+        "duration",
+        "closable",
+        "icon",
+        "action",
+        "onClose",
+        "className",
+        "autoScroll",
+        "pauseOnHover"
+      ]
+    },
+    {
+      "id": "toggle-button",
+      "label": "ToggleButton",
+      "bearComponent": "ToggleButton",
+      "group": "general",
+      "props": [
+        "value",
+        "defaultValue",
+        "onChange",
+        "exclusive",
+        "size",
+        "fullWidth",
+        "disabled",
+        "className",
+        "id",
+        "testId",
+        "children"
+      ]
+    },
+    {
+      "id": "tooltip",
+      "label": "Tooltip",
+      "bearComponent": "Tooltip",
+      "group": "overlay",
+      "props": [
+        "testId",
+        "id",
+        "content",
+        "children",
+        "position",
+        "placement",
+        "delay",
+        "className",
+        "disabled"
+      ]
+    },
+    {
+      "id": "tour",
+      "label": "Tour",
+      "bearComponent": "Tour",
+      "group": "general",
+      "props": [
+        "id",
+        "steps",
+        "open",
+        "current",
+        "onClose",
+        "onStepChange",
+        "onFinish",
+        "showIndicators",
+        "showCloseButton",
+        "showSkipButton",
+        "showPrevButton",
+        "finishText",
+        "skipText",
+        "className",
+        "maskOpacity",
+        "maskColor",
+        "animated",
+        "testId"
+      ]
+    },
+    {
+      "id": "transfer-list",
+      "label": "TransferList",
+      "bearComponent": "TransferList",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "transition",
+      "label": "Transition",
+      "bearComponent": "Transition",
+      "group": "general",
+      "props": [
+        "id",
+        "show",
+        "name",
+        "duration",
+        "delay",
+        "easing",
+        "enterFrom",
+        "enterTo",
+        "leaveFrom",
+        "leaveTo",
+        "unmountOnHide",
+        "onEnter",
+        "onEntered",
+        "onLeave",
+        "onLeft",
+        "children",
+        "className",
+        "as"
+      ]
+    },
+    {
+      "id": "tree-select",
+      "label": "TreeSelect",
+      "bearComponent": "TreeSelect",
+      "group": "form",
+      "props": [
+        "node",
+        "depth",
+        "selected",
+        "expanded",
+        "multiple",
+        "onToggleExpand",
+        "onSelect"
+      ]
+    },
+    {
+      "id": "tree-view",
+      "label": "TreeView",
+      "bearComponent": "TreeView",
+      "group": "general",
+      "props": [
+        "testId",
+        "id",
+        "data",
+        "onSelect",
+        "onExpand",
+        "selectedId",
+        "expandedIds",
+        "defaultExpandedIds",
+        "multiSelect",
+        "selectedIds",
+        "showCheckboxes",
+        "onCheck",
+        "checkedIds",
+        "className",
+        "size",
+        "showLines"
+      ]
+    },
+    {
+      "id": "typewriter",
+      "label": "Typewriter",
+      "bearComponent": "Typewriter",
+      "group": "general",
+      "props": [
+        "id",
+        "text",
+        "speed",
+        "startDelay",
+        "deleteDelay",
+        "deleteSpeed",
+        "loop",
+        "cursor",
+        "cursorChar",
+        "cursorBlinkSpeed",
+        "onComplete",
+        "onWordComplete",
+        "as",
+        "className",
+        "style",
+        "testId"
+      ]
+    },
+    {
+      "id": "typography",
+      "label": "Typography",
+      "bearComponent": "Typography",
+      "group": "basic",
+      "props": []
+    },
+    {
+      "id": "virtual-list",
+      "label": "VirtualList",
+      "bearComponent": "VirtualList",
+      "group": "general",
+      "props": []
+    },
+    {
+      "id": "watermark",
+      "label": "Watermark",
+      "bearComponent": "Watermark",
+      "group": "general",
+      "props": [
+        "id",
+        "children",
+        "text",
+        "image",
+        "fontSize",
+        "color",
+        "rotate",
+        "opacity",
+        "patternRepeat",
+        "gap",
+        "offset",
+        "zIndex",
+        "fontFamily",
+        "fontWeight",
+        "visible",
+        "className",
+        "style",
+        "testId"
+      ]
+    }
+  ]
+}

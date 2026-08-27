@@ -1,6 +1,7 @@
 import { BEAR_WIDGET_CATALOG } from '../ContentEdit/ContentEdit.const';
 import { loadCustomWidgets } from './customWidgets.utils';
 import { MARKETING_WIDGETS } from './MarketingBlocks.const';
+import { BEAR_PALETTE } from './BearPalette.const';
 import {
   BUILDER_CANVAS_EMPTY,
   BUILDER_CANVAS_KEY,
@@ -34,6 +35,7 @@ export const createLayoutNode = (kind: CanvasKind, label: string): CanvasNode =>
 
 export const createWidgetNode = (widgetId: string): CanvasNode | null => {
   const widget =
+    BEAR_PALETTE.find((entry) => entry.id === widgetId) ||
     BEAR_WIDGET_CATALOG.find((entry) => entry.id === widgetId) ||
     MARKETING_WIDGETS.find((entry) => entry.id === widgetId) ||
     loadCustomWidgets().find((entry) => entry.id === widgetId);

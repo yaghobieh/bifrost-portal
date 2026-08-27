@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bifrost Marketing Pages — Figma artboards</title>
+<style>
+
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --blue:#2951C4; --violet:#8A3FD4; --pink:#EA0A8E;
+    --ink:#14161C; --rail-bg:#14161C; --rail-text:#9BA1AF; --rail-text-dim:#5D6270; --rail-border:#23262F;
+    --paper:#fff; --canvas:#F5F6FA; --border:#E4E6EE; --border-strong:#CDD1DB;
+    --text:#14161C; --text-secondary:#585D6B; --text-tertiary:#8D92A1;
+    --accent-soft:#F1ECFB; --success:#0E8A6E; --success-soft:#E7F6F1;
+    --grad:linear-gradient(90deg,var(--blue),var(--violet),var(--pink));
+    --shadow-md:0 4px 16px rgba(20,22,28,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;color:var(--text);background:var(--canvas);-webkit-font-smoothing:antialiased;padding:44px 24px;}
+  .wrap{max-width:1180px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:6px;height:6px;background:var(--pink);border-radius:1px;display:inline-block;}
+  h1{font-size:25px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;}
+  .sub{color:var(--text-secondary);font-size:13.5px;max-width:640px;line-height:1.55;margin-bottom:26px;}
+  .section-label{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin:34px 0 12px;}
+  .section-label:first-of-type{margin-top:0;}
+
+  /* ---- store listing card ---- */
+  .ext-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px 22px;display:flex;gap:16px;}
+  .ext-mark{width:46px;height:46px;border-radius:11px;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ext-mark svg{width:24px;height:24px;}
+  .ext-body{flex:1;}
+  .ext-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .ext-name{font-size:15px;font-weight:700;}
+  .ext-dev{font-size:11px;color:var(--text-tertiary);font-family:'IBM Plex Mono';margin-left:8px;}
+  .ext-desc{font-size:12.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;max-width:640px;}
+  .ext-tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .ext-tag{font-size:10.5px;background:var(--canvas);border:1px solid var(--border);color:var(--text-secondary);padding:3px 8px;border-radius:4px;}
+  .btn{font-size:12px;font-weight:600;border-radius:7px;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;}
+  .btn-grad{background:var(--grad);color:#fff;}
+  .btn-ghost{background:#fff;border:1px solid var(--border-strong);color:var(--text);}
+
+  /* ---- builder shell ---- */
+  .builder{border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden;margin-top:6px;background:#fff;}
+  .builder-top{display:flex;align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--border);background:#fff;}
+  .builder-title{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .builder-title svg{width:15px;height:15px;color:var(--violet);}
+  .builder-crumb{font-size:11.5px;color:var(--text-tertiary);}
+  .builder-actions{margin-left:auto;display:flex;gap:8px;align-items:center;}
+  .device-toggle{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .device-toggle span{padding:6px 10px;font-size:11px;color:var(--text-secondary);}
+  .device-toggle span.active{background:var(--accent-soft);color:var(--violet);font-weight:600;}
+
+  .builder-shell{display:grid;grid-template-columns:210px 1fr 230px;min-height:600px;}
+
+  /* blocks panel */
+  .blocks-panel{background:var(--canvas);border-right:1px solid var(--border);padding:16px 12px;overflow:auto;}
+  .bcat-label{font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin:16px 0 7px;}
+  .bcat-label:first-child{margin-top:0;}
+  .block-chip{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:#fff;border-radius:7px;padding:9px 10px;font-size:11.5px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  .block-chip svg{width:14px;height:14px;color:var(--text-secondary);flex-shrink:0;}
+  .block-chip .swatch-mini{width:14px;height:14px;border-radius:3px;flex-shrink:0;}
+
+  /* canvas */
+  .canvas-pane{background:#fff;padding:22px 26px;overflow:auto;}
+  .cv-page{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+
+  .cv-block{position:relative;border:1.5px dashed var(--border-strong);}
+  .cv-block .cv-tag{position:absolute;top:6px;left:8px;font-family:'IBM Plex Mono';font-size:9px;color:var(--text-tertiary);background:#fff;padding:1px 6px;border-radius:3px;border:1px solid var(--border);z-index:2;}
+  .cv-block.selected{border:1.5px solid var(--violet);}
+  .cv-block.selected .cv-tag{color:#fff;background:var(--violet);border-color:var(--violet);}
+
+  .cv-hero{background:var(--ink);padding:26px 20px;text-align:center;position:relative;}
+  .cv-hero-glow{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:220px;height:160px;background:radial-gradient(circle, rgba(138,63,212,0.3), transparent 70%);}
+  .cv-hero h2{font-family:'Space Grotesk';color:#fff;font-size:16px;font-weight:700;position:relative;margin-bottom:6px;}
+  .cv-hero p{color:#9DA2B3;font-size:10.5px;position:relative;}
+
+  .cv-split{display:grid;grid-template-columns:1fr 1fr;}
+  .cv-split-brand{background:var(--ink);padding:20px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
+  .cv-split-brand .dot3{display:flex;gap:4px;}
+  .cv-split-brand .dot3 span{width:8px;height:8px;border-radius:2px;}
+  .cv-split-brand p{color:#fff;font-family:'Space Grotesk';font-size:12px;font-weight:700;margin-top:6px;}
+  .cv-split-form{padding:20px;display:flex;flex-direction:column;gap:8px;}
+  .cv-mini-input{height:20px;background:var(--canvas);border:1px solid var(--border);border-radius:5px;}
+  .cv-mini-btn{height:22px;border-radius:5px;background:var(--grad);}
+
+  .cv-features{padding:20px;}
+  .cv-features .flbl{font-size:10.5px;font-weight:700;margin-bottom:10px;}
+  .cv-feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .cv-feat-item{border:1px solid var(--border);border-radius:6px;padding:8px;}
+  .cv-feat-ic{width:16px;height:16px;border-radius:4px;margin-bottom:6px;}
+  .cv-feat-item .ln{height:5px;background:var(--border);border-radius:2px;margin-bottom:4px;}
+  .cv-feat-item .ln.s{width:60%;}
+
+  .cv-cta{background:var(--grad);padding:20px;text-align:center;}
+  .cv-cta .ln{height:8px;background:rgba(255,255,255,.85);border-radius:3px;width:40%;margin:0 auto 8px;}
+  .cv-cta .btn-mini{width:80px;height:18px;background:#fff;border-radius:4px;margin:0 auto;}
+
+  .cv-footer{background:var(--ink);padding:16px 20px;display:flex;justify-content:space-between;}
+  .cv-footer .fln{height:5px;background:var(--rail-border);border-radius:2px;width:60px;}
+
+  /* inspector */
+  .inspector-pane{background:var(--canvas);border-left:1px solid var(--border);padding:16px 14px;overflow:auto;}
+  .insp-title{font-size:12.5px;font-weight:700;margin-bottom:2px;}
+  .insp-sub{font-size:10.5px;color:var(--text-tertiary);margin-bottom:16px;}
+  .insp-label{font-family:'IBM Plex Mono';font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-tertiary);margin:16px 0 8px;}
+  .insp-label:first-of-type{margin-top:0;}
+
+  .bg-options{display:flex;gap:8px;}
+  .bg-opt{width:34px;height:34px;border-radius:7px;border:1.5px solid var(--border);}
+  .bg-opt.active{border-color:var(--violet);box-shadow:0 0 0 2px var(--accent-soft);}
+
+  .grad-bar{height:10px;border-radius:5px;background:var(--grad);position:relative;margin-bottom:8px;}
+  .grad-bar .stop{position:absolute;top:-3px;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--violet);}
+  .grad-labels{display:flex;justify-content:space-between;font-family:'IBM Plex Mono';font-size:9.5px;color:var(--text-tertiary);}
+
+  .radius-row{display:flex;gap:6px;}
+  .radius-opt{flex:1;border:1px solid var(--border);background:#fff;border-radius:6px;padding:7px 0;text-align:center;font-size:10.5px;font-weight:600;color:var(--text-secondary);}
+  .radius-opt.active{border-color:var(--violet);color:var(--violet);background:var(--accent-soft);}
+
+  .suggest-list{display:flex;flex-direction:column;gap:6px;}
+  .suggest-item{display:flex;align-items:center;gap:7px;border:1px solid var(--success);background:var(--success-soft);border-radius:6px;padding:8px 10px;font-size:11px;font-weight:600;color:var(--success);}
+  .suggest-item svg{width:12px;height:12px;flex-shrink:0;}
+
+  .field-label{font-size:11px;font-weight:600;margin-bottom:6px;display:block;}
+  .field-input{width:100%;border:1px solid var(--border);border-radius:6px;padding:7px 9px;font-size:11.5px;background:#fff;}
+
+
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  :root{
+    --blue:#2951C4; --violet:#8A3FD4; --pink:#EA0A8E;
+    --ink:#14161C; --paper:#fff; --canvas:#F5F6FA; --border:#E4E6EE; --border-strong:#CDD1DB;
+    --text:#14161C; --text-secondary:#585D6B; --text-tertiary:#8D92A1;
+    --accent-soft:#F1ECFB; --danger:#C4302B;
+    --grad:linear-gradient(90deg,var(--blue),var(--violet),var(--pink));
+    --shadow-md:0 4px 16px rgba(20,22,28,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;color:var(--text);background:var(--canvas);-webkit-font-smoothing:antialiased;padding:44px 24px;}
+  .wrap{max-width:980px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:6px;height:6px;background:var(--pink);border-radius:1px;display:inline-block;}
+  h1{font-size:24px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;}
+  .sub{color:var(--text-secondary);font-size:13.5px;max-width:640px;line-height:1.6;margin-bottom:28px;}
+  .section-label{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin:30px 0 12px;}
+  .section-label:first-of-type{margin-top:0;}
+
+  /* ---- canvas frame ---- */
+  .stage-frame{border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden;background:#fff;}
+  .frame-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--canvas);}
+  .frame-dots span{width:8px;height:8px;border-radius:50%;background:#D7DAE3;display:inline-block;margin-right:5px;}
+  .frame-lbl{margin-left:6px;font-family:'IBM Plex Mono';font-size:10.5px;color:var(--text-tertiary);}
+  .frame-hint{margin-left:auto;font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:6px;}
+  .frame-hint svg{width:12px;height:12px;}
+
+  .cv-wrap{position:relative;}
+  .cv-hero{background:var(--ink);padding:60px 20px 40px;text-align:center;position:relative;overflow:hidden;outline:1.5px solid var(--violet);outline-offset:-1.5px;}
+  .cv-tag{position:absolute;top:10px;left:12px;font-family:'IBM Plex Mono';font-size:9.5px;color:#fff;background:var(--violet);padding:2px 8px;border-radius:4px;z-index:3;}
+  .cv-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:520px;height:340px;background:radial-gradient(ellipse at center, rgba(138,63,212,0.28), transparent 65%);pointer-events:none;}
+  .cv-eyebrow{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#F472C7;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:14px;position:relative;}
+  .cv-eyebrow::before{content:'';width:5px;height:5px;background:#F472C7;border-radius:1px;}
+  .cv-hero h1{font-family:'Space Grotesk';font-size:32px;line-height:1.15;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:14px;position:relative;max-width:560px;margin-left:auto;margin-right:auto;}
+  .cv-hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .cv-hero p{color:#A6ABBA;font-size:12.5px;max-width:420px;margin:0 auto 22px;position:relative;line-height:1.6;}
+  .cv-ctas{display:flex;gap:10px;justify-content:center;position:relative;}
+  .cv-btn{font-size:12px;font-weight:600;padding:9px 16px;border-radius:6px;}
+  .cv-btn.grad{background:var(--grad);color:#fff;}
+  .cv-btn.ghost{border:1px solid #2A2D38;color:#E4E6EE;}
+
+  /* cursor marker */
+  .cursor-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--ink);box-shadow:0 0 0 3px rgba(255,255,255,.5);z-index:41;}
+  .cursor-lbl{position:absolute;font-family:'IBM Plex Mono';font-size:9.5px;color:#fff;background:var(--ink);padding:2px 7px;border-radius:4px;z-index:41;white-space:nowrap;}
+
+  /* context menu */
+  .ctx-menu{position:absolute;width:230px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 16px 40px rgba(20,22,28,.22);padding:6px;z-index:40;}
+  .ctx-section-lbl{font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-tertiary);padding:7px 10px 4px;}
+  .ctx-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--text);}
+  .ctx-item svg{width:14px;height:14px;color:var(--text-secondary);flex-shrink:0;}
+  .ctx-item .kbd{margin-left:auto;font-family:'IBM Plex Mono';font-size:10px;color:var(--text-tertiary);}
+  .ctx-item.hover{background:var(--accent-soft);}
+  .ctx-item.hover svg{color:var(--violet);}
+  .ctx-item.hover .kbd{color:var(--violet);}
+  .ctx-item.disabled{color:var(--text-tertiary);}
+  .ctx-item.disabled svg{color:var(--text-tertiary);}
+  .ctx-item.danger{color:var(--danger);}
+  .ctx-item.danger svg{color:var(--danger);}
+  .ctx-divider{height:1px;background:var(--border);margin:5px 6px;}
+
+  .note{font-size:12px;color:var(--text-secondary);line-height:1.65;margin-top:18px;max-width:680px;}
+  .note b{color:var(--text);}
+
+.figma-artboard {
+  max-width: 1180px;
+  margin: 0 auto 72px;
+  padding: 24px 0 48px;
+  border-bottom: 1px solid #E4E6EE;
+}
+.figma-artboard__name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #EA0A8E;
+  margin: 0 24px 16px;
+}
+</style>
+</head>
+<body>
+<section class="figma-artboard" data-name="01 Store and builder">
+<p class="figma-artboard__name">Artboard 01 · Store + Marketing builder</p>
+
+<div class="wrap">
+
+  <div class="eyebrow">Bifrost · Store extension</div>
+  <h1>Marketing Pages — a Stage plugin for pages like this</h1>
+  <p class="sub">Stage's default palette (Section, Grid, Card, Button) is built for content pages. Marketing and auth pages are composed of whole patterns — a split hero, a credentials form, a CTA band — so this plugin adds a second block set to Stage rather than making you assemble a login screen out of raw grids.</p>
+
+  <div class="section-label">In the Store</div>
+  <div class="ext-card">
+    <div class="ext-mark">
+      <svg viewBox="0 0 64 64"><defs><linearGradient id="mg" x1="4" y1="0" x2="60" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2951C4"/><stop offset="0.5" stop-color="#8A3FD4"/><stop offset="1" stop-color="#EA0A8E"/></linearGradient><clipPath id="mc"><rect x="0" y="0" width="64" height="41"/></clipPath></defs><g clip-path="url(#mc)"><circle cx="32" cy="41" r="26" fill="none" stroke="url(#mg)" stroke-width="7" stroke-linecap="round"/><circle cx="32" cy="41" r="17" fill="none" stroke="url(#mg)" stroke-width="7" stroke-linecap="round" opacity="0.88"/><circle cx="32" cy="41" r="8" fill="none" stroke="url(#mg)" stroke-width="7" stroke-linecap="round" opacity="0.74"/></g></svg>
+    </div>
+    <div class="ext-body">
+      <div class="ext-head"><div><span class="ext-name">Marketing Pages</span><span class="ext-dev">Bifrost team</span></div><span class="btn btn-grad">Install</span></div>
+      <div class="ext-desc">Adds hero, split-auth, feature grid, CTA band, and footer blocks to Stage — plus a gradient inspector for the Bifrost accent — so landing and auth pages assemble from patterns instead of raw grids.</div>
+      <div class="ext-tags"><span class="ext-tag">Hero sections</span><span class="ext-tag">Auth layouts</span><span class="ext-tag">Gradient inspector</span><span class="ext-tag">CTA bands</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Inside Stage, once installed</div>
+
+  <div class="builder">
+    <div class="builder-top">
+      <div class="builder-title"><svg viewBox="0 0 16 16" fill="none"><path d="M2 5L8 2L14 5L8 8L2 5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 5V11L8 14L14 11V5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Marketing Pages</div>
+      <div class="builder-crumb">Editing · Sign in page</div>
+      <div class="builder-actions">
+        <div class="device-toggle"><span class="active">Desktop</span><span>Mobile</span></div>
+        <span class="btn btn-ghost">Preview</span>
+        <span class="btn btn-grad">Publish</span>
+      </div>
+    </div>
+
+    <div class="builder-shell">
+
+      <!-- BLOCKS -->
+      <div class="blocks-panel">
+        <div class="bcat-label">Hero</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 8.5H11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Centered hero</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="5.5" height="10" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8.5" y="3" width="5.5" height="10" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>Split hero</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><path d="M2 10L8 4L14 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Minimal hero</div>
+
+        <div class="bcat-label">Auth</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="6" width="10" height="8" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 6V4.5C5.5 3.1 6.6 2 8 2C9.4 2 10.5 3.1 10.5 4.5V6" stroke="currentColor" stroke-width="1.2"/></svg>Credentials form</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><circle cx="5" cy="8" r="2.6" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="8" r="2.6" stroke="currentColor" stroke-width="1.2"/></svg>OAuth row</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><path d="M4 3.5H12M4 3.5V12L8 10L12 12V3.5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Testimonial quote</div>
+
+        <div class="bcat-label">Content</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" stroke="currentColor" stroke-width="1.1"/><rect x="9" y="2" width="5" height="5" stroke="currentColor" stroke-width="1.1"/><rect x="2" y="9" width="5" height="5" stroke="currentColor" stroke-width="1.1"/><rect x="9" y="9" width="5" height="5" stroke="currentColor" stroke-width="1.1"/></svg>Feature grid</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><path d="M2 11Q8 3 14 8" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>Bridge diagram</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M5 6.5H11M5 9H9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>Code showcase</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><path d="M2 13V7M8 13V3M13 13V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Stat strip</div>
+
+        <div class="bcat-label">Conversion</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="8" rx="1.2" stroke="currentColor" stroke-width="1.2"/></svg>CTA band</div>
+        <div class="block-chip"><span class="swatch-mini" style="background:linear-gradient(90deg,#2951C4,#EA0A8E);"></span>Gradient button</div>
+
+        <div class="bcat-label">Footer</div>
+        <div class="block-chip"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="9" width="12" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 11H6M9 11H12" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>Multi-column footer</div>
+      </div>
+
+      <!-- CANVAS -->
+      <div class="canvas-pane">
+        <div class="cv-page">
+          <div class="cv-block cv-split">
+            <div class="cv-tag">Split hero</div>
+            <div class="cv-split-brand">
+              <div class="dot3"><span style="background:#2951C4;"></span><span style="background:#8A3FD4;"></span><span style="background:#EA0A8E;"></span></div>
+              <p>Bifrost</p>
+            </div>
+            <div class="cv-split-form">
+              <div class="cv-mini-input"></div>
+              <div class="cv-mini-input"></div>
+              <div class="cv-mini-btn"></div>
+            </div>
+          </div>
+
+          <div class="cv-block selected" style="border-top:none;">
+            <div class="cv-tag">Credentials form — selected</div>
+            <div style="padding:16px 20px;">
+              <div class="cv-mini-input" style="width:60%;margin-bottom:8px;"></div>
+              <div class="cv-mini-input" style="width:40%;"></div>
+            </div>
+          </div>
+
+          <div class="cv-block" style="border-top:none;">
+            <div class="cv-tag">OAuth row</div>
+            <div style="display:flex;gap:8px;padding:14px 20px;">
+              <div class="cv-mini-input" style="flex:1;"></div>
+              <div class="cv-mini-input" style="flex:1;"></div>
+            </div>
+          </div>
+
+          <div class="cv-block" style="border-top:none;">
+            <div class="cv-tag">Footer</div>
+            <div class="cv-footer">
+              <div class="fln"></div><div class="fln"></div><div class="fln"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSPECTOR -->
+      <div class="inspector-pane">
+        <div class="insp-title">Credentials form</div>
+        <div class="insp-sub">Auth block · Marketing Pages</div>
+
+        <div class="insp-label">Background</div>
+        <div class="bg-options">
+          <div class="bg-opt active" style="background:#fff;"></div>
+          <div class="bg-opt" style="background:var(--ink);"></div>
+          <div class="bg-opt" style="background:var(--canvas);"></div>
+        </div>
+
+        <div class="insp-label">Accent gradient</div>
+        <div class="grad-bar"><div class="stop" style="left:calc(100% - 16px);"></div></div>
+        <div class="grad-labels"><span>#2951C4</span><span>#8A3FD4</span><span>#EA0A8E</span></div>
+
+        <div class="insp-label">Corner radius</div>
+        <div class="radius-row">
+          <div class="radius-opt">None</div>
+          <div class="radius-opt active">Medium</div>
+          <div class="radius-opt">Full</div>
+        </div>
+
+        <div class="insp-label">Field width</div>
+        <div class="field-label">Max width (px)</div>
+        <input class="field-input" value="340"/>
+
+        <div class="insp-label">Live suggestions</div>
+        <div class="suggest-list">
+          <div class="suggest-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5L9.6 6H14.5L10.5 8.8L12 13.3L8 10.5L4 13.3L5.5 8.8L1.5 6H6.4L8 1.5Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>Match landing hero</div>
+          <div class="suggest-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5L9.6 6H14.5L10.5 8.8L12 13.3L8 10.5L4 13.3L5.5 8.8L1.5 6H6.4L8 1.5Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>Add bridge divider</div>
+          <div class="suggest-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5L9.6 6H14.5L10.5 8.8L12 13.3L8 10.5L4 13.3L5.5 8.8L1.5 6H6.4L8 1.5Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>Tighten form to 340px</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</section>
+<section class="figma-artboard" data-name="02 Canvas context menu">
+<p class="figma-artboard__name">Artboard 02 · Right-click context menu</p>
+
+<div class="wrap">
+
+  <div class="eyebrow">Bifrost · Stage canvas</div>
+  <h1>Right-click menu on canvas blocks</h1>
+  <p class="sub">Right now selecting a block only opens the Inspector on the right — fine for style changes, but slow for structural moves (duplicate, reorder, delete) that you'd rather do at the cursor. Here's a right-click context menu on the Hero block from your landing page.</p>
+
+  <div class="section-label">Right-click on the Hero section</div>
+
+  <div class="stage-frame">
+    <div class="frame-bar">
+      <span class="frame-dots"><span></span><span></span><span></span></span>
+      <span class="frame-lbl">Canvas · Sign in page</span>
+      <span class="frame-hint"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/></svg>Right-click any block for quick actions</span>
+    </div>
+
+    <div class="cv-wrap">
+      <div class="cv-hero">
+        <span class="cv-tag">Hero — centered</span>
+        <div class="cv-glow"></div>
+        <div class="cv-eyebrow">One content model. Every surface.</div>
+        <h1>Content that reaches <em>every surface</em>, without three CMSs</h1>
+        <p>Bifrost is the CMS that bridges your content model to your website, app, docs, and inbox.</p>
+        <div class="cv-ctas">
+          <span class="cv-btn grad">Start free</span>
+          <span class="cv-btn ghost">Read the docs →</span>
+        </div>
+      </div>
+
+      <!-- cursor + menu -->
+      <div class="cursor-dot" style="top:56px; left:640px;"></div>
+      <div class="cursor-lbl" style="top:44px; left:654px;">Right-click</div>
+
+      <div class="ctx-menu" style="top:68px; left:654px;">
+        <div class="ctx-section-lbl">Hero — centered</div>
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2.5L13.5 5L5 13.5H2.5V11L11 2.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Edit content<span class="kbd">E</span></div>
+        <div class="ctx-item hover"><svg viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M3 11V3.5C3 2.7 3.7 2 4.5 2H11" stroke="currentColor" stroke-width="1.2"/></svg>Duplicate section<span class="kbd">⌘D</span></div>
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 12.5V3.5M8 3.5L4.5 7M8 3.5L11.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Move up<span class="kbd">⌘↑</span></div>
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5V12.5M8 12.5L4.5 9M8 12.5L11.5 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Move down<span class="kbd">⌘↓</span></div>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M5.3 2C3.5 3 2.3 5 2.3 7.2C2.3 10.5 5 13.2 8.3 13.2C10.5 13.2 12.4 12 13.5 10.3C9.7 10.8 6.5 7.6 6.5 3.8C6.5 3.1 6.7 2.5 7 2C6.4 2 5.8 1.9 5.3 2Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>Copy styles<span class="kbd">⌥⌘C</span></div>
+        <div class="ctx-item disabled"><svg viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="8" height="10" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>Paste styles</div>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2L9.6 6H14L10.5 8.6L12 13L8 10.3L4 13L5.5 8.6L2 6H6.4L8 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Save as reusable block</div>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-item danger"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 4.5H12.5M6 4.5V3C6 2.4 6.4 2 7 2H9C9.6 2 10 2.4 10 3V4.5M5 4.5V12.5C5 13.1 5.4 13.5 6 13.5H10C10.6 13.5 11 13.1 11 12.5V4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delete section<span class="kbd">Del</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note"><b>Why these groupings:</b> structural actions (edit / duplicate / reorder) sit first since they're the most frequent; style actions (copy/paste styles) are second and <b>Paste styles</b> is shown disabled when nothing's been copied yet, rather than hidden — so the option is discoverable even unused; <b>Save as reusable block</b> is isolated on its own because it's a bigger commitment (turns this into a shared component across pages); <b>Delete</b> is last, separated by a divider, and colored red — the one action that shouldn't be reachable by an accidental fast click.</p>
+
+</div>
+
+</section>
+</body>
+</html>

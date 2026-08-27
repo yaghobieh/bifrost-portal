@@ -888,6 +888,11 @@ export interface Messages {
     paletteGroupMktContent: string;
     paletteGroupConversion: string;
     paletteGroupFooter: string;
+    paletteGroupBasic: string;
+    paletteGroupMedia: string;
+    paletteGroupFeedback: string;
+    paletteGroupOverlay: string;
+    paletteGroupGeneral: string;
     paletteGroupContent: string;
     paletteGroupForm: string;
     presetTwoColumns: string;
@@ -906,6 +911,9 @@ export interface Messages {
     marketingCtaBand: string;
     marketingGradientButton: string;
     marketingFooter: string;
+    marketingImage: string;
+    marketingHeading: string;
+    marketingSpacer: string;
     layers: string;
     layersEmpty: string;
     previewMode: string;
@@ -917,6 +925,7 @@ export interface Messages {
     inspectorContent: string;
     inspectorStyle: string;
     inspectorCode: string;
+    inspectorAdvanced: string;
     inspectorLabel: string;
     inspectorHtml: string;
     inspectorCss: string;
@@ -956,6 +965,20 @@ export interface Messages {
     customWidgetHtml: string;
     customWidgetAdd: string;
     aiLive: string;
+    backToWidgets: string;
+    librarySearch: string;
+    globalColors: string;
+    colorLabels: {
+      'bridge-blue': string;
+      'bridge-violet': string;
+      'bridge-pink': string;
+      ink: string;
+    };
+    imageSrc: string;
+    imageAlt: string;
+    imageWidth: string;
+    imageHeight: string;
+    imageLoading: string;
     aiHints: {
       'type-hero': string;
       'type-body': string;

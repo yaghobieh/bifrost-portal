@@ -2397,6 +2397,52 @@ html.bifrost-cms-host #root {
   border-style: solid;
 }
 
+.bifrost-cms-canvas-node:hover {
+  border-color: var(--bifrost-cms-accent);
+}
+
+.bifrost-cms-canvas-node__hover {
+  display: none;
+  position: absolute;
+  top: -0.7rem;
+  right: 0.4rem;
+  z-index: 3;
+  gap: 0.25rem;
+}
+
+.bifrost-cms-canvas-node:hover .bifrost-cms-canvas-node__hover {
+  display: flex;
+}
+
+.bifrost-cms-canvas-node__hover button {
+  border: 1px solid var(--bifrost-cms-border);
+  background: var(--bifrost-cms-surface);
+  color: var(--bifrost-cms-text);
+  border-radius: 0.35rem;
+  font: inherit;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  cursor: pointer;
+}
+
+.bifrost-cms-global-colors {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bifrost-cms-global-colors__swatch {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.45rem;
+  border: 1.5px solid var(--bifrost-cms-border);
+  padding: 0;
+  cursor: pointer;
+}
+
+.bifrost-cms-builder__stage--preview .bifrost-cms-canvas-node__hover {
+  display: none;
+}
+
 .bifrost-cms-builder__stage--preview .bifrost-cms-canvas-node {
   margin: 0;
   padding: 0;

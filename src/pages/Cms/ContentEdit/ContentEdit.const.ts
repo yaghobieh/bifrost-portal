@@ -1,5 +1,6 @@
 import {
   HTML_TAG_H2,
+  HTML_TAG_IMG,
   HTML_TAG_P,
   HERO_IMG_SRC,
 } from '@const/strings.const';
@@ -188,7 +189,7 @@ export const BEAR_WIDGET_CATALOG: readonly BearWidgetDef[] = [
     id: 'image',
     label: BEAR_WIDGET_COMPONENT.IMAGE,
     bearComponent: BEAR_WIDGET_COMPONENT.IMAGE,
-    html: bearWidgetHtml(BEAR_WIDGET_COMPONENT.IMAGE, `<img src="${HERO_IMG_SRC}" alt="${BEAR_WIDGET_COMPONENT.IMAGE}" />`),
+    html: `<${HTML_TAG_IMG} src="${HERO_IMG_SRC}" alt="${BEAR_WIDGET_COMPONENT.IMAGE}" />`,
   },
   {
     id: 'quote',

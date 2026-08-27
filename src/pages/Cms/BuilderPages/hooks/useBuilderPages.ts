@@ -49,7 +49,8 @@ import {
   LAYOUT_BLOCKS,
   LAYOUT_MIME,
 } from '../BuilderPages.const';
-import { MARKETING_WIDGET_GROUPS, MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
+import { BEAR_PALETTE, BEAR_PALETTE_GROUPS } from '../BearPalette.const';
+import { MARKETING_GLOBAL_COLORS, MARKETING_WIDGET_GROUPS, MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
 import type {
   BuilderInspectorTab,
   BuilderStageTab,
@@ -110,6 +111,7 @@ export const useBuilderPages = () => {
     js: BUILDER_STYLE_EMPTY,
   });
   const [customWidgets, setCustomWidgets] = useState(() => loadCustomWidgets());
+  const [libraryQuery, setLibraryQuery] = useState(BUILDER_STYLE_EMPTY);
   const [customLabel, setCustomLabel] = useState(BUILDER_STYLE_EMPTY);
   const [customHtml, setCustomHtml] = useState(BUILDER_STYLE_EMPTY);
   const [previewWidth, setPreviewWidth] = useState(0);
@@ -397,8 +399,12 @@ export const useBuilderPages = () => {
     ...EMPTY_NODE_STYLES,
     ...(selected?.styles ?? {}),
   };
+  const query = libraryQuery.trim().toLowerCase();
+  const matchQuery = (label: string) => !query || label.toLowerCase().includes(query);
   const catalog = [...BEAR_WIDGET_CATALOG, ...customWidgets];
-  const contentWidgets = catalog.filter((widget) => widget.id !== CAST_WIDGET_ID);
+  const contentWidgets = catalog.filter(
+    (widget) => widget.id !== CAST_WIDGET_ID && matchQuery(widget.label),
+  );
   const formWidgets = BEAR_WIDGET_CATALOG.filter((widget) => widget.id === CAST_WIDGET_ID);
   const marketingLabels: Record<string, string> = {
     [MARKETING_WIDGET_IDS.HERO]: t.cmsBuilder.marketingHero,
@@ -415,12 +421,16 @@ export const useBuilderPages = () => {
     [MARKETING_WIDGET_IDS.CTA_BAND]: t.cmsBuilder.marketingCtaBand,
     [MARKETING_WIDGET_IDS.GRADIENT_BUTTON]: t.cmsBuilder.marketingGradientButton,
     [MARKETING_WIDGET_IDS.FOOTER]: t.cmsBuilder.marketingFooter,
+    [MARKETING_WIDGET_IDS.IMAGE]: t.cmsBuilder.marketingImage,
+    [MARKETING_WIDGET_IDS.HEADING]: t.cmsBuilder.marketingHeading,
+    [MARKETING_WIDGET_IDS.SPACER]: t.cmsBuilder.marketingSpacer,
   };
   const marketingWidgets = MARKETING_WIDGETS.map((widget) => ({
     ...widget,
     label: marketingLabels[widget.id] || widget.label,
   }));
   const marketingGroupLabels: Record<string, string> = {
+    basic: t.cmsBuilder.paletteGroupBasic,
     hero: t.cmsBuilder.paletteGroupHero,
     auth: t.cmsBuilder.paletteGroupAuth,
     content: t.cmsBuilder.paletteGroupMktContent,
@@ -430,8 +440,22 @@ export const useBuilderPages = () => {
   const marketingGroups = MARKETING_WIDGET_GROUPS.map((group) => ({
     id: group,
     label: marketingGroupLabels[group],
-    widgets: marketingWidgets.filter((widget) => widget.group === group),
-  }));
+    widgets: marketingWidgets.filter((widget) => widget.group === group && matchQuery(widget.label)),
+  })).filter((group) => group.widgets.length > 0);
+  const bearGroupLabels: Record<string, string> = {
+    basic: t.cmsBuilder.paletteGroupBasic,
+    layout: t.cmsBuilder.paletteGroupLayout,
+    media: t.cmsBuilder.paletteGroupMedia,
+    form: t.cmsBuilder.paletteGroupForm,
+    feedback: t.cmsBuilder.paletteGroupFeedback,
+    overlay: t.cmsBuilder.paletteGroupOverlay,
+    general: t.cmsBuilder.paletteGroupGeneral,
+  };
+  const bearGroups = BEAR_PALETTE_GROUPS.map((group) => ({
+    id: group,
+    label: bearGroupLabels[group],
+    widgets: BEAR_PALETTE.filter((widget) => widget.group === group && matchQuery(widget.label)),
+  })).filter((group) => group.widgets.length > 0);
   const layers = flattenLayers(tree);
 
   return {
@@ -457,6 +481,8 @@ export const useBuilderPages = () => {
     setPageCode,
     customLabel,
     setCustomLabel,
+    libraryQuery,
+    setLibraryQuery,
     customHtml,
     setCustomHtml,
     previewWidth,
@@ -471,6 +497,7 @@ export const useBuilderPages = () => {
     formWidgets,
     marketingWidgets,
     marketingGroups,
+    bearGroups,
     canPasteStyles,
     layers,
     apply,

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bifrost — Canvas context menu</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  :root{
+    --blue:#2951C4; --violet:#8A3FD4; --pink:#EA0A8E;
+    --ink:#14161C; --paper:#fff; --canvas:#F5F6FA; --border:#E4E6EE; --border-strong:#CDD1DB;
+    --text:#14161C; --text-secondary:#585D6B; --text-tertiary:#8D92A1;
+    --accent-soft:#F1ECFB; --danger:#C4302B;
+    --grad:linear-gradient(90deg,var(--blue),var(--violet),var(--pink));
+    --shadow-md:0 4px 16px rgba(20,22,28,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;color:var(--text);background:var(--canvas);-webkit-font-smoothing:antialiased;padding:44px 24px;}
+  .wrap{max-width:980px;margin:0 auto;}
+  .eyebrow{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .eyebrow::before{content:'';width:6px;height:6px;background:var(--pink);border-radius:1px;display:inline-block;}
+  h1{font-size:24px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px;}
+  .sub{color:var(--text-secondary);font-size:13.5px;max-width:640px;line-height:1.6;margin-bottom:28px;}
+  .section-label{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-tertiary);margin:30px 0 12px;}
+  .section-label:first-of-type{margin-top:0;}
+
+  /* ---- canvas frame ---- */
+  .stage-frame{border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden;background:#fff;}
+  .frame-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--canvas);}
+  .frame-dots span{width:8px;height:8px;border-radius:50%;background:#D7DAE3;display:inline-block;margin-right:5px;}
+  .frame-lbl{margin-left:6px;font-family:'IBM Plex Mono';font-size:10.5px;color:var(--text-tertiary);}
+  .frame-hint{margin-left:auto;font-size:11px;color:var(--text-tertiary);display:flex;align-items:center;gap:6px;}
+  .frame-hint svg{width:12px;height:12px;}
+
+  .cv-wrap{position:relative;}
+  .cv-hero{background:var(--ink);padding:60px 20px 40px;text-align:center;position:relative;overflow:hidden;outline:1.5px solid var(--violet);outline-offset:-1.5px;}
+  .cv-tag{position:absolute;top:10px;left:12px;font-family:'IBM Plex Mono';font-size:9.5px;color:#fff;background:var(--violet);padding:2px 8px;border-radius:4px;z-index:3;}
+  .cv-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:520px;height:340px;background:radial-gradient(ellipse at center, rgba(138,63,212,0.28), transparent 65%);pointer-events:none;}
+  .cv-eyebrow{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#F472C7;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:14px;position:relative;}
+  .cv-eyebrow::before{content:'';width:5px;height:5px;background:#F472C7;border-radius:1px;}
+  .cv-hero h1{font-family:'Space Grotesk';font-size:32px;line-height:1.15;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:14px;position:relative;max-width:560px;margin-left:auto;margin-right:auto;}
+  .cv-hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .cv-hero p{color:#A6ABBA;font-size:12.5px;max-width:420px;margin:0 auto 22px;position:relative;line-height:1.6;}
+  .cv-ctas{display:flex;gap:10px;justify-content:center;position:relative;}
+  .cv-btn{font-size:12px;font-weight:600;padding:9px 16px;border-radius:6px;}
+  .cv-btn.grad{background:var(--grad);color:#fff;}
+  .cv-btn.ghost{border:1px solid #2A2D38;color:#E4E6EE;}
+
+  /* cursor marker */
+  .cursor-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--ink);box-shadow:0 0 0 3px rgba(255,255,255,.5);z-index:41;}
+  .cursor-lbl{position:absolute;font-family:'IBM Plex Mono';font-size:9.5px;color:#fff;background:var(--ink);padding:2px 7px;border-radius:4px;z-index:41;white-space:nowrap;}
+
+  /* context menu */
+  .ctx-menu{position:absolute;width:230px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 16px 40px rgba(20,22,28,.22);padding:6px;z-index:40;}
+  .ctx-section-lbl{font-family:'IBM Plex Mono';font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-tertiary);padding:7px 10px 4px;}
+  .ctx-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--text);}
+  .ctx-item svg{width:14px;height:14px;color:var(--text-secondary);flex-shrink:0;}
+  .ctx-item .kbd{margin-left:auto;font-family:'IBM Plex Mono';font-size:10px;color:var(--text-tertiary);}
+  .ctx-item.hover{background:var(--accent-soft);}
+  .ctx-item.hover svg{color:var(--violet);}
+  .ctx-item.hover .kbd{color:var(--violet);}
+  .ctx-item.disabled{color:var(--text-tertiary);}
+  .ctx-item.disabled svg{color:var(--text-tertiary);}
+  .ctx-item.danger{color:var(--danger);}
+  .ctx-item.danger svg{color:var(--danger);}
+  .ctx-divider{height:1px;background:var(--border);margin:5px 6px;}
+
+  .note{font-size:12px;color:var(--text-secondary);line-height:1.65;margin-top:18px;max-width:680px;}
+  .note b{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Bifrost · Stage canvas</div>
+  <h1>Right-click menu on canvas blocks</h1>
+  <p class="sub">Right now selecting a block only opens the Inspector on the right — fine for style changes, but slow for structural moves (duplicate, reorder, delete) that you'd rather do at the cursor. Here's a right-click context menu on the Hero block from your landing page.</p>
+
+  <div class="section-label">Right-click on the Hero section</div>
+
+  <div class="stage-frame">
+    <div class="frame-bar">
+      <span class="frame-dots"><span></span><span></span><span></span></span>
+      <span class="frame-lbl">Canvas · Sign in page</span>
+      <span class="frame-hint"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/></svg>Right-click any block for quick actions</span>
+    </div>
+
+    <div class="cv-wrap">
+      <div class="cv-hero">
+        <span class="cv-tag">Hero — centered</span>
+        <div class="cv-glow"></div>
+        <div class="cv-eyebrow">One content model. Every surface.</div>
+        <h1>Content that reaches <em>every surface</em>, without three CMSs</h1>
+        <p>Bifrost is the CMS that bridges your content model to your website, app, docs, and inbox.</p>
+        <div class="cv-ctas">
+          <span class="cv-btn grad">Start free</span>
+          <span class="cv-btn ghost">Read the docs →</span>
+        </div>
+      </div>
+
+      <!-- cursor + menu -->
+      <div class="cursor-dot" style="top:56px; left:640px;"></div>
+      <div class="cursor-lbl" style="top:44px; left:654px;">Right-click</div>
+
+      <div class="ctx-menu" style="top:68px; left:654px;">
+        <div class="ctx-section-lbl">Hero — centered</div>
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M11 2.5L13.5 5L5 13.5H2.5V11L11 2.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Edit content<span class="kbd">E</span></div>
+        <div class="ctx-item hover"><svg viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M3 11V3.5C3 2.7 3.7 2 4.5 2H11" stroke="currentColor" stroke-width="1.2"/></svg>Duplicate section<span class="kbd">⌘D</span></div>
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 12.5V3.5M8 3.5L4.5 7M8 3.5L11.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Move up<span class="kbd">⌘↑</span></div>
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 3.5V12.5M8 12.5L4.5 9M8 12.5L11.5 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Move down<span class="kbd">⌘↓</span></div>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M5.3 2C3.5 3 2.3 5 2.3 7.2C2.3 10.5 5 13.2 8.3 13.2C10.5 13.2 12.4 12 13.5 10.3C9.7 10.8 6.5 7.6 6.5 3.8C6.5 3.1 6.7 2.5 7 2C6.4 2 5.8 1.9 5.3 2Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>Copy styles<span class="kbd">⌥⌘C</span></div>
+        <div class="ctx-item disabled"><svg viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="8" height="10" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>Paste styles</div>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-item"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2L9.6 6H14L10.5 8.6L12 13L8 10.3L4 13L5.5 8.6L2 6H6.4L8 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Save as reusable block</div>
+
+        <div class="ctx-divider"></div>
+
+        <div class="ctx-item danger"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 4.5H12.5M6 4.5V3C6 2.4 6.4 2 7 2H9C9.6 2 10 2.4 10 3V4.5M5 4.5V12.5C5 13.1 5.4 13.5 6 13.5H10C10.6 13.5 11 13.1 11 12.5V4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Delete section<span class="kbd">Del</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note"><b>Why these groupings:</b> structural actions (edit / duplicate / reorder) sit first since they're the most frequent; style actions (copy/paste styles) are second and <b>Paste styles</b> is shown disabled when nothing's been copied yet, rather than hidden — so the option is discoverable even unused; <b>Save as reusable block</b> is isolated on its own because it's a bigger commitment (turns this into a shared component across pages); <b>Delete</b> is last, separated by a divider, and colored red — the one action that shouldn't be reachable by an accidental fast click.</p>
+
+</div>
+</body>
+</html>
