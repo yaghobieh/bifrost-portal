@@ -13,7 +13,7 @@ import {
   trailingOtherCount,
 } from '@pages/Cms/CmsShell/CmsCrewChat/CmsCrewChat.utils';
 import { CREW_STATUS_SELECT_ID } from './CrewChatSidebar.const';
-import { crewDotClass, crewItemClass, crewPresenceCopy, crewStatusOptions, crewUnreadCount } from './CrewChatSidebar.utils';
+import { crewDotClass, crewItemClass, crewMessagePreview, crewPersonVariant, crewPresenceCopy, crewStatusOptions, crewUnreadCount } from './CrewChatSidebar.utils';
 
 export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
   const {
@@ -105,11 +105,12 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
           <Typography variant="caption" className="bifrost-cms-crew__section mb-0">
             {addPeopleLabel}
           </Typography>
-          {people.length === NUMBER_ZERO ? (
+          {people.length === NUMBER_ZERO && (
             <Typography variant="caption" className="bifrost-cms__muted mb-0">
               {emptyPeopleLabel}
             </Typography>
-          ) : (
+          )}
+          {people.length > NUMBER_ZERO && (
             <Flex wrap="wrap" gap={1}>
               {people.map((person) => {
                 const selected = selectedPeopleIds.includes(person.id);
@@ -118,7 +119,7 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
                     key={person.id}
                     type="button"
                     size="sm"
-                    variant={selected ? 'ink' : 'outline'}
+                    variant={crewPersonVariant(selected)}
                     onClick={() => onTogglePerson(person.id)}
                   >
                     {person.name}
@@ -218,7 +219,7 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
                     {name}
                   </Typography>
                   <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                    {lastMessagePreview(room) || emptyPreview}
+                    {crewMessagePreview(lastMessagePreview(room), emptyPreview)}
                   </Typography>
                 </Flex>
                 {sent && <BearIcons.CheckIcon size={CMS_ICON_SIZE} />}

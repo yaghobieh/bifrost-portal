@@ -8,7 +8,9 @@ export const TranslationAiBanner: FC<TranslationAiBannerProps> = (props) => {
   return (
     <Flex align="center" justify="between" gap={3} wrap="wrap" className="bifrost-cms-translations__banner">
       <Flex align="center" gap={2} className="bifrost-cms-translations__banner-copy">
-        <BearIcons.StarIcon size={CMS_ICON_SIZE} className="bifrost-cms-translations__banner-icon" />
+        <Flex className="bifrost-cms-translations__banner-icon">
+          <BearIcons.StarIcon size={CMS_ICON_SIZE} />
+        </Flex>
         <Typography variant="body2" className="mb-0">
           {message}
         </Typography>

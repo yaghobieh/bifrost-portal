@@ -49,6 +49,20 @@ export const crewPresenceCopy = (params: { online: boolean; onlineLabel: string;
   return offlineLabel;
 };
 
+export const crewMessagePreview = (preview: string, empty: string): string => {
+  if (preview) {
+    return preview;
+  }
+  return empty;
+};
+
+export const crewPersonVariant = (selected: boolean): 'ink' | 'outline' => {
+  if (selected) {
+    return 'ink';
+  }
+  return 'outline';
+};
+
 export const crewUnreadCount = (params: { active: boolean; count: number }): number => {
   const { active, count } = params;
   if (active) {

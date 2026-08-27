@@ -23,6 +23,35 @@ export const TranslationTableRow: FC<TranslationTableRowProps> = (props) => {
     onTranslateOne,
   } = props;
   const isAi = row.status === TRANSLATION_STATUS.AI;
+  let actions = (
+    <Button
+      size="sm"
+      variant="ghost"
+      className="bifrost-cms-translations__star"
+      aria-label={translateOneLabel}
+      disabled={busy}
+      onClick={() => onTranslateOne(row.key)}
+    >
+      <BearIcons.StarIcon size={CMS_ICON_SIZE} />
+    </Button>
+  );
+  if (isAi) {
+    actions = (
+      <Flex gap={1} align="center" className="bifrost-cms-translations__row-actions">
+        <Button size="sm" variant="outline" className="bifrost-cms-translations__accept" onClick={() => onAccept(row.key)}>
+          {acceptLabel}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          aria-label={rejectLabel}
+          onClick={() => onReject(row.key)}
+        >
+          <BearIcons.XIcon size={CMS_ICON_SIZE} />
+        </Button>
+      </Flex>
+    );
+  }
 
   return (
     <Flex align="center" gap={2} className="bifrost-cms-translations__row">
@@ -46,32 +75,7 @@ export const TranslationTableRow: FC<TranslationTableRowProps> = (props) => {
         missingLabel={missingLabel}
         aiLabel={aiLabel}
       />
-      {isAi ? (
-        <Flex gap={1} align="center" className="bifrost-cms-translations__row-actions">
-          <Button size="sm" variant="outline" className="bifrost-cms-translations__accept" onClick={() => onAccept(row.key)}>
-            {acceptLabel}
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            aria-label={rejectLabel}
-            onClick={() => onReject(row.key)}
-          >
-            <BearIcons.XIcon size={CMS_ICON_SIZE} />
-          </Button>
-        </Flex>
-      ) : (
-        <Button
-          size="sm"
-          variant="ghost"
-          className="bifrost-cms-translations__star"
-          aria-label={translateOneLabel}
-          disabled={busy}
-          onClick={() => onTranslateOne(row.key)}
-        >
-          <BearIcons.StarIcon size={CMS_ICON_SIZE} />
-        </Button>
-      )}
+      {actions}
     </Flex>
   );
 };

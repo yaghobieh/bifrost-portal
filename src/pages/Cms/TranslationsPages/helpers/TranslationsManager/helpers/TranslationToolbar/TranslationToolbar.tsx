@@ -1,4 +1,4 @@
-import type { ChangeEvent, FC, KeyboardEvent } from 'react';
+import { useRef, type ChangeEvent, type FC, type KeyboardEvent } from 'react';
 import { BearIcons, Button, Flex, Input } from '@forgedevstack/bear';
 import { CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
 import { CMS_KEY_ENTER } from '@pages/Cms/CmsShell/CmsShell.const';
@@ -36,6 +36,7 @@ export const TranslationToolbar: FC<TranslationToolbarProps> = (props) => {
     onAddLocaleValue,
     onAddLocale,
   } = props;
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[NUMBER_ZERO];
@@ -101,6 +102,7 @@ export const TranslationToolbar: FC<TranslationToolbarProps> = (props) => {
       <Flex gap={1} align="center" className="bifrost-cms-translations__actions">
         <input
           id={TRANSLATION_IMPORT_ID}
+          ref={fileRef}
           type="file"
           accept={TRANSLATION_FILE_ACCEPT}
           className="bifrost-cms-translations__file"
@@ -109,7 +111,7 @@ export const TranslationToolbar: FC<TranslationToolbarProps> = (props) => {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => document.getElementById(TRANSLATION_IMPORT_ID)?.click()}
+          onClick={() => fileRef.current?.click()}
         >
           {importLabel}
         </Button>
