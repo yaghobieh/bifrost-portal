@@ -31,6 +31,7 @@ import {
   contentStatusClass,
   contentStatusLabel,
   formatContentUpdated,
+  isDocsLayout,
   templateFromPayload,
 } from './ContentPages.utils';
 import { ContentRowActions } from './helpers/ContentRowActions';
@@ -121,13 +122,21 @@ export const ContentPages: FC = () => {
         canvas,
         [PAYLOAD_KEY_LAYOUT]: layout?.id || layoutId,
         [PAYLOAD_KEY_TEMPLATE]: saved?.id,
-        [PAYLOAD_KEY_CAST_FIELDS]: [],
-        [PAYLOAD_KEY_CAST_VALUES]: {},
+        [PAYLOAD_KEY_CAST_FIELDS]: layout?.castFields || castFieldsFromPayload(saved?.payload),
+        [PAYLOAD_KEY_CAST_VALUES]: layout?.castValues || castValuesFromPayload(saved?.payload),
       },
     });
     if (!item) return;
     await fetchContent(activeToken);
-    navigate(saved ? cmsEditPath(item.id) : cmsBuilderPath({ doc: item.id }));
+    if (layout && isDocsLayout(layout.id)) {
+      navigate(cmsEditPath(item.id));
+      return;
+    }
+    if (saved) {
+      navigate(cmsEditPath(item.id));
+      return;
+    }
+    navigate(cmsBuilderPath({ doc: item.id }));
   };
 
   const onDeletePage = (id: string) => {

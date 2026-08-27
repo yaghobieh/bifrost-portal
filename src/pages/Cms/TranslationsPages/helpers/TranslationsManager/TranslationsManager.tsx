@@ -20,6 +20,7 @@ import { authHeaders } from '@sdk/modules/auth/auth.api';
 import {
   TRANSLATION_DEFAULT_TARGET,
   TRANSLATION_EXPORT_NAME,
+  TRANSLATION_GLOBAL_ID,
   TRANSLATION_JSON_INDENT,
   TRANSLATION_PAGE_COL,
   TRANSLATION_SCOPE,
@@ -44,7 +45,11 @@ import {
   downloadJsonFile,
   emptyBag,
   fillTemplate,
+  globalKeyCount,
+  addKeyToBag,
+  addPageToBag,
   isLocaleCode,
+  isTranslationKey,
   listLocales,
   localeLanguageName,
   parseTranslationsJson,
@@ -58,17 +63,17 @@ import { TranslationAiBanner } from './helpers/TranslationAiBanner';
 import { TranslationJsonPanel } from './helpers/TranslationJsonPanel';
 import { TranslationTable } from './helpers/TranslationTable';
 import { TranslationToolbar } from './helpers/TranslationToolbar';
+import { TranslationAddBar } from './helpers/TranslationAddBar';
+import { TranslationAddPage } from './helpers/TranslationAddPage';
 
 export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
-  const { pageId, onOpenPage, pages } = props;
+  const { pageId, onOpenPage, pages, onCreatePage } = props;
   const { t } = useI18n();
   const { token } = useAuth();
   const [bag, setBag] = useState<CmsTranslations>(() => loadCmsTranslationsLocal() || emptyBag());
   const [locale, setLocale] = useState<TranslationLocale>(TRANSLATION_DEFAULT_TARGET);
   const [view, setView] = useState<TranslationViewId>(TRANSLATION_VIEW.TABLE);
-  const [scope, setScope] = useState<TranslationScopeId>(
-    pageId ? TRANSLATION_SCOPE.PAGE : TRANSLATION_SCOPE.GLOBAL,
-  );
+  const [scope, setScope] = useState<TranslationScopeId>(TRANSLATION_SCOPE.PAGE);
   const [query, setQuery] = useState(EMPTY_STRING);
   const [jsonDraft, setJsonDraft] = useState(EMPTY_STRING);
   const [saved, setSaved] = useState(false);
@@ -76,6 +81,9 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
   const [aiReady, setAiReady] = useState(true);
   const [addLocaleOpen, setAddLocaleOpen] = useState(false);
   const [addLocaleValue, setAddLocaleValue] = useState(EMPTY_STRING);
+  const [newKey, setNewKey] = useState(EMPTY_STRING);
+  const [newSource, setNewSource] = useState(EMPTY_STRING);
+  const [newPageTitle, setNewPageTitle] = useState(EMPTY_STRING);
   const seeded = seedIfEmpty(bag);
   const activePageId = scope === TRANSLATION_SCOPE.PAGE ? pageId : EMPTY_STRING;
   const rows = buildTranslationRows(seeded, locale, query, activePageId);
@@ -84,6 +92,7 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
   const suggested = countSuggested(seeded, locale, activePageId);
   const jsonValue = jsonDraft || JSON.stringify(seeded, null, TRANSLATION_JSON_INDENT);
   const showPageTable = scope === TRANSLATION_SCOPE.PAGE && !pageId;
+  const showBackToPages = Boolean(activePageId) || scope === TRANSLATION_SCOPE.GLOBAL;
   const localeNames: TranslationLocaleNames = {
     en: t.cmsTranslations.localeEn,
     fr: t.cmsTranslations.localeFr,
@@ -211,6 +220,54 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
     setLocale(code);
   };
 
+  const onAddString = () => {
+    if (!isTranslationKey(newKey.trim())) {
+      return;
+    }
+    const next = addKeyToBag({
+      bag: seeded,
+      key: newKey,
+      value: newSource,
+      pageId: activePageId,
+    });
+    setNewKey(EMPTY_STRING);
+    setNewSource(EMPTY_STRING);
+    void persist(next);
+  };
+
+  const onAddPage = async () => {
+    const title = newPageTitle.trim();
+    if (!title) {
+      return;
+    }
+    const createdId = await onCreatePage(title);
+    setNewPageTitle(EMPTY_STRING);
+    if (!createdId) {
+      return;
+    }
+    void persist(addPageToBag({ bag: seeded, pageId: createdId }));
+    onOpenPage(createdId);
+  };
+
+  const onPageRowClick = (rowId: string) => {
+    if (rowId === TRANSLATION_GLOBAL_ID) {
+      setScope(TRANSLATION_SCOPE.GLOBAL);
+      onOpenPage(EMPTY_STRING);
+      return;
+    }
+    setScope(TRANSLATION_SCOPE.PAGE);
+    onOpenPage(rowId);
+  };
+
+  const pageRows = [
+    {
+      id: TRANSLATION_GLOBAL_ID,
+      title: t.cmsTranslations.scopeGlobal,
+      keys: globalKeyCount(seeded),
+    },
+    ...pages,
+  ];
+
   const onImportFile = (file: File) => {
     void file.text().then((raw) => {
       const parsed = parseTranslationsJson(raw);
@@ -261,14 +318,20 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
         <Button
           size="sm"
           variant={scope === TRANSLATION_SCOPE.GLOBAL ? 'ink' : 'ghost'}
-          onClick={() => setScope(TRANSLATION_SCOPE.GLOBAL)}
+          onClick={() => {
+            setScope(TRANSLATION_SCOPE.GLOBAL);
+            onOpenPage(EMPTY_STRING);
+          }}
         >
           {t.cmsTranslations.scopeGlobal}
         </Button>
         <Button
           size="sm"
-          variant={scope === TRANSLATION_SCOPE.PAGE ? 'ink' : 'ghost'}
-          onClick={() => setScope(TRANSLATION_SCOPE.PAGE)}
+          variant={scope === TRANSLATION_SCOPE.PAGE && !pageId ? 'ink' : 'ghost'}
+          onClick={() => {
+            setScope(TRANSLATION_SCOPE.PAGE);
+            onOpenPage(EMPTY_STRING);
+          }}
         >
           {t.cmsTranslations.scopePages}
         </Button>
@@ -299,23 +362,49 @@ export const TranslationsManager: FC<TranslationsManagerProps> = (props) => {
         />
       )}
       {showPageTable ? (
-        <CmsGridTable
-          data={pages}
-          getRowId={(row) => row.id}
-          onRowClick={(row) => onOpenPage(String(row.id))}
-          columns={[
-            { id: TRANSLATION_PAGE_COL.TITLE, header: t.cmsTranslations.pageTitle, accessor: 'title' },
-            { id: TRANSLATION_PAGE_COL.KEYS, header: t.cmsTranslations.pageKeys, accessor: 'keys' },
-          ]}
-          emptyContent={t.cmsTranslations.pagesEmpty}
-        />
+        <Flex direction="column" gap={2}>
+          <TranslationAddPage
+            titleValue={newPageTitle}
+            titlePlaceholder={t.cmsTranslations.addPagePlaceholder}
+            addLabel={t.cmsTranslations.addPage}
+            onTitle={setNewPageTitle}
+            onAdd={() => void onAddPage()}
+          />
+          <CmsGridTable
+            data={pageRows}
+            getRowId={(row) => row.id}
+            onRowClick={(row) => onPageRowClick(String(row.id))}
+            columns={[
+              { id: TRANSLATION_PAGE_COL.TITLE, header: t.cmsTranslations.pageTitle, accessor: 'title' },
+              { id: TRANSLATION_PAGE_COL.KEYS, header: t.cmsTranslations.pageKeys, accessor: 'keys' },
+            ]}
+            emptyContent={t.cmsTranslations.pagesEmpty}
+          />
+        </Flex>
       ) : (
         <Flex direction="column" gap={2}>
-          {activePageId && (
-            <Button size="sm" variant="ghost" onClick={() => onOpenPage(EMPTY_STRING)}>
+          {showBackToPages && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setScope(TRANSLATION_SCOPE.PAGE);
+                onOpenPage(EMPTY_STRING);
+              }}
+            >
               {t.cmsTranslations.backToPages}
             </Button>
           )}
+          <TranslationAddBar
+            keyValue={newKey}
+            sourceValue={newSource}
+            keyPlaceholder={t.cmsTranslations.addKeyPlaceholder}
+            valuePlaceholder={t.cmsTranslations.addValuePlaceholder}
+            addLabel={t.cmsTranslations.addString}
+            onKey={setNewKey}
+            onValue={setNewSource}
+            onAdd={onAddString}
+          />
           {view === TRANSLATION_VIEW.TABLE ? (
             <TranslationTable
               rows={rows}

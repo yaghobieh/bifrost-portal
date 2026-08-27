@@ -28,6 +28,7 @@ export type TranslationsManagerProps = {
   pageId: string;
   onOpenPage: (pageId: string) => void;
   pages: TranslationPageRow[];
+  onCreatePage: (title: string) => Promise<string | null>;
 };
 
 export type TranslationBag = CmsTranslations;

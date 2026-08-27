@@ -3,6 +3,7 @@ import { NUMBER_ZERO } from '@const/numbers.const';
 import type { CmsTranslations } from '@pages/Cms/SettingsPages/SettingsPages.types';
 import {
   TRANSLATION_LOCALE_PATTERN,
+  TRANSLATION_KEY_PATTERN,
   TRANSLATION_SEED,
   TRANSLATION_SOURCE_LOCALE,
   TRANSLATION_STATUS,
@@ -311,3 +312,60 @@ export const pageKeyCount = (bag: CmsTranslations, pageId: string): number => {
   const source = page[bag.sourceLocale] || {};
   return Object.keys(source).length;
 };
+
+export const globalKeyCount = (bag: CmsTranslations): number =>
+  Object.keys(bag.locales[bag.sourceLocale] || {}).length;
+
+export const addKeyToBag = (params: {
+  bag: CmsTranslations;
+  key: string;
+  value: string;
+  pageId: string;
+}): CmsTranslations => {
+  const { bag, key, value, pageId } = params;
+  const trimmed = key.trim();
+  if (!trimmed) {
+    return bag;
+  }
+  if (!pageId) {
+    const source = bag.locales[bag.sourceLocale] || {};
+    return {
+      ...bag,
+      locales: {
+        ...bag.locales,
+        [bag.sourceLocale]: { ...source, [trimmed]: value },
+      },
+    };
+  }
+  const page = bag.pages?.[pageId] || {};
+  const source = page[bag.sourceLocale] || {};
+  return {
+    ...bag,
+    pages: {
+      ...(bag.pages || {}),
+      [pageId]: {
+        ...page,
+        [bag.sourceLocale]: { ...source, [trimmed]: value },
+      },
+    },
+  };
+};
+
+export const addPageToBag = (params: {
+  bag: CmsTranslations;
+  pageId: string;
+}): CmsTranslations => {
+  const { bag, pageId } = params;
+  if (bag.pages?.[pageId]) {
+    return bag;
+  }
+  return {
+    ...bag,
+    pages: {
+      ...(bag.pages || {}),
+      [pageId]: {},
+    },
+  };
+};
+
+export const isTranslationKey = (value: string): boolean => TRANSLATION_KEY_PATTERN.test(value);

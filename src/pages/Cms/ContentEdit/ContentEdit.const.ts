@@ -13,6 +13,7 @@ import {
 import { bearWidgetHtml } from './bearWidget.utils';
 import type { BearWidgetDef } from './ContentEdit.types';
 
+export const BEAR_WIDGET_ID_TRANSLATION = 'translation';
 export const CONTENT_EDIT_EDITOR_MIN_HEIGHT_PX = NUMBER_FOUR_HUNDRED_TWENTY;
 export const CONTENT_EDIT_DRAWER_WIDTH_PX = NUMBER_THREE_HUNDRED_EIGHTY;
 export const CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX = NUMBER_THREE_HUNDRED_TWENTY;
@@ -43,6 +44,7 @@ export const BEAR_WIDGET_COMPONENT = {
   QUOTE: 'Quote',
   STAT: 'Stat',
   CAST: 'Cast',
+  TRANSLATION: 'Translation',
   CODE_EDITOR: 'CodeEditor',
   DRAWER: 'Drawer',
   MODAL: 'Modal',
@@ -211,6 +213,12 @@ export const BEAR_WIDGET_CATALOG: readonly BearWidgetDef[] = [
       BEAR_WIDGET_COMPONENT.CAST,
       '<label>Email</label><input type="email" /><label>Name</label><input type="text" /><button type="submit">Send</button>',
     ),
+  },
+  {
+    id: BEAR_WIDGET_ID_TRANSLATION,
+    label: BEAR_WIDGET_COMPONENT.TRANSLATION,
+    bearComponent: BEAR_WIDGET_COMPONENT.TRANSLATION,
+    html: bearWidgetHtml(BEAR_WIDGET_COMPONENT.TRANSLATION, ''),
   },
   {
     id: 'code-editor',

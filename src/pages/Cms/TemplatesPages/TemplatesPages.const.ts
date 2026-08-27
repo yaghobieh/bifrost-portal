@@ -1,6 +1,12 @@
 import type { CanvasNode } from '../BuilderPages/BuilderPages.types';
 import { CANVAS_KIND } from '../BuilderPages/BuilderPages.const';
 import { DOCUMENT_CLOUDINARY_IMAGE_SRC } from '@const/docsCloudinary.const';
+import type { CastField } from '@pages/Cms/CastPages/CastPages.types';
+import {
+  buildDocsCastFields,
+  docsCastValues,
+} from '@pages/Cms/ContentPages/ContentPages.utils';
+import { DOCS_LAYOUT_IDS } from '@pages/Cms/ContentPages/ContentPages.const';
 
 export const TEMPLATES_COLLECTION = 'templates';
 export const TEMPLATE_SLUG_PREFIX = 'template-';
@@ -15,52 +21,42 @@ export type PageLayoutTemplate = {
   title: string;
   description: string;
   tree: CanvasNode[];
+  castFields: CastField[];
+  castValues: Record<string, string>;
 };
 
 const layoutId = (prefix: string): string => `${prefix}-seed`;
 
 export const PAGE_LAYOUT_TEMPLATES: PageLayoutTemplate[] = [
   {
-    id: 'documentation',
+    id: DOCS_LAYOUT_IDS.DOCUMENTATION,
     title: 'Documentation',
-    description: 'Docs article — hero image, steps, and code. Use this for installation and every docs page.',
+    description: 'Docs article — four titles, subtitles, and one bash field.',
     tree: [
       {
         id: layoutId('documentation-section'),
         kind: CANVAS_KIND.SECTION,
         label: 'Article',
-        children: [
-          {
-            id: layoutId('documentation-ink'),
-            kind: CANVAS_KIND.INK,
-            label: 'Body',
-            html: DOCS_ARTICLE_HTML,
-            children: [],
-          },
-        ],
+        children: [],
       },
     ],
+    castFields: buildDocsCastFields(),
+    castValues: docsCastValues(),
   },
   {
-    id: 'docs-article',
+    id: DOCS_LAYOUT_IDS.DOCS_ARTICLE,
     title: 'Document',
-    description: 'Installation page layout — hero image, steps, and code. Used for every docs page.',
+    description: 'Same docs fields as /docs/quickstart — four titles, subtitles, and bash.',
     tree: [
       {
         id: layoutId('docs-section'),
         kind: CANVAS_KIND.SECTION,
         label: 'Article',
-        children: [
-          {
-            id: layoutId('docs-ink'),
-            kind: CANVAS_KIND.INK,
-            label: 'Body',
-            html: DOCS_ARTICLE_HTML,
-            children: [],
-          },
-        ],
+        children: [],
       },
     ],
+    castFields: buildDocsCastFields(),
+    castValues: docsCastValues(),
   },
   {
     id: 'landing-hero',
@@ -89,6 +85,8 @@ export const PAGE_LAYOUT_TEMPLATES: PageLayoutTemplate[] = [
         ],
       },
     ],
+    castFields: [],
+    castValues: {},
   },
   {
     id: 'blank-canvas',
@@ -102,5 +100,7 @@ export const PAGE_LAYOUT_TEMPLATES: PageLayoutTemplate[] = [
         children: [],
       },
     ],
+    castFields: [],
+    castValues: {},
   },
 ];

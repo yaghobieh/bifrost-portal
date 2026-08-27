@@ -30,6 +30,7 @@ import { isPageSubmitLocked, locationOwner } from '../CmsShell/helpers/LiveEdito
 import { loadStoredWidth, saveStoredWidth, startHorizontalResize } from '../CmsShell/CmsShell.utils';
 import {
   BEAR_WIDGET_CATALOG,
+  BEAR_WIDGET_ID_TRANSLATION,
   CONTENT_EDIT_AUTHOR_ID,
   CONTENT_EDIT_CATEGORIES_ID,
   CONTENT_EDIT_EDITOR_MIN_HEIGHT_PX,
@@ -72,11 +73,19 @@ import {
   loadSeoCollapsed,
   nowScheduleAt,
   payloadString,
+  resolveEditBodyHtml,
   resolveEditTarget,
   saveSeoCollapsed,
   splitScheduleAt,
 } from './ContentEdit.utils';
 import { CastPageFields } from './helpers/CastPageFields';
+import { ContentFieldStage } from './helpers/ContentFieldStage';
+import { ContentTranslationWidget } from './helpers/ContentTranslationWidget';
+import type { TranslationApplyParams } from './helpers/ContentTranslationWidget';
+import { createCastField, createNamedCastField } from '@pages/Cms/CastPages/CastPages.utils';
+import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
+import { docsHtmlFromValues, isDocsLayout } from '@pages/Cms/ContentPages/ContentPages.utils';
+import { TRANSLATION_CONTENT_COLLECTIONS } from '@pages/Cms/TranslationsPages/TranslationsPages.const';
 import type { BearWidgetDef } from './ContentEdit.types';
 import {
   CAST_VALUE_SUMMARY_JOIN,
@@ -90,7 +99,6 @@ import {
   pageOwnedCastFields,
   summarizeCastValues,
 } from './castFields.utils';
-import { createCastField } from '../CastPages/CastPages.utils';
 import type { CastField } from '../CastPages/CastPages.types';
 import {
   CONTENT_COLLECTION_PAGE_META,
@@ -147,6 +155,7 @@ export const ContentEdit: FC = () => {
   const [revisions, setRevisions] = useState<ContentRevision[]>([]);
   const [preview, setPreview] = useState(false);
   const [widgetsOpen, setWidgetsOpen] = useState(false);
+  const [translationOpen, setTranslationOpen] = useState(false);
   const [saveOk, setSaveOk] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [seoCollapsed, setSeoCollapsed] = useState(() => loadSeoCollapsed());
@@ -230,6 +239,11 @@ export const ContentEdit: FC = () => {
   const markUnsaved = () => setSaveOk(false);
 
   const insertWidget = (widget: BearWidgetDef) => {
+    if (widget.id === BEAR_WIDGET_ID_TRANSLATION) {
+      setTranslationOpen(true);
+      setWidgetsOpen(false);
+      return;
+    }
     setBodyHtml((current) => appendWidgetHtml(current, widget.html));
     setSaveOk(false);
   };
@@ -284,6 +298,7 @@ export const ContentEdit: FC = () => {
     target?.payload && typeof target.payload[PAYLOAD_KEY_LAYOUT] === 'string'
       ? String(target.payload[PAYLOAD_KEY_LAYOUT])
       : EMPTY_STRING;
+  const useFieldEditor = displayFields.length > 0 || isDocsLayout(existingLayout);
 
   const onFieldChange = (id: string, patch: Partial<CastField>) => {
     setPageFields((current) =>
@@ -311,6 +326,13 @@ export const ContentEdit: FC = () => {
     if (pageLocked) return;
     setSaveOk(false);
     pushRevision();
+    const nextBody = resolveEditBodyHtml({
+      layoutId: existingLayout,
+      values: castValues,
+      fieldCount: displayFields.length,
+      fallback: bodyHtml,
+    });
+    setBodyHtml(nextBody);
     const extras = {
       [PAYLOAD_KEY_SUBTITLE]: subtitle,
       [PAYLOAD_KEY_SEO_TITLE]: seoTitle,
@@ -333,7 +355,7 @@ export const ContentEdit: FC = () => {
       const okPage = await updatePage(activeToken, {
         id: target.id,
         title,
-        bodyHtml,
+        bodyHtml: nextBody,
         status,
         mediaUrl: featuredImage || target.mediaUrl,
       });
@@ -360,7 +382,7 @@ export const ContentEdit: FC = () => {
               payload: {
                 ...contentPage.payload,
                 ...extras,
-                html: bodyHtml,
+                html: nextBody,
               },
               status,
             }),
@@ -371,8 +393,8 @@ export const ContentEdit: FC = () => {
     }
     const payload = {
       ...(target.payload || {}),
-      html: bodyHtml,
-      blocks: [{ type: 'html', html: bodyHtml }],
+      html: nextBody,
+      blocks: [{ type: 'html', html: nextBody }],
       ...extras,
       [PAYLOAD_KEY_TEMPLATE]: existingTemplate || DOCUMENT_TEMPLATE_ID,
     };
@@ -385,6 +407,31 @@ export const ContentEdit: FC = () => {
       status,
     });
     setSaveOk(ok);
+  };
+
+  const translationItems = items.filter((item) =>
+    TRANSLATION_CONTENT_COLLECTIONS.includes(item.collection),
+  );
+
+  const onApplyTranslation = (params: TranslationApplyParams) => {
+    const { key, source } = params;
+    setPageFields((current) => {
+      const exists = current.some((field) => field.name === key);
+      if (exists) {
+        return current;
+      }
+      return [
+        ...current,
+        createNamedCastField({
+          id: `t-${key}`,
+          name: key,
+          label: key,
+          type: CAST_FIELD_TYPE.TEXT,
+        }),
+      ];
+    });
+    setCastValues((current) => ({ ...current, [key]: source }));
+    setSaveOk(false);
   };
 
   return (
@@ -507,7 +554,7 @@ export const ContentEdit: FC = () => {
                   value={slug}
                   onChange={onStringInput(setSlug)}
                 />
-                {preview ? (
+                {preview && (
                   <div
                     className="bifrost-cms-preview-shell"
                     style={
@@ -541,12 +588,38 @@ export const ContentEdit: FC = () => {
                       }}
                     />
                   </div>
-                ) : (
+                )}
+                {!preview && useFieldEditor && (
+                  <Flex direction="column" gap={3} className="bifrost-cms-editor-stage">
+                    {translationOpen && (
+                      <ContentTranslationWidget
+                        items={translationItems}
+                        onApply={onApplyTranslation}
+                      />
+                    )}
+                    <ContentFieldStage
+                      fields={displayFields}
+                      values={castValues}
+                      onValueChange={(name, value) => {
+                        setCastValues((current) => ({ ...current, [name]: value }));
+                        setSaveOk(false);
+                      }}
+                      onDrop={onEditorDrop}
+                    />
+                  </Flex>
+                )}
+                {!preview && !useFieldEditor && (
                   <div
                     className="bifrost-cms-editor-stage ink-theme-snow"
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={onEditorDrop}
                   >
+                    {translationOpen && (
+                      <ContentTranslationWidget
+                        items={translationItems}
+                        onApply={onApplyTranslation}
+                      />
+                    )}
                     <InkEditor
                       value={bodyHtml}
                       onChange={(next) => {

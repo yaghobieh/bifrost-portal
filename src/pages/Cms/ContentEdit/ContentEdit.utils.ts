@@ -20,6 +20,7 @@ import {
   CONTENT_COLLECTION_PAGE_META,
   CONTENT_COLLECTION_PAGES,
 } from '@pages/Cms/ContentPages/ContentPages.const';
+import { docsHtmlFromValues, isDocsLayout } from '@pages/Cms/ContentPages/ContentPages.utils';
 import {
   CONTENT_EDIT_KIND,
   PAYLOAD_ALT_KEY,
@@ -245,4 +246,30 @@ export const joinScheduleAt = (date: Date | null, time: string): string => {
   const clock =
     time && time.length >= NUMBER_FOUR ? time.slice(NUMBER_ZERO, NUMBER_FIVE) : SCHEDULE_DEFAULT_TIME;
   return `${day}${ISO_DATE_SEP}${clock}`;
+};
+
+export const htmlFromCastValues = (values: Record<string, string>): string => {
+  const blocks = Object.entries(values)
+    .filter(([, text]) => text.trim().length > NUMBER_ZERO)
+    .map(([, text]) => `<p>${text}</p>`);
+  if (blocks.length === NUMBER_ZERO) {
+    return EMPTY_STRING;
+  }
+  return blocks.join(HTML_NEWLINE);
+};
+
+export const resolveEditBodyHtml = (params: {
+  layoutId: string;
+  values: Record<string, string>;
+  fieldCount: number;
+  fallback: string;
+}): string => {
+  const { layoutId, values, fieldCount, fallback } = params;
+  if (isDocsLayout(layoutId)) {
+    return docsHtmlFromValues(values);
+  }
+  if (fieldCount > NUMBER_ZERO) {
+    return htmlFromCastValues(values);
+  }
+  return fallback;
 };

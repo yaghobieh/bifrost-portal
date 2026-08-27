@@ -819,6 +819,7 @@ export interface Messages {
     widgetsTitle: string;
     widgetsHint: string;
     widgetsOpen: string;
+    translationWidget: string;
     publishTitle: string;
     statusLabel: string;
     seoTitle: string;
@@ -1042,6 +1043,14 @@ export interface Messages {
     pageKeys: string;
     pagesEmpty: string;
     backToPages: string;
+    addString: string;
+    addPage: string;
+    addPagePlaceholder: string;
+    addKeyPlaceholder: string;
+    addValuePlaceholder: string;
+    translationPage: string;
+    translationKey: string;
+    translationApply: string;
     localeEn: string;
     localeFr: string;
     localeEs: string;
