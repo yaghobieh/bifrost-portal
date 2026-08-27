@@ -3928,13 +3928,13 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms-crew__nav {
-  flex: 0 0 14rem;
-  width: 14rem;
+  flex: 0 0 16.5rem;
+  width: 16.5rem;
   border-right: 1px solid var(--bear-border-default);
   padding: 0.85rem 0.75rem;
   min-height: 0;
   overflow: auto;
-  background: var(--bear-bg-secondary);
+  background: var(--bear-bg-primary);
 }
 
 .bifrost-cms-crew__section {
@@ -3958,6 +3958,7 @@ html.bifrost-cms-host #root {
   align-items: center;
   gap: 0.55rem;
   width: 100%;
+  height: auto;
   padding: 0.4rem 0.55rem;
   border: 0;
   border-radius: 0.55rem;
@@ -3965,6 +3966,12 @@ html.bifrost-cms-host #root {
   color: inherit;
   text-align: start;
   cursor: pointer;
+  justify-content: flex-start;
+}
+
+.bifrost-cms-crew__item-inner {
+  width: 100%;
+  min-width: 0;
 }
 
 .bifrost-cms-crew__item:hover,

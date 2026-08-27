@@ -77,7 +77,9 @@ export const CmsCrewChat: FC<CmsCrewChatProps> = (props) => {
     };
   }, [isOpen, token]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const onCreateNamedRoom = () => {
     const tag = slugChannelTag(newRoomValue);

@@ -1,23 +1,19 @@
 import type { FC } from 'react';
-import { Avatar, Badge, BearIcons, Button, Dropdown, Flex, Input, Typography } from '@forgedevstack/bear';
+import { Avatar, Badge, BearIcons, Button, Flex, Input, Select, Typography } from '@forgedevstack/bear';
 import { CMS_AVATAR_INITIALS_LENGTH, CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
 import { CMS_KEY_ENTER } from '@pages/Cms/CmsShell/CmsShell.const';
-import { isChatPresent } from '@pages/Cms/CmsShell/CmsLive.utils';
-import {
-  CMS_PRESENCE_AWAY,
-  CMS_PRESENCE_BUSY,
-  CMS_PRESENCE_NOT_THERE,
-  CMS_PRESENCE_ONLINE,
-} from '@pages/Cms/CmsShell/CmsLive.const';
-import { CREW_JUMP_INPUT_ID, CREW_NEW_ROOM_INPUT_ID } from '../../CmsCrewChat.const';
-import type { CrewChatSidebarProps } from '../../CmsCrewChat.types';
+import { isChatPresent, readPresenceStatus } from '@pages/Cms/CmsShell/CmsLive.utils';
+import { CREW_JUMP_INPUT_ID, CREW_NEW_ROOM_INPUT_ID } from '@pages/Cms/CmsShell/CmsCrewChat/CmsCrewChat.const';
+import type { CrewChatSidebarProps } from '@pages/Cms/CmsShell/CmsCrewChat/CmsCrewChat.types';
 import {
   initialsFromName,
   lastMessageMine,
   lastMessagePreview,
   matchesJump,
   trailingOtherCount,
-} from '../../CmsCrewChat.utils';
+} from '@pages/Cms/CmsShell/CmsCrewChat/CmsCrewChat.utils';
+import { CREW_STATUS_SELECT_ID } from './CrewChatSidebar.const';
+import { crewDotClass, crewItemClass, crewPresenceCopy, crewStatusOptions, crewUnreadCount } from './CrewChatSidebar.utils';
 
 export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
   const {
@@ -64,45 +60,31 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
   const visibleChannels = channels.filter((row) => matchesJump(row.tag, jumpQuery));
   const visibleRooms = directRooms.filter((room) => matchesJump(roomTitleFor(room), jumpQuery));
   const visiblePeople = leftoverPeople.filter((person) => matchesJump(person.name, jumpQuery));
+  const statusOptions = crewStatusOptions({
+    online: statusOnlineLabel,
+    away: statusAwayLabel,
+    busy: statusBusyLabel,
+    notThere: statusNotThereLabel,
+  });
 
-  const statusLabel =
-    availability === CMS_PRESENCE_AWAY
-      ? statusAwayLabel
-      : availability === CMS_PRESENCE_BUSY
-        ? statusBusyLabel
-        : availability === CMS_PRESENCE_NOT_THERE
-          ? statusNotThereLabel
-          : statusOnlineLabel;
   return (
     <Flex direction="column" gap={2} className="bifrost-cms-crew__nav">
       <Flex align="center" justify="between" gap={2}>
         <Typography variant="h4" className="mb-0">
           {title}
         </Typography>
-        <Flex align="center" gap={1}>
-          <Dropdown
-            placement="bottom-start"
-            trigger={
-              <Button size="sm" variant="outline" aria-label={statusLabel}>
-                {statusLabel}
-              </Button>
-            }
-            items={[
-              { key: CMS_PRESENCE_ONLINE, label: statusOnlineLabel, onClick: () => onAvailability(CMS_PRESENCE_ONLINE) },
-              { key: CMS_PRESENCE_AWAY, label: statusAwayLabel, onClick: () => onAvailability(CMS_PRESENCE_AWAY) },
-              { key: CMS_PRESENCE_BUSY, label: statusBusyLabel, onClick: () => onAvailability(CMS_PRESENCE_BUSY) },
-              {
-                key: CMS_PRESENCE_NOT_THERE,
-                label: statusNotThereLabel,
-                onClick: () => onAvailability(CMS_PRESENCE_NOT_THERE),
-              },
-            ]}
-          />
-          <Button size="sm" variant="ghost" onClick={onToggleNewRoom} aria-label={newRoomLabel}>
-            <BearIcons.PlusIcon size={CMS_ICON_SIZE} />
-          </Button>
-        </Flex>
+        <Button size="sm" variant="ghost" onClick={onToggleNewRoom} aria-label={newRoomLabel}>
+          <BearIcons.PlusIcon size={CMS_ICON_SIZE} />
+        </Button>
       </Flex>
+      <Select
+        id={CREW_STATUS_SELECT_ID}
+        size="sm"
+        fullWidth
+        value={availability}
+        options={statusOptions}
+        onChange={(value) => onAvailability(readPresenceStatus(value))}
+      />
       {newRoomOpen && (
         <Flex direction="column" gap={2} className="bifrost-cms-crew__create">
           <Input
@@ -113,7 +95,9 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
             fullWidth
             onChange={(event) => onNewRoomChange(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key !== CMS_KEY_ENTER) return;
+              if (event.key !== CMS_KEY_ENTER) {
+                return;
+              }
               event.preventDefault();
               onCreateRoom();
             }}
@@ -168,26 +152,31 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
       </Typography>
       <Flex direction="column" gap={1}>
         {visibleChannels.map((row) => {
-          const unread =
-            row.room && row.room.id !== activeRoomId
-              ? trailingOtherCount(row.room, currentUserId)
-              : NUMBER_ZERO;
           const active = Boolean(row.room && row.room.id === activeRoomId);
+          let channelUnread = NUMBER_ZERO;
+          if (row.room) {
+            channelUnread = trailingOtherCount(row.room, currentUserId);
+          }
+          const unread = crewUnreadCount({
+            active,
+            count: channelUnread,
+          });
           return (
-            <button
+            <Button
               key={row.tag}
               type="button"
-              className={
-                active ? 'bifrost-cms-crew__item bifrost-cms-crew__item--active' : 'bifrost-cms-crew__item'
-              }
+              variant="ghost"
+              className={crewItemClass({ active, person: false })}
               onClick={() => onOpenChannel(row.tag)}
             >
-              <span>
-                {hashPrefix}
-                {row.tag}
-              </span>
-              {unread > NUMBER_ZERO && <Badge variant="info">{unread}</Badge>}
-            </button>
+              <Flex align="center" justify="between" gap={2} className="bifrost-cms-crew__item-inner">
+                <Typography variant="body2" className="mb-0">
+                  {hashPrefix}
+                  {row.tag}
+                </Typography>
+                {unread > NUMBER_ZERO && <Badge variant="info">{unread}</Badge>}
+              </Flex>
+            </Button>
           );
         })}
         {visibleChannels.length === NUMBER_ZERO && (
@@ -205,67 +194,66 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
           const live = room.userIds.some(
             (id) => id !== currentUserId && onlineUsers.some((user) => user.id === id && isChatPresent(user)),
           );
-          const unread =
-            room.id === activeRoomId ? NUMBER_ZERO : trailingOtherCount(room, currentUserId);
           const sent = lastMessageMine(room, currentUserId);
           const active = room.id === activeRoomId;
+          const unread = crewUnreadCount({
+            active,
+            count: trailingOtherCount(room, currentUserId),
+          });
           return (
-            <button
+            <Button
               key={room.id}
               type="button"
-              className={
-                active
-                  ? 'bifrost-cms-crew__item bifrost-cms-crew__person bifrost-cms-crew__item--active'
-                  : 'bifrost-cms-crew__item bifrost-cms-crew__person'
-              }
+              variant="ghost"
+              className={crewItemClass({ active, person: true })}
               onClick={() => onOpenRoom(room.id)}
             >
-              <span className="bifrost-cms-crew__avatar-wrap">
-                <Avatar initials={initialsFromName(name, CMS_AVATAR_INITIALS_LENGTH)} size="sm" />
-                <span
-                  className={live ? 'bifrost-cms-crew__dot bifrost-cms-crew__dot--on' : 'bifrost-cms-crew__dot'}
-                />
-              </span>
-              <span className="bifrost-cms-crew__person-copy">
-                <Typography variant="body2" className="mb-0">
-                  {name}
-                </Typography>
-                <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                  {lastMessagePreview(room) || emptyPreview}
-                </Typography>
-              </span>
-              {sent && <BearIcons.CheckIcon size={CMS_ICON_SIZE} />}
-              {unread > NUMBER_ZERO && <Badge variant="info">{unread}</Badge>}
-            </button>
+              <Flex align="center" gap={2} className="bifrost-cms-crew__item-inner">
+                <Flex className="bifrost-cms-crew__avatar-wrap">
+                  <Avatar initials={initialsFromName(name, CMS_AVATAR_INITIALS_LENGTH)} size="sm" />
+                  <Flex className={crewDotClass(live)} />
+                </Flex>
+                <Flex direction="column" className="bifrost-cms-crew__person-copy">
+                  <Typography variant="body2" className="mb-0">
+                    {name}
+                  </Typography>
+                  <Typography variant="caption" className="bifrost-cms__muted mb-0">
+                    {lastMessagePreview(room) || emptyPreview}
+                  </Typography>
+                </Flex>
+                {sent && <BearIcons.CheckIcon size={CMS_ICON_SIZE} />}
+                {unread > NUMBER_ZERO && <Badge variant="info">{unread}</Badge>}
+              </Flex>
+            </Button>
           );
         })}
         {visiblePeople.map((person) => (
-          <button
+          <Button
             key={person.id}
             type="button"
-            className="bifrost-cms-crew__item bifrost-cms-crew__person"
+            variant="ghost"
+            className={crewItemClass({ active: false, person: true })}
             onClick={() => onOpenUser(person.id)}
           >
-            <span className="bifrost-cms-crew__avatar-wrap">
-              <Avatar
-                initials={initialsFromName(person.name, CMS_AVATAR_INITIALS_LENGTH)}
-                size="sm"
-              />
-              <span
-                className={
-                  person.online ? 'bifrost-cms-crew__dot bifrost-cms-crew__dot--on' : 'bifrost-cms-crew__dot'
-                }
-              />
-            </span>
-            <span className="bifrost-cms-crew__person-copy">
-              <Typography variant="body2" className="mb-0">
-                {person.name}
-              </Typography>
-              <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                {person.online ? onlineLabel : offlineLabel}
-              </Typography>
-            </span>
-          </button>
+            <Flex align="center" gap={2} className="bifrost-cms-crew__item-inner">
+              <Flex className="bifrost-cms-crew__avatar-wrap">
+                <Avatar initials={initialsFromName(person.name, CMS_AVATAR_INITIALS_LENGTH)} size="sm" />
+                <Flex className={crewDotClass(person.online)} />
+              </Flex>
+              <Flex direction="column" className="bifrost-cms-crew__person-copy">
+                <Typography variant="body2" className="mb-0">
+                  {person.name}
+                </Typography>
+                <Typography variant="caption" className="bifrost-cms__muted mb-0">
+                  {crewPresenceCopy({
+                    online: person.online,
+                    onlineLabel,
+                    offlineLabel,
+                  })}
+                </Typography>
+              </Flex>
+            </Flex>
+          </Button>
         ))}
       </Flex>
     </Flex>
