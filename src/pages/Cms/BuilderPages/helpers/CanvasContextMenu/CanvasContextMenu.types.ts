@@ -1,7 +1,9 @@
-import type { CanvasMenuAction } from '../../BuilderPages.types';
+import type { CanvasMenuAction } from '@pages/Cms/BuilderPages/BuilderPages.types';
 
 export type CanvasContextMenuLabels = {
   edit: string;
+  props: string;
+  style: string;
   duplicate: string;
   moveUp: string;
   moveDown: string;
@@ -10,6 +12,7 @@ export type CanvasContextMenuLabels = {
   saveReusable: string;
   remove: string;
   kbdEdit: string;
+  kbdProps: string;
   kbdDuplicate: string;
   kbdUp: string;
   kbdDown: string;

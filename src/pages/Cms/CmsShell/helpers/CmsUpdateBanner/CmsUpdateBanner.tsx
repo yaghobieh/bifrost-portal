@@ -13,6 +13,7 @@ import {
 } from '@sdk/modules/version';
 import type { CmsUpdateResult, WhatsNewCopy } from '@sdk/modules/version';
 import {
+  CMS_UPDATE_APPLIED_ID,
   CMS_UPDATE_BANNER_ID,
   CMS_UPDATE_SNACKBAR_ANCHOR,
   CMS_UPDATE_SNACKBAR_CLOSE_ON_OUTSIDE,
@@ -39,11 +40,15 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
   const [whatsNew, setWhatsNew] = useState<WhatsNewCopy>(EMPTY_WHATS_NEW);
   const [result, setResult] = useState<CmsUpdateResult | null>(null);
   const [behind, setBehind] = useState(false);
+  const [applied, setApplied] = useState(false);
 
   useEffect(() => {
     void fetchVersionInfo().then((info) => {
       const current = versionFromInfo(info.portal, info.version);
       setBehind(isBehindHub(current) || current === EMPTY_STRING);
+    });
+    void fetchWhatsNew().then((copy) => {
+      setWhatsNew(copy);
     });
   }, []);
 
@@ -72,10 +77,16 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
     setRunning(false);
     if (!next) {
       setResult(null);
-      setPreviewOpen(true);
+      setApplied(false);
+      setPreviewOpen(false);
       return;
     }
     setResult(next);
+    if (next.updated) {
+      setHidden(true);
+      setApplied(true);
+      return;
+    }
     setPreviewOpen(true);
   };
 
@@ -86,7 +97,7 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
         open={isOpen}
         severity={CMS_UPDATE_SNACKBAR_SEVERITY}
         message={t.cmsShell.updateHello.replace('{version}', TARGET_CMS_VERSION)}
-        description={t.cmsShell.updateChangelog}
+        description={whatsNew.lead || t.cmsShell.updateChangelog}
         autoHideDuration={CMS_UPDATE_SNACKBAR_STICKY}
         closeOnClickOutside={CMS_UPDATE_SNACKBAR_CLOSE_ON_OUTSIDE}
         showCloseButton
@@ -110,6 +121,17 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
             </Button>
           </Flex>
         }
+      />
+      <Snackbar
+        id={CMS_UPDATE_APPLIED_ID}
+        open={applied}
+        severity="success"
+        message={t.cmsShell.updatePreviewApplied}
+        autoHideDuration={CMS_UPDATE_SNACKBAR_STICKY}
+        showCloseButton
+        anchorOrigin={CMS_UPDATE_SNACKBAR_ANCHOR}
+        offsetY={CMS_UPDATE_SNACKBAR_OFFSET_Y}
+        onClose={() => setApplied(false)}
       />
       <Modal
         isOpen={previewOpen}

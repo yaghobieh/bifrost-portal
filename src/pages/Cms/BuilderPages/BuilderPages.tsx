@@ -1,39 +1,57 @@
-import { type DragEvent, type FC, type MouseEvent } from 'react';
-import { Alert, BearIcons, Button, Card, Dropdown, Flex, Input, Tab, TabList, TabPanel, Tabs, Typography } from '@forgedevstack/bear';
-import { InkEditor } from '@forgedevstack/ink';
-import { cmsInkAiProps } from '@/ai/index';
-import { CMS_ICON_SIZE } from '@const/numbers.const';
-import { ROUTES } from '@const/index';
+import { type FC, useState } from 'react';
+import { Alert, Accordion, BearIcons, Button, Card, Dropdown, Flex, Input, Select, Tab, TabList, TabPanel, Tabs, Typography } from '@forgedevstack/bear';
+import { CMS_ICON_SIZE, NUMBER_THREE, NUMBER_TWO, NUMBER_ZERO } from '@const/numbers.const';
+import { EMPTY_STRING, JQUERY_SCRIPT_SRC, ROUTES } from '@const/index';
+import { useAuth } from '@hooks/index';
+import { uploadAndRegisterMedia } from '@sdk/index';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { useCmsLive } from '../CmsShell/CmsLiveProvider';
 import { currentLiveLocation } from '../CmsShell/CmsLive.utils';
 import { isPageSubmitLocked, locationOwner } from '../CmsShell/helpers/LiveEditors';
-import { CanvasContextMenu } from './helpers/CanvasContextMenu';
+import { CanvasContextMenu, canvasMenuVars } from './helpers/CanvasContextMenu';
+import type { CanvasContextMenuLabels } from './helpers/CanvasContextMenu/CanvasContextMenu.types';
+import { BuilderCanvasNode } from './helpers/BuilderCanvasNode';
+import { BuilderImageFields } from './helpers/BuilderImageFields';
+import type { BuilderImageFieldKey } from './helpers/BuilderImageFields';
+import { BuilderInspectorStyle } from './helpers/BuilderInspectorStyle';
+import { BuilderPaletteGroup } from './helpers/BuilderPaletteGroup';
+import { BuilderStageRuntime } from './helpers/BuilderStageRuntime';
+import { BuilderWidgetChip, paletteGroupIcon } from './helpers/BuilderWidgetChip';
 import {
-  BUILDER_INK_MIN_HEIGHT_PX,
-  BUILDER_INSPECTOR_NONE,
-  BUILDER_INSPECTOR_TAB,
-  BUILDER_LAYER_MAX_DEPTH,
-  BUILDER_MENU_OFFSET_PX,
-  BUILDER_PREVIEW_MIN_WIDTH_PX,
-  BUILDER_STAGE_TAB,
-  BUILDER_STYLE_EMPTY,
-  BUILDER_THREE_COLUMNS,
-  BUILDER_TWO_COLUMNS,
-  BUILDER_VIEWPORT,
-  BUILDER_VIEWPORT_WIDTH_PX,
   AI_STYLE_SUGGESTIONS,
+  BUILDER_INSPECTOR_TAB,
+  BUILDER_PUBLISH_KEY_SAVE,
+  BUILDER_PUBLISH_KEY_TEMPLATE,
+  BUILDER_PX_SUFFIX,
+  BUILDER_STAGE_PREVIEW_CLASS,
+  BUILDER_STYLE_EMPTY,
+  BUILDER_VIEWPORT,
   CANVAS_KIND,
-  DEFAULT_INK_FALLBACK,
-  EMPTY_NODE_STYLES,
   LAYOUT_BLOCKS,
-  STYLE_FIELD_KEYS,
+  PALETTE_ACCORDION_DEFAULT,
+  PALETTE_GROUP_ID,
 } from './BuilderPages.const';
 import type { BuilderInspectorTab, CanvasNode } from './BuilderPages.types';
-import { nodeStyleObject, updateNodeCss, updateNodeHtml, updateNodeJs, updateNodeLabel, updateNodeStyles } from './BuilderPages.utils';
+import {
+  builderLayoutVars,
+  duplicateNode,
+  isContainerKind,
+  layerDepth,
+  removeNode,
+  stageShellVars,
+  stageViewportModifier,
+  updateNodeCss,
+  updateNodeHtml,
+  updateNodeJs,
+  updateNodeLabel,
+  updateNodeStyles,
+} from './BuilderPages.utils';
+import { IMAGE_ATTR_BY_FIELD } from './BearPalette.const';
+import { htmlHasImg, readI18nKey, readImgAttr, writeI18nKey, writeImgAttr } from './BearPalette.utils';
 import { BuilderBoardNiche } from './BuilderBoardNiche';
 import { BuilderCodeField } from './BuilderCodeField';
-import { useBuilderPages } from './hooks';
+import { completeMarketingPage, isHttpsScriptSrc } from './marketingAi.utils';
+import { useBuilderPages, useBuilderTranslations, useStagePreviewResize } from './hooks';
 
 export const BuilderPages: FC = () => {
   const {
@@ -49,9 +67,15 @@ export const BuilderPages: FC = () => {
     setSaved,
     targetId,
     viewport,
-    setViewport,
     preview,
-    setPreview,
+    onClearSelection,
+    onClearStage,
+    onStageContextMenu,
+    onStageDragOver,
+    onViewportDesktop,
+    onViewportTablet,
+    onViewportMobile,
+    onTogglePreview,
     inspectorTab,
     setInspectorTab,
     pageCode,
@@ -71,6 +95,9 @@ export const BuilderPages: FC = () => {
     contentWidgets,
     formWidgets,
     marketingGroups,
+    bearGroups,
+    libraryQuery,
+    setLibraryQuery,
     canPasteStyles,
     layers,
     apply,
@@ -80,6 +107,7 @@ export const BuilderPages: FC = () => {
     addCustomWidget,
     onDragStartWidget,
     onDragStartLayout,
+    onDragStartNode,
     acceptDrop,
     onContextMenu,
     runMenu,
@@ -92,6 +120,9 @@ export const BuilderPages: FC = () => {
     isContainerKind,
     navigate,
   } = useBuilderPages();
+  const { token } = useAuth();
+  const { localeBag, keyOptions, createKey } = useBuilderTranslations(targetId);
+  const { onPreviewResizeStart } = useStagePreviewResize({ previewWidth, setPreviewWidth });
   const { onlineUsers, selfId } = useCmsLive();
   const liveLocation = currentLiveLocation().location;
   const pageLocked = isPageSubmitLocked({
@@ -100,288 +131,510 @@ export const BuilderPages: FC = () => {
     location: liveLocation,
   });
   const pageOwner = locationOwner({ users: onlineUsers, location: liveLocation });
+  const [scriptDraft, setScriptDraft] = useState(JQUERY_SCRIPT_SRC);
+  const [i18nKeyDraft, setI18nKeyDraft] = useState(EMPTY_STRING);
+  const [i18nValueDraft, setI18nValueDraft] = useState(EMPTY_STRING);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiFailed, setAiFailed] = useState(false);
 
-  const renderNode = (node: CanvasNode) => {
+  const applyBackground = (value: string) => {
+    if (!selected) {
+      return;
+    }
+    apply(
+      updateNodeStyles(tree, selected.id, {
+        ...selectedStyles,
+        background: value,
+      }),
+    );
+  };
+  const applyRadius = (value: string) => {
+    if (!selected) {
+      return;
+    }
+    apply(
+      updateNodeStyles(tree, selected.id, {
+        ...selectedStyles,
+        borderRadius: value,
+      }),
+    );
+  };
+  const applyWidth = (value: string) => {
+    if (!selected) {
+      return;
+    }
+    apply(
+      updateNodeStyles(tree, selected.id, {
+        ...selectedStyles,
+        width: value ? `${value}${BUILDER_PX_SUFFIX}` : EMPTY_STRING,
+      }),
+    );
+  };
+  const applyStyleField = (key: keyof typeof selectedStyles, value: string) => {
+    if (!selected) {
+      return;
+    }
+    apply(
+      updateNodeStyles(tree, selected.id, {
+        ...selectedStyles,
+        [key]: value,
+      }),
+    );
+  };
+  const applyHint = (id: string) => {
+    if (!selected) {
+      return;
+    }
+    const hint = AI_STYLE_SUGGESTIONS.find((item) => item.id === id);
+    if (!hint) {
+      return;
+    }
+    apply(
+      updateNodeStyles(tree, selected.id, {
+        ...selectedStyles,
+        ...hint.styles,
+      }),
+    );
+  };
+  const onImageFieldChange = (key: BuilderImageFieldKey, value: string) => {
+    if (!selected) {
+      return;
+    }
+    apply(
+      updateNodeHtml(
+        tree,
+        selected.id,
+        writeImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_BY_FIELD[key], value),
+      ),
+    );
+  };
+  const onImageUpload = async (file: File) => {
+    if (!selected || !token) {
+      return;
+    }
+    const item = await uploadAndRegisterMedia(token, file);
+    if (!item) {
+      return;
+    }
+    onImageFieldChange('src', item.secureUrl || item.url);
+  };
+  const onI18nKeyChange = (value: string) => {
+    if (!selected) {
+      return;
+    }
+    apply(
+      updateNodeHtml(
+        tree,
+        selected.id,
+        writeI18nKey(selected.html || BUILDER_STYLE_EMPTY, String(value)),
+      ),
+    );
+  };
+  const onDuplicateNode = (id: string) => {
+    apply(duplicateNode(tree, id));
+  };
+  const onDeleteNode = (id: string) => {
+    apply(removeNode(tree, id));
+    if (selectedId === id) {
+      setSelectedId(EMPTY_STRING);
+    }
+  };
+  const onNodeHtmlChange = (id: string, html: string) => {
+    apply(updateNodeHtml(tree, id, html));
+  };
+  const renderNode = (node: CanvasNode) => (
+    <BuilderCanvasNode
+      key={node.id}
+      node={node}
+      selectedId={selectedId}
+      preview={preview}
+      tree={tree}
+      duplicateLabel={t.cmsBuilder.menuDuplicate}
+      deleteLabel={t.cmsBuilder.menuDelete}
+      resizeLabel={t.cmsBuilder.resizeWidget}
+      apply={apply}
+      setSelectedId={setSelectedId}
+      setDropParentId={setDropParentId}
+      onContextMenu={onContextMenu}
+      onDragStartNode={onDragStartNode}
+      acceptDrop={acceptDrop}
+      onDuplicate={onDuplicateNode}
+      onDelete={onDeleteNode}
+      onHtmlChange={onNodeHtmlChange}
+      renderChild={renderNode}
+      localeBag={localeBag}
+    />
+  );
 
-    const selectedClass = node.id === selectedId ? ' bifrost-cms-canvas-node--selected' : '';
-    const layoutClass = `bifrost-cms-canvas-node bifrost-cms-canvas-node--${node.kind}${selectedClass}`;
-    const dynamicStyle = nodeStyleObject(node.styles);
-    const onResizeStart = (event: MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const startX = event.clientX;
-      const startY = event.clientY;
-      const startWidth = event.currentTarget.parentElement?.offsetWidth || 0;
-      const startHeight = event.currentTarget.parentElement?.offsetHeight || 0;
-      const onMove = (moveEvent: globalThis.MouseEvent) => {
-        apply(
-          updateNodeStyles(tree, node.id, {
-            ...EMPTY_NODE_STYLES,
-            ...node.styles,
-            width: `${Math.max(BUILDER_PREVIEW_MIN_WIDTH_PX / 4, startWidth + moveEvent.clientX - startX)}px`,
-            height: `${Math.max(40, startHeight + moveEvent.clientY - startY)}px`,
-          }),
-        );
-      };
-      const onUp = () => {
-        window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('mouseup', onUp);
-      };
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onUp);
-    };
+  const stageViewportClass = stageViewportModifier(viewport);
+  const stagePreviewClass = preview ? ` ${BUILDER_STAGE_PREVIEW_CLASS}` : EMPTY_STRING;
+  const onAddBlankSection = () => {
+    addLayout(CANVAS_KIND.SECTION);
+  };
+  const contextMenuLabels: CanvasContextMenuLabels = {
+    edit: t.cmsBuilder.menuEditContent,
+    props: t.cmsBuilder.menuInspectProps,
+    style: t.cmsBuilder.menuInspectStyle,
+    duplicate: t.cmsBuilder.menuDuplicate,
+    moveUp: t.cmsBuilder.menuMoveUp,
+    moveDown: t.cmsBuilder.menuMoveDown,
+    copyStyles: t.cmsBuilder.menuCopyStyles,
+    pasteStyles: t.cmsBuilder.menuPasteStyles,
+    saveReusable: t.cmsBuilder.menuSaveReusable,
+    remove: t.cmsBuilder.menuDelete,
+    kbdEdit: t.cmsBuilder.menuKbdEdit,
+    kbdProps: t.cmsBuilder.menuKbdProps,
+    kbdDuplicate: t.cmsBuilder.menuKbdDuplicate,
+    kbdUp: t.cmsBuilder.menuKbdUp,
+    kbdDown: t.cmsBuilder.menuKbdDown,
+    kbdCopy: t.cmsBuilder.menuKbdCopy,
+    kbdDelete: t.cmsBuilder.menuKbdDelete,
+  };
+  const inspectorTabs = [
+    { id: BUILDER_INSPECTOR_TAB.CONTENT, label: t.cmsBuilder.inspectorContent },
+    { id: BUILDER_INSPECTOR_TAB.STYLE, label: t.cmsBuilder.inspectorStyle },
+    { id: BUILDER_INSPECTOR_TAB.CODE, label: t.cmsBuilder.inspectorAdvanced },
+  ];
+  const imageFields = selected
+    ? [
+        {
+          key: 'src' as const,
+          label: t.cmsBuilder.imageSrc,
+          value: readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_BY_FIELD.src),
+        },
+        {
+          key: 'alt' as const,
+          label: t.cmsBuilder.imageAlt,
+          value: readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_BY_FIELD.alt),
+        },
+        {
+          key: 'width' as const,
+          label: t.cmsBuilder.imageWidth,
+          value: readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_BY_FIELD.width),
+        },
+        {
+          key: 'height' as const,
+          label: t.cmsBuilder.imageHeight,
+          value: readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_BY_FIELD.height),
+        },
+        {
+          key: 'loading' as const,
+          label: t.cmsBuilder.imageLoading,
+          value: readImgAttr(selected.html || BUILDER_STYLE_EMPTY, IMAGE_ATTR_BY_FIELD.loading),
+        },
+      ]
+    : [];
+  const onLayerClick = (id: string, kind: CanvasNode['kind']) => {
+    setSelectedId(id);
+    setDropParentId(isContainerKind(kind) ? id : EMPTY_STRING);
+  };
+  const renderLayers = () => {
+    if (layers.length === NUMBER_ZERO) {
+      return <Typography variant="caption">{t.cmsBuilder.layersEmpty}</Typography>;
+    }
     return (
-      <div
-        key={node.id}
-        className={layoutClass}
-        data-node={node.id}
-        style={dynamicStyle}
-        onClick={(event) => {
-          event.stopPropagation();
-          setSelectedId(node.id);
-          setDropParentId(isContainerKind(node.kind) ? node.id : BUILDER_INSPECTOR_NONE);
-        }}
-        onContextMenu={(event) => onContextMenu(event, node.id)}
-        onDragOver={(event) => {
-          if (isContainerKind(node.kind)) event.preventDefault();
-        }}
-        onDrop={(event) => {
-          if (isContainerKind(node.kind)) acceptDrop(event, node.id);
-        }}
-      >
-        {preview ? null : (
-          <Typography variant="caption" className="bifrost-cms-canvas-node__label mb-0">
-            {node.label}
-          </Typography>
-        )}
-        {node.css ? <style>{`[data-node="${node.id}"]{${node.css}}`}</style> : null}
-        {node.kind === CANVAS_KIND.INK ? (
-          <InkEditor
-            value={node.html || DEFAULT_INK_FALLBACK}
-            onChange={(next) => apply(updateNodeHtml(tree, node.id, next))}
-            colorMode="light"
-            variant="document"
-            minHeight={BUILDER_INK_MIN_HEIGHT_PX}
-            features={{ blocks: true, slash: true, ai: true }}
-            ai={cmsInkAiProps()}
-          />
-        ) : node.html ? (
-          <div dangerouslySetInnerHTML={{ __html: node.html }} />
-        ) : null}
-        {node.children.map(renderNode)}
-        {preview || node.id !== selectedId ? null : (
-          <button
+      <div className="bifrost-cms-layers">
+        {layers.map((row) => (
+          <Button
+            key={row.id}
             type="button"
-            className="bifrost-cms-canvas-node__resize"
-            aria-label={t.cmsBuilder.resizeWidget}
-            onMouseDown={onResizeStart}
-          />
-        )}
+            size="sm"
+            variant={row.id === selectedId ? 'ink' : 'ghost'}
+            className={`bifrost-cms-layers__row${row.id === selectedId ? ' bifrost-cms-layers__row--selected' : EMPTY_STRING}`}
+            data-depth={layerDepth(row.depth)}
+            onClick={() => onLayerClick(row.id, row.kind)}
+          >
+            {row.label}
+          </Button>
+        ))}
       </div>
     );
   };
+  const onPublishSave = () => {
+    if (pageLocked) {
+      return;
+    }
+    void onSave();
+  };
+  const onPublishTemplate = () => {
+    if (pageLocked) {
+      return;
+    }
+    void onSaveAsTemplate();
+  };
+  const publishItems = [
+    {
+      key: BUILDER_PUBLISH_KEY_SAVE,
+      label: targetId ? t.cmsBuilder.saveToContent : t.cmsBuilder.saveCanvas,
+      onClick: onPublishSave,
+    },
+    {
+      key: BUILDER_PUBLISH_KEY_TEMPLATE,
+      label: t.cmsBuilder.saveAsTemplate,
+      onClick: onPublishTemplate,
+    },
+  ];
+  const renderInspectorEmpty = () => (
+    <Typography variant="caption">{t.cmsBuilder.inspectorEmpty}</Typography>
+  );
+  const renderCodePanel = () => {
+    if (selected) {
+      return (
+        <>
+          {selected.html !== undefined && selected.kind !== CANVAS_KIND.INK && (
+            <BuilderCodeField
+              label={t.cmsBuilder.inspectorHtml}
+              value={selected.html}
+              language="html"
+              onChange={(value) => apply(updateNodeHtml(tree, selected.id, value))}
+            />
+          )}
+          <BuilderCodeField
+            label={t.cmsBuilder.inspectorCss}
+            value={selected.css || BUILDER_STYLE_EMPTY}
+            language="css"
+            onChange={(value) => apply(updateNodeCss(tree, selected.id, value))}
+          />
+          <BuilderCodeField
+            label={t.cmsBuilder.inspectorJs}
+            value={selected.js || BUILDER_STYLE_EMPTY}
+            language="javascript"
+            onChange={(value) => apply(updateNodeJs(tree, selected.id, value))}
+          />
+        </>
+      );
+    }
+    return (
+      <>
+        <BuilderCodeField
+          label={t.cmsBuilder.pageCss}
+          value={pageCode.css}
+          language="css"
+          onChange={(value) => {
+            setPageCode({ ...pageCode, css: value });
+            setSaved(false);
+          }}
+        />
+        <BuilderCodeField
+          label={t.cmsBuilder.pageJs}
+          value={pageCode.js}
+          language="javascript"
+          onChange={(value) => {
+            setPageCode({ ...pageCode, js: value });
+            setSaved(false);
+          }}
+        />
+        <Input
+          label={t.cmsBuilder.scriptSrc}
+          value={scriptDraft}
+          onChange={(event) => setScriptDraft(event.target.value)}
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!isHttpsScriptSrc(scriptDraft)}
+          onClick={() => {
+            const src = scriptDraft.trim();
+            if (!isHttpsScriptSrc(src) || pageCode.scripts.includes(src)) {
+              return;
+            }
+            setPageCode({ ...pageCode, scripts: [...pageCode.scripts, src] });
+            setSaved(false);
+            setScriptDraft(EMPTY_STRING);
+          }}
+        >
+          {t.cmsBuilder.addScript}
+        </Button>
+        {pageCode.scripts.map((src) => (
+          <Button
+            key={src}
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setPageCode({
+                ...pageCode,
+                scripts: pageCode.scripts.filter((item) => item !== src),
+              });
+              setSaved(false);
+            }}
+          >
+            {src}
+          </Button>
+        ))}
+      </>
+    );
+  };
 
-  const stageViewportClass =
-    viewport === BUILDER_VIEWPORT.TABLET
-      ? ' bifrost-cms-builder__stage--tablet'
-      : viewport === BUILDER_VIEWPORT.MOBILE
-        ? ' bifrost-cms-builder__stage--mobile'
-        : '';
-  const stagePreviewClass = preview ? ' bifrost-cms-builder__stage--preview' : '';
+  const renderLocked = () => (
+    <Card padding="md">
+      <Flex direction="column" gap={3}>
+        <Typography variant="h4">{t.cmsBuilder.lockedTitle}</Typography>
+        <Typography variant="body2">{t.cmsBuilder.lockedBody}</Typography>
+        <Button
+          size="sm"
+          variant="primary"
+          icon={<BearIcons.PackageIcon size={CMS_ICON_SIZE} />}
+          onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
+        >
+          {t.cmsBuilder.openStore}
+        </Button>
+      </Flex>
+    </Card>
+  );
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.BUILDER}>
       <Flex direction="column" gap={6} className="bifrost-cms-builder">
         <CmsPageHeader title={t.cmsBuilder.title} subtitle={t.cmsBuilder.subtitle} />
         <BuilderBoardNiche />
-        {!installed ? (
-          <Card padding="md">
-            <Typography variant="h4" className="mb-2">
-              {t.cmsBuilder.lockedTitle}
-            </Typography>
-            <Typography variant="body2" className="mb-3">
-              {t.cmsBuilder.lockedBody}
-            </Typography>
-            <Button
-              size="sm"
-              variant="primary"
-              icon={<BearIcons.PackageIcon size={CMS_ICON_SIZE} />}
-              onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
-            >
-              {t.cmsBuilder.openStore}
-            </Button>
-          </Card>
-        ) : (
+        {installed ? (
           <div
             className="bifrost-cms-builder__layout"
-            style={{
-              gridTemplateColumns: `${paletteWidth}px minmax(0, 1fr) ${inspectorWidth}px`,
-            }}
+            style={builderLayoutVars({ paletteWidth, inspectorWidth })}
           >
             <div className="bifrost-cms-builder__pane bifrost-cms-builder__pane--palette">
             <Card padding="md" className="bifrost-cms-builder__palette">
-              <Typography variant="h4" className="mb-1">
-                {t.cmsBuilder.palette}
+            <Flex direction="column" gap={3}>
+              {selected && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={onClearSelection}
+                >
+                  {t.cmsBuilder.backToWidgets}
+                </Button>
+              )}
+              <Typography variant="h4">
+                {selected ? t.cmsBuilder.inspector : t.cmsBuilder.palette}
               </Typography>
               {pageLocked && pageOwner && (
                 <Alert severity="warning">
                   {t.cmsShell.pageLocked.replace('{name}', pageOwner.name)}
                 </Alert>
               )}
-              <Typography variant="caption" className="bifrost-cms__muted mb-3 block">
+              {!selected && (
+                <Flex direction="column" gap={4}>
+              <Input
+                label={t.cmsBuilder.librarySearch}
+                value={libraryQuery}
+                onChange={(event) => setLibraryQuery(event.target.value)}
+              />
+              <Typography variant="caption" className="bifrost-cms__muted">
                 {t.cmsBuilder.layoutHint}
               </Typography>
+              <Accordion allowMultiple defaultOpen={[...PALETTE_ACCORDION_DEFAULT]}>
               {marketingGroups.map((group) => (
-                <div key={group.id}>
-                  <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
-                    {group.label}
-                  </Typography>
-                  <div className="bifrost-cms-widget-grid mb-4">
+                <BuilderPaletteGroup key={group.id} id={group.id} label={group.label}>
                     {group.widgets.map((widget) => (
-                      <button
+                      <BuilderWidgetChip
                         key={widget.id}
-                        type="button"
-                        className="bifrost-cms-widget-chip"
+                        label={widget.label}
+                        icon={paletteGroupIcon(group.id)}
                         draggable
                         onDragStart={(event) => onDragStartWidget(event, widget.id)}
                         onClick={() => addWidget(widget.id)}
-                      >
-                        <Typography variant="body2" className="mb-0 font-medium">
-                          {widget.label}
-                        </Typography>
-                      </button>
+                      />
                     ))}
-                  </div>
-                </div>
+                </BuilderPaletteGroup>
               ))}
-              <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
-                {t.cmsBuilder.paletteGroupLayout}
-              </Typography>
-              <div className="bifrost-cms-widget-grid mb-4">
+              <BuilderPaletteGroup id={PALETTE_GROUP_ID.LAYOUT} label={t.cmsBuilder.paletteGroupLayout}>
                 {LAYOUT_BLOCKS.map((block) => (
-                  <button
+                  <BuilderWidgetChip
                     key={block.id}
-                    type="button"
-                    className="bifrost-cms-widget-chip"
+                    label={block.label}
+                    icon={paletteGroupIcon('layout')}
                     draggable
                     onDragStart={(event) => onDragStartLayout(event, block.id)}
                     onClick={() => addLayout(block.id)}
-                  >
-                    <Typography variant="body2" className="mb-0 font-medium">
-                      {block.label}
-                    </Typography>
-                  </button>
+                  />
                 ))}
-                <button
-                  type="button"
-                  className="bifrost-cms-widget-chip"
-                  onClick={() => addColumns(BUILDER_TWO_COLUMNS)}
-                >
-                  <Typography variant="body2" className="mb-0 font-medium">
-                    {t.cmsBuilder.presetTwoColumns}
-                  </Typography>
-                </button>
-                <button
-                  type="button"
-                  className="bifrost-cms-widget-chip"
-                  onClick={() => addColumns(BUILDER_THREE_COLUMNS)}
-                >
-                  <Typography variant="body2" className="mb-0 font-medium">
-                    {t.cmsBuilder.presetThreeColumns}
-                  </Typography>
-                </button>
-              </div>
-              <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
-                {t.cmsBuilder.paletteGroupContent}
-              </Typography>
-              <div className="bifrost-cms-widget-grid mb-4">
+                <BuilderWidgetChip
+                  label={t.cmsBuilder.presetTwoColumns}
+                  icon={paletteGroupIcon('layout')}
+                  onClick={() => addColumns(NUMBER_TWO)}
+                />
+                <BuilderWidgetChip
+                  label={t.cmsBuilder.presetThreeColumns}
+                  icon={paletteGroupIcon('layout')}
+                  onClick={() => addColumns(NUMBER_THREE)}
+                />
+              </BuilderPaletteGroup>
+              <BuilderPaletteGroup id={PALETTE_GROUP_ID.CONTENT} label={t.cmsBuilder.paletteGroupContent}>
                 {contentWidgets.map((widget) => (
-                  <button
+                  <BuilderWidgetChip
                     key={widget.id}
-                    type="button"
-                    className="bifrost-cms-widget-chip"
+                    label={widget.label}
+                    icon={paletteGroupIcon('basic')}
                     draggable
                     onDragStart={(event) => onDragStartWidget(event, widget.id)}
                     onClick={() => addWidget(widget.id)}
-                  >
-                    <Typography variant="body2" className="mb-0 font-medium">
-                      {widget.label}
-                    </Typography>
-                  </button>
+                  />
                 ))}
-              </div>
-              <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
-                {t.cmsBuilder.paletteGroupForm}
-              </Typography>
-              <div className="bifrost-cms-widget-grid mb-4">
+              </BuilderPaletteGroup>
+              {bearGroups.map((group) => (
+                <BuilderPaletteGroup key={group.id} id={group.id} label={group.label}>
+                    {group.widgets.map((widget) => (
+                      <BuilderWidgetChip
+                        key={widget.id}
+                        label={widget.label}
+                        icon={paletteGroupIcon(group.id)}
+                        draggable
+                        onDragStart={(event) => onDragStartWidget(event, widget.id)}
+                        onClick={() => addWidget(widget.id)}
+                      />
+                    ))}
+                </BuilderPaletteGroup>
+              ))}
+              <BuilderPaletteGroup id={PALETTE_GROUP_ID.FORM} label={t.cmsBuilder.paletteGroupForm}>
                 {formWidgets.map((widget) => (
-                  <button
+                  <BuilderWidgetChip
                     key={widget.id}
-                    type="button"
-                    className="bifrost-cms-widget-chip"
+                    label={widget.label}
+                    icon={paletteGroupIcon('form')}
                     draggable
                     onDragStart={(event) => onDragStartWidget(event, widget.id)}
                     onClick={() => addWidget(widget.id)}
-                  >
-                    <Typography variant="body2" className="mb-0 font-medium">
-                      {widget.label}
-                    </Typography>
-                  </button>
+                  />
                 ))}
-                  </div>
-                  <Typography variant="caption" className="bifrost-cms-builder__group mb-2 block">
-                    {t.cmsBuilder.customWidget}
-                  </Typography>
-                  <Flex direction="column" gap={2} className="mb-4">
-                    <Input
-                      label={t.cmsBuilder.customWidgetLabel}
-                      value={customLabel}
-                      onChange={(event) => setCustomLabel(event.target.value)}
-                    />
-                    <Input
-                      label={t.cmsBuilder.customWidgetHtml}
-                      value={customHtml}
-                      onChange={(event) => setCustomHtml(event.target.value)}
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={!customLabel.trim() || !customHtml.trim()}
-                      onClick={addCustomWidget}
-                    >
-                      {t.cmsBuilder.customWidgetAdd}
-                    </Button>
-                  </Flex>
-                  <Typography variant="h5" className="mb-2">
+              </BuilderPaletteGroup>
+              <BuilderPaletteGroup id={PALETTE_GROUP_ID.CUSTOM} label={t.cmsBuilder.customWidget}>
+                <Input
+                  label={t.cmsBuilder.customWidgetLabel}
+                  value={customLabel}
+                  onChange={(event) => setCustomLabel(event.target.value)}
+                />
+                <Input
+                  label={t.cmsBuilder.customWidgetHtml}
+                  value={customHtml}
+                  onChange={(event) => setCustomHtml(event.target.value)}
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={!customLabel.trim() || !customHtml.trim()}
+                  onClick={addCustomWidget}
+                >
+                  {t.cmsBuilder.customWidgetAdd}
+                </Button>
+              </BuilderPaletteGroup>
+              </Accordion>
+              <Typography variant="h5">
                 {t.cmsBuilder.layers}
               </Typography>
-              {layers.length === 0 ? (
-                <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                  {t.cmsBuilder.layersEmpty}
-                </Typography>
-              ) : (
-                <div className="bifrost-cms-layers">
-                  {layers.map((row) => (
-                    <button
-                      key={row.id}
-                      type="button"
-                      className={`bifrost-cms-layers__row${row.id === selectedId ? ' bifrost-cms-layers__row--selected' : ''}`}
-                      data-depth={Math.min(row.depth, BUILDER_LAYER_MAX_DEPTH)}
-                      onClick={() => {
-                        setSelectedId(row.id);
-                        setDropParentId(
-                          isContainerKind(row.kind) ? row.id : BUILDER_INSPECTOR_NONE,
-                        );
-                      }}
-                    >
-                      {row.label}
-                    </button>
-                  ))}
-                </div>
+              {renderLayers()}
+                </Flex>
               )}
+              {selected && (
+                <Typography variant="body2">
+                  {selected.label}
+                </Typography>
+              )}
+            </Flex>
             </Card>
-            <button
+            <Button
               type="button"
+              size="sm"
+              variant="ghost"
               className="bifrost-cms-panel-resize"
               aria-label={t.cmsBuilder.palette}
               onMouseDown={onPaletteResize}
@@ -389,43 +642,75 @@ export const BuilderPages: FC = () => {
             </div>
             <Card padding="md" className="bifrost-cms-builder__canvas">
               <div className="bifrost-cms-builder__toolbar">
-                <Tabs
-                  value={stageTab}
-                  defaultTab={BUILDER_STAGE_TAB.CANVAS}
-                  variant="line"
-                  onChange={onStageTab}
-                >
-                  <TabList>
-                    <Tab id={BUILDER_STAGE_TAB.CANVAS}>{t.cmsBuilder.canvas}</Tab>
-                    <Tab id={BUILDER_STAGE_TAB.CONTENT}>{t.cmsBuilder.inspectorContent}</Tab>
-                    <Tab id={BUILDER_STAGE_TAB.STYLE}>{t.cmsBuilder.inspectorStyle}</Tab>
-                    <Tab id={BUILDER_STAGE_TAB.CODE}>{t.cmsBuilder.inspectorCode}</Tab>
-                  </TabList>
-                </Tabs>
+                <Typography variant="h5">{t.cmsBuilder.canvas}</Typography>
                 <div className="bifrost-cms-builder__toolbar-actions">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => navigate(ROUTES.CMS_TRANSLATIONS)}
+                  >
+                    {t.cmsBuilder.openTranslations}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ink"
+                    disabled={aiBusy || pageLocked || !token}
+                    onClick={() => {
+                      if (!token) {
+                        return;
+                      }
+                      setAiBusy(true);
+                      setAiFailed(false);
+                      void completeMarketingPage(
+                        token,
+                        t.cmsBuilder.generatePagePrompt,
+                      ).then((result) => {
+                        setAiBusy(false);
+                        if (!result) {
+                          setAiFailed(true);
+                          return;
+                        }
+                        apply(result.nodes);
+                        setPageCode(result.code);
+                        setSaved(false);
+                      });
+                    }}
+                  >
+                    {aiBusy ? t.cmsBuilder.generatingPage : t.cmsBuilder.generatePage}
+                  </Button>
                   <Button
                     size="sm"
                     variant={viewport === BUILDER_VIEWPORT.DESKTOP ? 'ink' : 'outline'}
                     icon={<BearIcons.DesktopIcon size={CMS_ICON_SIZE} />}
                     aria-label={t.cmsBuilder.viewportDesktop}
-                    onClick={() => {
-                      setViewport(BUILDER_VIEWPORT.DESKTOP);
-                      setPreview(false);
-                    }}
+                    onClick={onViewportDesktop}
                   >
                     {t.cmsBuilder.viewportDesktop}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={viewport === BUILDER_VIEWPORT.TABLET ? 'ink' : 'outline'}
+                    icon={<BearIcons.TabletIcon size={CMS_ICON_SIZE} />}
+                    aria-label={t.cmsBuilder.viewportTablet}
+                    onClick={onViewportTablet}
+                  >
+                    {t.cmsBuilder.viewportTablet}
                   </Button>
                   <Button
                     size="sm"
                     variant={viewport === BUILDER_VIEWPORT.MOBILE ? 'ink' : 'outline'}
                     icon={<BearIcons.PhoneIcon size={CMS_ICON_SIZE} />}
                     aria-label={t.cmsBuilder.viewportMobile}
-                    onClick={() => {
-                      setViewport(BUILDER_VIEWPORT.MOBILE);
-                      setPreview(false);
-                    }}
+                    onClick={onViewportMobile}
                   >
                     {t.cmsBuilder.viewportMobile}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={preview ? 'ink' : 'outline'}
+                    onClick={onTogglePreview}
+                  >
+                    {t.cmsBuilder.previewMode}
                   </Button>
                   <Dropdown
                     placement="bottom-end"
@@ -451,102 +736,67 @@ export const BuilderPages: FC = () => {
                         aria-label={t.cmsBuilder.saveCanvas}
                         disabled={pageLocked}
                       >
-                        {targetId ? t.cmsBuilder.saveToContent : t.cmsBuilder.saveCanvas}
+                        {t.cmsBuilder.publish}
                       </Button>
                     }
-                    items={[
-                      {
-                        key: 'save',
-                        label: targetId ? t.cmsBuilder.saveToContent : t.cmsBuilder.saveCanvas,
-                        onClick: () => {
-                          if (pageLocked) return;
-                          void onSave();
-                        },
-                      },
-                      {
-                        key: 'template',
-                        label: t.cmsBuilder.saveAsTemplate,
-                        onClick: () => {
-                          if (pageLocked) return;
-                          void onSaveAsTemplate();
-                        },
-                      },
-                    ]}
+                    items={publishItems}
                   />
                 </div>
               </div>
               <div className="bifrost-cms-preview-shell">
               <div
                 className={`bifrost-cms-builder__stage${stageViewportClass}${stagePreviewClass}`}
-                style={{
-                  ...(viewport === BUILDER_VIEWPORT.DESKTOP
-                    ? undefined
-                    : { maxWidth: `${BUILDER_VIEWPORT_WIDTH_PX[viewport]}px` }),
-                  ...(previewWidth ? { width: `${previewWidth}px`, maxWidth: `${previewWidth}px` } : {}),
-                }}
-                onClick={() => {
-                  setSelectedId(BUILDER_INSPECTOR_NONE);
-                  setDropParentId(BUILDER_INSPECTOR_NONE);
-                  setMenu(null);
-                }}
-                onDragOver={(event) => event.preventDefault()}
+                style={stageShellVars({ viewport, previewWidth })}
+                onClick={onClearStage}
+                onDragOver={onStageDragOver}
                 onDrop={(event) => acceptDrop(event)}
-                onContextMenu={(event) => {
-                  event.preventDefault();
-                  setMenu({
-                    nodeId: BUILDER_INSPECTOR_NONE,
-                    x: event.clientX + BUILDER_MENU_OFFSET_PX,
-                    y: event.clientY + BUILDER_MENU_OFFSET_PX,
-                  });
-                }}
+                onContextMenu={onStageContextMenu}
               >
-                {pageCode.css ? <style>{pageCode.css}</style> : null}
-                {tree.length === 0 ? (
-                  <Typography variant="body2" className="bifrost-cms__muted mb-0">
-                    {t.cmsBuilder.empty}
-                  </Typography>
+                {pageCode.css || pageCode.js || pageCode.scripts.length > NUMBER_ZERO ? (
+                  <BuilderStageRuntime
+                    css={pageCode.css}
+                    js={pageCode.js}
+                    scripts={pageCode.scripts}
+                  />
+                ) : null}
+                {tree.length === NUMBER_ZERO ? (
+                  <Typography variant="body2">{t.cmsBuilder.empty}</Typography>
                 ) : (
                   tree.map(renderNode)
                 )}
               </div>
-              <button
+              <Button
                 type="button"
+                size="sm"
+                variant="ghost"
                 className="bifrost-cms-preview-resize"
                 aria-label={t.cmsBuilder.viewportLabel}
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  const startX = event.clientX;
-                  const startWidth =
-                    previewWidth || event.currentTarget.parentElement?.clientWidth || BUILDER_PREVIEW_MIN_WIDTH_PX;
-                  const onMove = (moveEvent: globalThis.MouseEvent) => {
-                    setPreviewWidth(
-                      Math.max(BUILDER_PREVIEW_MIN_WIDTH_PX, startWidth + moveEvent.clientX - startX),
-                    );
-                  };
-                  const onUp = () => {
-                    window.removeEventListener('mousemove', onMove);
-                    window.removeEventListener('mouseup', onUp);
-                  };
-                  window.addEventListener('mousemove', onMove);
-                  window.addEventListener('mouseup', onUp);
-                }}
+                onMouseDown={onPreviewResizeStart}
               />
               </div>
-              {saved ? (
-                <Typography variant="caption" className="bifrost-cms-save-ok mb-0">
+              <Flex direction="column" gap={2} className="bifrost-cms-builder__sandbox">
+                <Typography variant="h5">{t.cmsBuilder.sandboxTitle}</Typography>
+                {aiFailed && <Alert severity="error">{t.cmsBuilder.generateFailed}</Alert>}
+                {renderCodePanel()}
+              </Flex>
+              {saved && (
+                <Typography variant="caption" className="bifrost-cms-save-ok">
                   {t.cmsBuilder.saved}
                 </Typography>
-              ) : null}
+              )}
             </Card>
             <div className="bifrost-cms-builder__pane bifrost-cms-builder__pane--inspector">
-            <button
+            <Button
               type="button"
+              size="sm"
+              variant="ghost"
               className="bifrost-cms-panel-resize"
               aria-label={t.cmsBuilder.inspector}
               onMouseDown={onInspectorResize}
             />
             <Card padding="md" className="bifrost-cms-builder__inspector">
-              <Typography variant="h4" className="mb-2">
+              <Flex direction="column" gap={3}>
+              <Typography variant="h4">
                 {t.cmsBuilder.inspector}
               </Typography>
               <Tabs
@@ -555,10 +805,12 @@ export const BuilderPages: FC = () => {
                 variant="line"
                 onChange={(tabId) => setInspectorTab(tabId as BuilderInspectorTab)}
               >
-                <TabList className="mb-3">
-                  <Tab id={BUILDER_INSPECTOR_TAB.CONTENT}>{t.cmsBuilder.inspectorContent}</Tab>
-                  <Tab id={BUILDER_INSPECTOR_TAB.STYLE}>{t.cmsBuilder.inspectorStyle}</Tab>
-                  <Tab id={BUILDER_INSPECTOR_TAB.CODE}>{t.cmsBuilder.inspectorCode}</Tab>
+                <TabList>
+                  {inspectorTabs.map((tab) => (
+                    <Tab key={tab.id} id={tab.id}>
+                      {tab.label}
+                    </Tab>
+                  ))}
                 </TabList>
                 <TabPanel tabId={BUILDER_INSPECTOR_TAB.CONTENT}>
                   {selected ? (
@@ -570,163 +822,130 @@ export const BuilderPages: FC = () => {
                           apply(updateNodeLabel(tree, selected.id, event.target.value))
                         }
                       />
-                      {selected.html !== undefined && selected.kind !== CANVAS_KIND.INK ? (
-                        <Input
-                          label={t.cmsBuilder.inspectorHtml}
-                          value={selected.html}
-                          onChange={(event) =>
-                            apply(updateNodeHtml(tree, selected.id, event.target.value))
-                          }
+                      {selected.html !== undefined && selected.kind !== CANVAS_KIND.INK && (
+                        <Select
+                          label={t.cmsBuilder.inspectorI18nKey}
+                          options={keyOptions}
+                          value={readI18nKey(selected.html || BUILDER_STYLE_EMPTY)}
+                          onChange={onI18nKeyChange}
+                          size="sm"
+                          fullWidth
                         />
-                      ) : null}
-                      <Typography variant="caption" className="bifrost-cms-builder__group mb-0 block">
-                        {t.cmsBuilder.aiLive}
-                      </Typography>
-                      <div className="bifrost-cms-ai-hints">
-                      {AI_STYLE_SUGGESTIONS.map((hint) => (
-                        <button
-                          key={hint.id}
-                          type="button"
-                          className="bifrost-cms-ai-hint"
-                          onClick={() =>
-                            apply(
-                              updateNodeStyles(tree, selected.id, {
-                                ...selectedStyles,
-                                ...hint.styles,
-                              }),
-                            )
+                      )}
+                      <Input
+                        label={t.cmsBuilder.createI18nKey}
+                        value={i18nKeyDraft}
+                        onChange={(event) => setI18nKeyDraft(event.target.value)}
+                      />
+                      <Input
+                        label={t.cmsBuilder.createI18nValue}
+                        value={i18nValueDraft}
+                        onChange={(event) => setI18nValueDraft(event.target.value)}
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={!i18nKeyDraft.trim()}
+                        onClick={() => {
+                          createKey(i18nKeyDraft, i18nValueDraft);
+                          if (selected.html !== undefined) {
+                            onI18nKeyChange(i18nKeyDraft.trim());
                           }
-                        >
-                          <BearIcons.StarIcon size={CMS_ICON_SIZE} />
-                          {t.cmsBuilder.aiHints[hint.id]}
-                        </button>
-                      ))}
-                      </div>
-                      <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                        {selected.kind}
-                      </Typography>
+                          setI18nKeyDraft(EMPTY_STRING);
+                          setI18nValueDraft(EMPTY_STRING);
+                        }}
+                      >
+                        {t.cmsBuilder.createI18nAction}
+                      </Button>
+                      {htmlHasImg(selected.html) && (
+                        <BuilderImageFields
+                          fields={imageFields}
+                          uploadLabel={t.cmsBuilder.imageUpload}
+                          onChangeField={onImageFieldChange}
+                          onUpload={onImageUpload}
+                        />
+                      )}
+                      {selected.html !== undefined &&
+                        selected.kind !== CANVAS_KIND.INK &&
+                        !htmlHasImg(selected.html) && (
+                          <Input
+                            label={t.cmsBuilder.inspectorHtml}
+                            value={selected.html}
+                            onChange={(event) =>
+                              apply(updateNodeHtml(tree, selected.id, event.target.value))
+                            }
+                          />
+                        )}
+                      <Typography variant="caption">{selected.kind}</Typography>
                     </Flex>
                   ) : (
-                    <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                      {t.cmsBuilder.inspectorEmpty}
-                    </Typography>
+                    renderInspectorEmpty()
                   )}
                 </TabPanel>
                 <TabPanel tabId={BUILDER_INSPECTOR_TAB.STYLE}>
                   {selected ? (
-                    <Flex direction="column" gap={2}>
-                      {STYLE_FIELD_KEYS.map((key) => (
-                        <Input
-                          key={key}
-                          label={t.cmsBuilder.styleFields[key]}
-                          value={selectedStyles[key]}
-                          onChange={(event) =>
-                            apply(
-                              updateNodeStyles(tree, selected.id, {
-                                ...selectedStyles,
-                                [key]: event.target.value,
-                              }),
-                            )
-                          }
-                        />
-                      ))}
-                    </Flex>
+                    <BuilderInspectorStyle
+                      selectedStyles={selectedStyles}
+                      backgroundLabel={t.cmsBuilder.inspectorBackground}
+                      paletteLabel={t.cmsBuilder.inspectorPalette}
+                      gradientLabel={t.cmsBuilder.inspectorGradient}
+                      radiusLabel={t.cmsBuilder.inspectorRadius}
+                      radiusNone={t.cmsBuilder.radiusNone}
+                      radiusMedium={t.cmsBuilder.radiusMedium}
+                      radiusFull={t.cmsBuilder.radiusFull}
+                      fieldWidthLabel={t.cmsBuilder.inspectorFieldWidth}
+                      fieldWidthHint={t.cmsBuilder.inspectorFieldWidthHint}
+                      suggestionsLabel={t.cmsBuilder.aiLive}
+                      suggestionLabels={{ ...t.cmsBuilder.aiHints }}
+                      swatchLabels={{
+                        paper: t.cmsBuilder.swatchPaper,
+                        ink: t.cmsBuilder.swatchInk,
+                        canvas: t.cmsBuilder.swatchCanvas,
+                      }}
+                      styleFieldLabels={{ ...t.cmsBuilder.styleFields }}
+                      onBackground={applyBackground}
+                      onRadius={applyRadius}
+                      onWidth={applyWidth}
+                      onStyleField={applyStyleField}
+                      onHint={applyHint}
+                    />
                   ) : (
-                    <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                      {t.cmsBuilder.inspectorEmpty}
-                    </Typography>
+                    renderInspectorEmpty()
                   )}
                 </TabPanel>
                 <TabPanel tabId={BUILDER_INSPECTOR_TAB.CODE}>
-                  <Flex direction="column" gap={2}>
-                    {selected ? (
-                      <>
-                        {selected.html !== undefined && selected.kind !== CANVAS_KIND.INK ? (
-                          <BuilderCodeField
-                            label={t.cmsBuilder.inspectorHtml}
-                            value={selected.html}
-                            language="html"
-                            onChange={(value) => apply(updateNodeHtml(tree, selected.id, value))}
-                          />
-                        ) : null}
-                        <BuilderCodeField
-                          label={t.cmsBuilder.inspectorCss}
-                          value={selected.css || BUILDER_STYLE_EMPTY}
-                          language="css"
-                          onChange={(value) => apply(updateNodeCss(tree, selected.id, value))}
-                        />
-                        <BuilderCodeField
-                          label={t.cmsBuilder.inspectorJs}
-                          value={selected.js || BUILDER_STYLE_EMPTY}
-                          language="javascript"
-                          onChange={(value) => apply(updateNodeJs(tree, selected.id, value))}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <BuilderCodeField
-                          label={t.cmsBuilder.pageCss}
-                          value={pageCode.css}
-                          language="css"
-                          onChange={(value) => {
-                            setPageCode({ ...pageCode, css: value });
-                            setSaved(false);
-                          }}
-                        />
-                        <BuilderCodeField
-                          label={t.cmsBuilder.pageJs}
-                          value={pageCode.js}
-                          language="javascript"
-                          onChange={(value) => {
-                            setPageCode({ ...pageCode, js: value });
-                            setSaved(false);
-                          }}
-                        />
-                      </>
-                    )}
-                  </Flex>
+                  <Typography variant="caption">{t.cmsBuilder.inspectorAdvancedHint}</Typography>
                 </TabPanel>
               </Tabs>
+              </Flex>
             </Card>
             </div>
           </div>
+        ) : (
+          renderLocked()
         )}
-        {menu && menu.nodeId ? (
+        {menu && menu.nodeId && (
           <CanvasContextMenu
             x={menu.x}
             y={menu.y}
             title={selected?.id === menu.nodeId ? selected.label : t.cmsBuilder.canvas}
             canPasteStyles={canPasteStyles}
-            labels={{
-              edit: t.cmsBuilder.menuEditContent,
-              duplicate: t.cmsBuilder.menuDuplicate,
-              moveUp: t.cmsBuilder.menuMoveUp,
-              moveDown: t.cmsBuilder.menuMoveDown,
-              copyStyles: t.cmsBuilder.menuCopyStyles,
-              pasteStyles: t.cmsBuilder.menuPasteStyles,
-              saveReusable: t.cmsBuilder.menuSaveReusable,
-              remove: t.cmsBuilder.menuDelete,
-              kbdEdit: t.cmsBuilder.menuKbdEdit,
-              kbdDuplicate: t.cmsBuilder.menuKbdDuplicate,
-              kbdUp: t.cmsBuilder.menuKbdUp,
-              kbdDown: t.cmsBuilder.menuKbdDown,
-              kbdCopy: t.cmsBuilder.menuKbdCopy,
-              kbdDelete: t.cmsBuilder.menuKbdDelete,
-            }}
+            labels={contextMenuLabels}
             onAction={runMenu}
           />
-        ) : null}
-        {menu && !menu.nodeId ? (
-          <div
+        )}
+        {menu && !menu.nodeId && (
+          <Flex
+            direction="column"
             className="bifrost-cms-canvas-menu"
-            style={{ left: menu.x, top: menu.y }}
+            style={canvasMenuVars(menu.x, menu.y)}
             onClick={(event) => event.stopPropagation()}
           >
-            <button type="button" onClick={() => addLayout(CANVAS_KIND.SECTION)}>
+            <Button type="button" size="sm" variant="ghost" onClick={onAddBlankSection}>
               {t.cmsBuilder.menuAddSection}
-            </button>
-          </div>
-        ) : null}
+            </Button>
+          </Flex>
+        )}
       </Flex>
     </CmsShell>
   );

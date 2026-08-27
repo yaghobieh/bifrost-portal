@@ -187,6 +187,8 @@ export const SETTINGS_MCP_TOOL_SUFFIXES = [
   'cms_create_form',
   'cms_delete_page',
   'cms_list_tables',
+  'cms_marketing_generate',
+  'cms_marketing_apply',
 ] as const;
 
 export const SETTINGS_SITE_SLUG_FALLBACK = 'bifrost';

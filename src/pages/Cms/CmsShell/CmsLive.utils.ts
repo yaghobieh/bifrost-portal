@@ -11,8 +11,12 @@ import {
   CMS_LIVE_TOKEN_QUERY,
   CMS_LIVE_TYPE_PRESENCE_PING,
   CMS_LIVE_WS_PROTOCOL,
+  CMS_PRESENCE_NOT_THERE,
+  CMS_PRESENCE_ONLINE,
+  CMS_PRESENCE_STATUSES,
+  CMS_PRESENCE_STORAGE_KEY,
 } from './CmsLive.const';
-import type { CmsChatMessage, CmsChatRoom, CmsLiveHealth, CmsPresenceUser } from './CmsLive.types';
+import type { CmsChatMessage, CmsChatRoom, CmsLiveHealth, CmsPresenceStatus, CmsPresenceUser } from './CmsLive.types';
 
 export const cmsApiOrigin = (): string => {
   if (INK_API_URL) {
@@ -130,8 +134,12 @@ export const currentLiveLocation = (): { location: string; locationLabel: string
   return { location, locationLabel: parts[parts.length - 1] };
 };
 
-export const presencePingBody = (params: { name: string; avatar: string }): string => {
-  const { name, avatar } = params;
+export const presencePingBody = (params: {
+  name: string;
+  avatar: string;
+  availability: CmsPresenceStatus;
+}): string => {
+  const { name, avatar, availability } = params;
   const { location, locationLabel } = currentLiveLocation();
   return JSON.stringify({
     type: CMS_LIVE_TYPE_PRESENCE_PING,
@@ -139,8 +147,35 @@ export const presencePingBody = (params: { name: string; avatar: string }): stri
     locationLabel,
     name,
     avatar,
+    availability,
   });
 };
+
+export const readPresenceStatus = (value: unknown): CmsPresenceStatus => {
+  if (typeof value === 'string' && (CMS_PRESENCE_STATUSES as readonly string[]).includes(value)) {
+    return value as CmsPresenceStatus;
+  }
+  return CMS_PRESENCE_ONLINE;
+};
+
+export const loadStoredAvailability = (): CmsPresenceStatus => {
+  try {
+    return readPresenceStatus(window.localStorage.getItem(CMS_PRESENCE_STORAGE_KEY));
+  } catch {
+    return CMS_PRESENCE_ONLINE;
+  }
+};
+
+export const saveStoredAvailability = (status: CmsPresenceStatus): void => {
+  try {
+    window.localStorage.setItem(CMS_PRESENCE_STORAGE_KEY, status);
+  } catch {
+    return;
+  }
+};
+
+export const isChatPresent = (user: CmsPresenceUser): boolean =>
+  user.availability !== CMS_PRESENCE_NOT_THERE;
 
 export const resolvePresenceUsers = (value: unknown): CmsPresenceUser[] => {
   if (!Array.isArray(value)) {
@@ -161,6 +196,7 @@ export const resolvePresenceUsers = (value: unknown): CmsPresenceUser[] => {
       avatar: readString(row.avatar),
       location: readString(row.location),
       locationLabel: readString(row.locationLabel),
+      availability: readPresenceStatus(row.availability),
     });
   });
   return users;

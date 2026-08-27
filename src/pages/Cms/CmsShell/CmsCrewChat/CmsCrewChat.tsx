@@ -49,6 +49,8 @@ export const CmsCrewChat: FC<CmsCrewChatProps> = (props) => {
     color,
     roomSoundOn,
     onToggleRoomSound,
+    availability,
+    onAvailability,
   } = props;
   const { t } = useI18n();
   const [body, setBody] = useState(EMPTY_STRING);
@@ -134,6 +136,12 @@ export const CmsCrewChat: FC<CmsCrewChatProps> = (props) => {
           emptyPreview={t.cmsShell.crewEmpty}
           onlineLabel={t.cmsShell.online}
           offlineLabel={t.cmsShell.offline}
+          statusOnlineLabel={t.cmsShell.statusOnline}
+          statusAwayLabel={t.cmsShell.statusAway}
+          statusBusyLabel={t.cmsShell.statusBusy}
+          statusNotThereLabel={t.cmsShell.statusNotThere}
+          availability={availability}
+          onAvailability={onAvailability}
           onJump={setJumpQuery}
           onToggleNewRoom={() => {
             setNewRoomOpen((open) => !open);

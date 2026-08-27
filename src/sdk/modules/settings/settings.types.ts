@@ -1,4 +1,4 @@
-export type SettingsKvKey = 'site' | 'plugins' | 'external-plugins';
+export type SettingsKvKey = 'site' | 'plugins' | 'external-plugins' | 'translations';
 
 export type SettingsValueResponse = {
   key: SettingsKvKey;

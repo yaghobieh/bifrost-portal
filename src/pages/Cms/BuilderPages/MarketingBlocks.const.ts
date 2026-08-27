@@ -1,11 +1,17 @@
-export const MARKETING_BLUE = '#2951C4';
-export const MARKETING_VIOLET = '#8A3FD4';
-export const MARKETING_PINK = '#EA0A8E';
-export const MARKETING_WHITE = '#ffffff';
-export const MARKETING_INK = '#14161C';
-export const MARKETING_MUTED = '#5B5F6A';
-export const MARKETING_CANVAS = '#F5F6FA';
-export const MARKETING_GRADIENT = `linear-gradient(90deg,${MARKETING_BLUE},${MARKETING_VIOLET},${MARKETING_PINK})`;
+import { HERO_IMG_SRC } from '@const/strings.const';
+import { NUMBER_EIGHT_HUNDRED } from '@const/numbers.const';
+import { BEAR_IMAGE_ALT, IMAGE_LOADING_LAZY } from './BearPalette.const';
+
+export const MARKETING_BLUE = 'var(--bifrost-cms-blue)';
+export const MARKETING_VIOLET = 'var(--bifrost-cms-violet)';
+export const MARKETING_PINK = 'var(--bifrost-cms-pink)';
+export const MARKETING_WHITE = 'var(--bifrost-cms-paper)';
+export const MARKETING_INK = 'var(--bifrost-cms-ink)';
+export const MARKETING_MUTED = 'var(--bifrost-cms-muted)';
+export const MARKETING_CANVAS = 'var(--bifrost-cms-canvas-fill)';
+export const MARKETING_SPACER_HEIGHT = '2rem';
+export const MARKETING_HEADING_SIZE = '2rem';
+export const MARKETING_GRADIENT = 'var(--bifrost-cms-gradient)';
 
 export const MARKETING_WIDGET_IDS = {
   HERO: 'mkt-hero',
@@ -22,15 +28,26 @@ export const MARKETING_WIDGET_IDS = {
   CTA_BAND: 'mkt-cta-band',
   GRADIENT_BUTTON: 'mkt-gradient-button',
   FOOTER: 'mkt-footer',
+  IMAGE: 'mkt-image',
+  HEADING: 'mkt-heading',
+  SPACER: 'mkt-spacer',
 } as const;
 
 export const MARKETING_WIDGET_GROUP = {
+  BASIC: 'basic',
   HERO: 'hero',
   AUTH: 'auth',
   CONTENT: 'content',
   CONVERSION: 'conversion',
   FOOTER: 'footer',
 } as const;
+
+export const MARKETING_GLOBAL_COLORS = [
+  { id: 'bridge-blue', value: MARKETING_BLUE },
+  { id: 'bridge-violet', value: MARKETING_VIOLET },
+  { id: 'bridge-pink', value: MARKETING_PINK },
+  { id: 'ink', value: MARKETING_INK },
+] as const;
 
 export type MarketingWidgetId =
   (typeof MARKETING_WIDGET_IDS)[keyof typeof MARKETING_WIDGET_IDS];
@@ -46,6 +63,7 @@ export type MarketingWidgetDef = {
 };
 
 export const MARKETING_WIDGET_GROUPS: readonly MarketingWidgetGroupId[] = [
+  MARKETING_WIDGET_GROUP.BASIC,
   MARKETING_WIDGET_GROUP.HERO,
   MARKETING_WIDGET_GROUP.AUTH,
   MARKETING_WIDGET_GROUP.CONTENT,
@@ -54,6 +72,24 @@ export const MARKETING_WIDGET_GROUPS: readonly MarketingWidgetGroupId[] = [
 ];
 
 export const MARKETING_WIDGETS: readonly MarketingWidgetDef[] = [
+  {
+    id: MARKETING_WIDGET_IDS.HEADING,
+    group: MARKETING_WIDGET_GROUP.BASIC,
+    label: 'Heading',
+    html: `<h1 data-i18n-key="marketing.heading" style="margin:0;color:${MARKETING_INK};font-size:${MARKETING_HEADING_SIZE}">Heading</h1>`,
+  },
+  {
+    id: MARKETING_WIDGET_IDS.IMAGE,
+    group: MARKETING_WIDGET_GROUP.BASIC,
+    label: 'Image',
+    html: `<img src="${HERO_IMG_SRC}" alt="${BEAR_IMAGE_ALT}" width="${NUMBER_EIGHT_HUNDRED}" loading="${IMAGE_LOADING_LAZY}" />`,
+  },
+  {
+    id: MARKETING_WIDGET_IDS.SPACER,
+    group: MARKETING_WIDGET_GROUP.BASIC,
+    label: 'Spacer',
+    html: `<div style="height:${MARKETING_SPACER_HEIGHT}" aria-hidden="true"></div>`,
+  },
   {
     id: MARKETING_WIDGET_IDS.HERO,
     group: MARKETING_WIDGET_GROUP.HERO,

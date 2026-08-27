@@ -14,10 +14,13 @@ import {
   CMS_BUILDER_PALETTE_MIN_PX,
   CMS_BUILDER_PALETTE_WIDTH_KEY,
   CMS_BUILDER_PALETTE_WIDTH_PX,
+  DRAG_NODE_MIME,
   DRAG_WIDGET_MIME,
   ROUTES,
   cmsBuilderPath,
 } from '@const/index';
+import { NUMBER_FOUR, NUMBER_THREE, NUMBER_TWO, NUMBER_ZERO } from '@const/numbers.const';
+import { EMPTY_STRING } from '@const/strings.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
 import { loadStoredWidth, saveStoredWidth, startHorizontalResize } from '../../CmsShell';
@@ -35,10 +38,8 @@ import {
 } from '../../TemplatesPages/TemplatesPages.const';
 import {
   BUILDER_DRAG_EFFECT_COPY,
-  BUILDER_INSPECTOR_NONE,
   BUILDER_INSPECTOR_TAB,
   BUILDER_MENU_ACTION,
-  BUILDER_MENU_OFFSET_PX,
   BUILDER_MOVE_BACK,
   BUILDER_MOVE_FORWARD,
   BUILDER_STAGE_TAB,
@@ -49,7 +50,8 @@ import {
   LAYOUT_BLOCKS,
   LAYOUT_MIME,
 } from '../BuilderPages.const';
-import { MARKETING_WIDGET_GROUPS, MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
+import { BEAR_PALETTE, BEAR_PALETTE_GROUPS } from '../BearPalette.const';
+import { MARKETING_GLOBAL_COLORS, MARKETING_WIDGET_GROUPS, MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
 import type {
   BuilderInspectorTab,
   BuilderStageTab,
@@ -72,10 +74,13 @@ import {
   findNode,
   flattenLayers,
   insertNode,
+  insertNodeAfter,
   isContainerKind,
   layoutBlockLabel,
   loadBuilderTree,
   moveNode,
+  relocateNode,
+  relocateNodeAfter,
   removeNode,
   saveBuilderTree,
   updateNodeStyles,
@@ -93,13 +98,13 @@ export const useBuilderPages = () => {
   const activeToken = token || providerToken;
   const installed = true;
   const [tree, setTree] = useState<CanvasNode[]>(() => loadBuilderTree());
-  const [selectedId, setSelectedId] = useState(BUILDER_INSPECTOR_NONE);
-  const [dropParentId, setDropParentId] = useState(BUILDER_INSPECTOR_NONE);
+  const [selectedId, setSelectedId] = useState(EMPTY_STRING);
+  const [dropParentId, setDropParentId] = useState(EMPTY_STRING);
   const [menu, setMenu] = useState<CanvasMenuState | null>(null);
   const styleClipboardRef = useRef<CanvasNodeStyles | null>(null);
   const [canPasteStyles, setCanPasteStyles] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [targetId, setTargetId] = useState(BUILDER_INSPECTOR_NONE);
+  const [targetId, setTargetId] = useState(EMPTY_STRING);
   const [viewport, setViewport] = useState<BuilderViewport>(BUILDER_VIEWPORT.DESKTOP);
   const [preview, setPreview] = useState(false);
   const [inspectorTab, setInspectorTab] = useState<BuilderInspectorTab>(
@@ -108,8 +113,10 @@ export const useBuilderPages = () => {
   const [pageCode, setPageCode] = useState<PageCode>({
     css: BUILDER_STYLE_EMPTY,
     js: BUILDER_STYLE_EMPTY,
+    scripts: [],
   });
   const [customWidgets, setCustomWidgets] = useState(() => loadCustomWidgets());
+  const [libraryQuery, setLibraryQuery] = useState(BUILDER_STYLE_EMPTY);
   const [customLabel, setCustomLabel] = useState(BUILDER_STYLE_EMPTY);
   const [customHtml, setCustomHtml] = useState(BUILDER_STYLE_EMPTY);
   const [previewWidth, setPreviewWidth] = useState(0);
@@ -139,13 +146,13 @@ export const useBuilderPages = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const docId = params.get(BUILDER_QUERY_DOC) || BUILDER_INSPECTOR_NONE;
+    const docId = params.get(BUILDER_QUERY_DOC) || EMPTY_STRING;
     const layoutId = params.get(BUILDER_QUERY_LAYOUT);
     if (layoutId) {
       const layout = PAGE_LAYOUT_TEMPLATES.find((item) => item.id === layoutId);
       if (layout) {
         setTree(cloneCanvasTree(layout.tree));
-        setTargetId(BUILDER_INSPECTOR_NONE);
+        setTargetId(EMPTY_STRING);
         setSaved(false);
       }
       return;
@@ -172,7 +179,7 @@ export const useBuilderPages = () => {
       item.collection === CONTENT_COLLECTION_DOCS,
   );
   const targetOptions = [
-    { value: BUILDER_INSPECTOR_NONE, label: t.cmsBuilder.scratch },
+    { value: EMPTY_STRING, label: t.cmsBuilder.scratch },
     ...editableItems.map((item) => ({
       value: item.id,
       label: `${item.title || item.slug} (${item.collection})`,
@@ -217,23 +224,50 @@ export const useBuilderPages = () => {
     event.dataTransfer.effectAllowed = BUILDER_DRAG_EFFECT_COPY;
   };
 
-  const acceptDrop = (event: DragEvent<HTMLElement>, parentId?: string) => {
+  const onDragStartNode = (event: DragEvent<HTMLElement>, nodeId: string) => {
+    event.dataTransfer.setData(DRAG_NODE_MIME, nodeId);
+    event.dataTransfer.effectAllowed = BUILDER_DRAG_EFFECT_COPY;
+  };
+
+  const acceptDrop = (event: DragEvent<HTMLElement>, parentId?: string, afterId?: string) => {
     event.preventDefault();
     event.stopPropagation();
+    const movedId = event.dataTransfer.getData(DRAG_NODE_MIME);
+    if (movedId) {
+      if (afterId) {
+        apply(relocateNodeAfter(tree, movedId, afterId));
+      } else {
+        apply(relocateNode(tree, movedId, parentId));
+      }
+      setSelectedId(movedId);
+      return;
+    }
     const layoutKind = event.dataTransfer.getData(LAYOUT_MIME) as CanvasKind;
     if (layoutKind) {
       const block = LAYOUT_BLOCKS.find((item) => item.id === layoutKind);
-      if (!block) return;
+      if (!block) {
+        return;
+      }
       const node = createLayoutNode(layoutKind, block.label);
-      apply(insertNode(tree, node, parentId));
+      if (afterId) {
+        apply(insertNodeAfter(tree, node, afterId));
+      } else {
+        apply(insertNode(tree, node, parentId));
+      }
       setSelectedId(node.id);
       return;
     }
     const widgetId = event.dataTransfer.getData(DRAG_WIDGET_MIME);
     if (widgetId) {
       const node = createWidgetNode(widgetId);
-      if (!node) return;
-      apply(insertNode(tree, node, parentId));
+      if (!node) {
+        return;
+      }
+      if (afterId) {
+        apply(insertNodeAfter(tree, node, afterId));
+      } else {
+        apply(insertNode(tree, node, parentId));
+      }
       setSelectedId(node.id);
     }
   };
@@ -244,8 +278,8 @@ export const useBuilderPages = () => {
     setSelectedId(nodeId);
     setMenu({
       nodeId,
-      x: event.clientX + BUILDER_MENU_OFFSET_PX,
-      y: event.clientY + BUILDER_MENU_OFFSET_PX,
+      x: event.clientX + NUMBER_FOUR,
+      y: event.clientY + NUMBER_FOUR,
     });
   };
 
@@ -254,7 +288,7 @@ export const useBuilderPages = () => {
     if (action === BUILDER_MENU_ACTION.DUPLICATE) apply(duplicateNode(tree, menu.nodeId));
     if (action === BUILDER_MENU_ACTION.DELETE) {
       apply(removeNode(tree, menu.nodeId));
-      setSelectedId(BUILDER_INSPECTOR_NONE);
+      setSelectedId(EMPTY_STRING);
     }
     if (action === BUILDER_MENU_ACTION.WRAP_FLEX) {
       apply(wrapNode(tree, menu.nodeId, CANVAS_KIND.FLEX, layoutBlockLabel(CANVAS_KIND.FLEX)));
@@ -273,6 +307,17 @@ export const useBuilderPages = () => {
     if (action === BUILDER_MENU_ACTION.EDIT_CONTENT) {
       setSelectedId(menu.nodeId);
       setInspectorTab(BUILDER_INSPECTOR_TAB.CONTENT);
+      setStageTab(BUILDER_STAGE_TAB.CANVAS);
+    }
+    if (action === BUILDER_MENU_ACTION.INSPECT_PROPS) {
+      setSelectedId(menu.nodeId);
+      setInspectorTab(BUILDER_INSPECTOR_TAB.CONTENT);
+      setStageTab(BUILDER_STAGE_TAB.CANVAS);
+    }
+    if (action === BUILDER_MENU_ACTION.INSPECT_STYLE) {
+      setSelectedId(menu.nodeId);
+      setInspectorTab(BUILDER_INSPECTOR_TAB.STYLE);
+      setStageTab(BUILDER_STAGE_TAB.CANVAS);
     }
     if (action === BUILDER_MENU_ACTION.COPY_STYLES) {
       const node = findNode(tree, menu.nodeId);
@@ -397,8 +442,12 @@ export const useBuilderPages = () => {
     ...EMPTY_NODE_STYLES,
     ...(selected?.styles ?? {}),
   };
+  const query = libraryQuery.trim().toLowerCase();
+  const matchQuery = (label: string) => !query || label.toLowerCase().includes(query);
   const catalog = [...BEAR_WIDGET_CATALOG, ...customWidgets];
-  const contentWidgets = catalog.filter((widget) => widget.id !== CAST_WIDGET_ID);
+  const contentWidgets = catalog.filter(
+    (widget) => widget.id !== CAST_WIDGET_ID && matchQuery(widget.label),
+  );
   const formWidgets = BEAR_WIDGET_CATALOG.filter((widget) => widget.id === CAST_WIDGET_ID);
   const marketingLabels: Record<string, string> = {
     [MARKETING_WIDGET_IDS.HERO]: t.cmsBuilder.marketingHero,
@@ -415,12 +464,16 @@ export const useBuilderPages = () => {
     [MARKETING_WIDGET_IDS.CTA_BAND]: t.cmsBuilder.marketingCtaBand,
     [MARKETING_WIDGET_IDS.GRADIENT_BUTTON]: t.cmsBuilder.marketingGradientButton,
     [MARKETING_WIDGET_IDS.FOOTER]: t.cmsBuilder.marketingFooter,
+    [MARKETING_WIDGET_IDS.IMAGE]: t.cmsBuilder.marketingImage,
+    [MARKETING_WIDGET_IDS.HEADING]: t.cmsBuilder.marketingHeading,
+    [MARKETING_WIDGET_IDS.SPACER]: t.cmsBuilder.marketingSpacer,
   };
   const marketingWidgets = MARKETING_WIDGETS.map((widget) => ({
     ...widget,
     label: marketingLabels[widget.id] || widget.label,
   }));
   const marketingGroupLabels: Record<string, string> = {
+    basic: t.cmsBuilder.paletteGroupBasic,
     hero: t.cmsBuilder.paletteGroupHero,
     auth: t.cmsBuilder.paletteGroupAuth,
     content: t.cmsBuilder.paletteGroupMktContent,
@@ -430,9 +483,57 @@ export const useBuilderPages = () => {
   const marketingGroups = MARKETING_WIDGET_GROUPS.map((group) => ({
     id: group,
     label: marketingGroupLabels[group],
-    widgets: marketingWidgets.filter((widget) => widget.group === group),
-  }));
+    widgets: marketingWidgets.filter((widget) => widget.group === group && matchQuery(widget.label)),
+  })).filter((group) => group.widgets.length > NUMBER_ZERO);
+  const bearGroupLabels: Record<string, string> = {
+    basic: t.cmsBuilder.paletteGroupBasic,
+    layout: t.cmsBuilder.paletteGroupLayout,
+    media: t.cmsBuilder.paletteGroupMedia,
+    form: t.cmsBuilder.paletteGroupForm,
+    feedback: t.cmsBuilder.paletteGroupFeedback,
+    overlay: t.cmsBuilder.paletteGroupOverlay,
+    general: t.cmsBuilder.paletteGroupGeneral,
+  };
+  const bearGroups = BEAR_PALETTE_GROUPS.map((group) => ({
+    id: group,
+    label: bearGroupLabels[group],
+    widgets: BEAR_PALETTE.filter((widget) => widget.group === group && matchQuery(widget.label)),
+  })).filter((group) => group.widgets.length > NUMBER_ZERO);
   const layers = flattenLayers(tree);
+  const onClearSelection = () => {
+    setSelectedId(EMPTY_STRING);
+  };
+  const onClearStage = () => {
+    setSelectedId(EMPTY_STRING);
+    setDropParentId(EMPTY_STRING);
+    setMenu(null);
+  };
+  const onStageContextMenu = (event: MouseEvent) => {
+    event.preventDefault();
+    setMenu({
+      nodeId: EMPTY_STRING,
+      x: event.clientX + NUMBER_FOUR,
+      y: event.clientY + NUMBER_FOUR,
+    });
+  };
+  const onStageDragOver = (event: DragEvent) => {
+    event.preventDefault();
+  };
+  const onViewportDesktop = () => {
+    setViewport(BUILDER_VIEWPORT.DESKTOP);
+    setPreview(false);
+  };
+  const onViewportTablet = () => {
+    setViewport(BUILDER_VIEWPORT.TABLET);
+    setPreview(false);
+  };
+  const onViewportMobile = () => {
+    setViewport(BUILDER_VIEWPORT.MOBILE);
+    setPreview(false);
+  };
+  const onTogglePreview = () => {
+    setPreview((current) => !current);
+  };
 
   return {
     t,
@@ -451,12 +552,22 @@ export const useBuilderPages = () => {
     setViewport,
     preview,
     setPreview,
+    onClearSelection,
+    onClearStage,
+    onStageContextMenu,
+    onStageDragOver,
+    onViewportDesktop,
+    onViewportTablet,
+    onViewportMobile,
+    onTogglePreview,
     inspectorTab,
     setInspectorTab,
     pageCode,
     setPageCode,
     customLabel,
     setCustomLabel,
+    libraryQuery,
+    setLibraryQuery,
     customHtml,
     setCustomHtml,
     previewWidth,
@@ -471,6 +582,7 @@ export const useBuilderPages = () => {
     formWidgets,
     marketingWidgets,
     marketingGroups,
+    bearGroups,
     canPasteStyles,
     layers,
     apply,
@@ -480,6 +592,7 @@ export const useBuilderPages = () => {
     addCustomWidget,
     onDragStartWidget,
     onDragStartLayout,
+    onDragStartNode,
     acceptDrop,
     onContextMenu,
     runMenu,

@@ -4,3 +4,10 @@ import type { CmsMeeting } from '@sdk/modules/cms';
 export type CalendarPageEvent = CalendarEvent;
 export type CalendarPagePerson = CalendarPerson;
 export type CalendarMeeting = CmsMeeting;
+
+export type MeetingRow = {
+  id: string;
+  title: string;
+  start: string;
+  people: number;
+};

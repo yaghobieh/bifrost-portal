@@ -1,4 +1,5 @@
 import { EMPTY_STRING } from '@const/index';
+import { CMS_PRESENCE_NOT_THERE } from '@pages/Cms/CmsShell/CmsLive.const';
 import type { CmsPresenceUser } from '@pages/Cms/CmsShell/CmsLive.types';
 
 const matchesLocation = (person: CmsPresenceUser, location: string): boolean => {
@@ -24,6 +25,9 @@ export const usersAtLocation = (params: {
     if (person.id === currentUserId) {
       return false;
     }
+    if (person.availability === CMS_PRESENCE_NOT_THERE) {
+      return false;
+    }
     return matchesLocation(person, location);
   });
 };
@@ -36,7 +40,9 @@ export const locationOwner = (params: {
   if (!location) {
     return null;
   }
-  const owner = users.find((person) => matchesLocation(person, location));
+  const owner = users.find(
+    (person) => person.availability !== CMS_PRESENCE_NOT_THERE && matchesLocation(person, location),
+  );
   if (!owner) {
     return null;
   }

@@ -1,141 +1,37 @@
-import { useEffect, useState, type FC, type FormEvent } from 'react';
-import { useNavigate } from '@forgedevstack/forge-compass/react';
-import { useNucleus } from '@forgedevstack/synapse';
-import { Alert, Button, Flex, Input, Typography } from '@forgedevstack/bear';
-import { useAuth } from '@hooks/index';
-import { AUTH_GITHUB_PATH, AUTH_GOOGLE_PATH } from '@hooks/auth.const';
-import type { GoogleAuthStartResponse } from '@hooks/auth.types';
-import { useI18n } from '@i18n/index';
-import { AUTH_OAUTH_TOKEN_PARAM, ROUTES } from '@const/index';
+import type { FC } from 'react';
+import { Alert, Button, Checkbox, Flex, Input, Typography } from '@forgedevstack/bear';
+import { GithubMark, GoogleMark } from '@icons';
+import { ROUTES } from '@const/index';
 import { SPACE_STRING } from '@const/generals.const';
-import { authNucleus } from '@sdk/index';
-import {
-  CMS_AUTH_MODE,
-  CMS_LOGIN_EMAIL_INITIAL,
-  CMS_LOGIN_NAME_INITIAL,
-  CMS_LOGIN_PASSWORD_INITIAL,
-  CMS_LOGIN_TERMS_UNCHECKED,
-  CMS_OAUTH_GITHUB,
-  CMS_OAUTH_GOOGLE,
-} from './CmsLogin.const';
-import { cmsLoginApiUrl, cmsLoginInitialPassword, cmsLoginInitialUsername } from './CmsLogin.utils';
-import { GithubMark, GoogleMark } from './CmsLogin.icons';
+import { CMS_AUTH_MODE, CMS_OAUTH_GITHUB, CMS_OAUTH_GOOGLE } from './CmsLogin.const';
 import { CmsLoginBrand } from './helpers/CmsLoginBrand';
+import { useCmsLogin } from './hooks';
 
 export const CmsLogin: FC = () => {
-  const { t } = useI18n();
-  const { navigate } = useNavigate();
-  const { setToken, setUserFromLogin, isAuthenticated } = useAuth();
-  const { login, register, loading, error, user } = useNucleus(authNucleus);
-  const [mode, setMode] = useState<(typeof CMS_AUTH_MODE)[keyof typeof CMS_AUTH_MODE]>(
-    CMS_AUTH_MODE.LOGIN,
-  );
-  const [username, setUsername] = useState(cmsLoginInitialUsername());
-  const [password, setPassword] = useState(cmsLoginInitialPassword());
-  const [firstName, setFirstName] = useState(CMS_LOGIN_NAME_INITIAL);
-  const [lastName, setLastName] = useState(CMS_LOGIN_NAME_INITIAL);
-  const [email, setEmail] = useState(CMS_LOGIN_EMAIL_INITIAL);
-  const [termsAccepted, setTermsAccepted] = useState(CMS_LOGIN_TERMS_UNCHECKED);
-  const [oauthError, setOauthError] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const oauthToken = params.get(AUTH_OAUTH_TOKEN_PARAM);
-    if (!oauthToken) {
-      return;
-    }
-    setToken(oauthToken);
-    params.delete(AUTH_OAUTH_TOKEN_PARAM);
-    const next = `${window.location.pathname}${params.toString() ? `?${params}` : ''}`;
-    window.history.replaceState({}, '', next);
-  }, [setToken]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(ROUTES.CMS, { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
-  const applySession = () => {
-    const state = authNucleus.get();
-    if (state.token) {
-      setToken(state.token);
-    }
-    if (state.user) {
-      setUserFromLogin({
-        id: state.user.id,
-        email: state.user.email,
-        name: state.user.name,
-        username: state.user.username,
-        plan: state.user.plan,
-        premium: state.user.premium,
-        role: state.user.role,
-      });
-    }
-    setPassword(CMS_LOGIN_PASSWORD_INITIAL);
-    navigate(ROUTES.CMS);
-  };
-
-  const onSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    if (mode === CMS_AUTH_MODE.REGISTER) {
-      if (!termsAccepted) {
-        return;
-      }
-      const name = `${firstName}${SPACE_STRING}${lastName}`.trim();
-      const ok = await register({
-        email,
-        name,
-        password,
-        username: username || undefined,
-      });
-      if (!ok) {
-        return;
-      }
-      applySession();
-      return;
-    }
-    const ok = await login(username, password);
-    if (!ok) {
-      return;
-    }
-    applySession();
-  };
-
-  const onOauth = async (provider: typeof CMS_OAUTH_GOOGLE | typeof CMS_OAUTH_GITHUB) => {
-    setOauthError(false);
-    const path = provider === CMS_OAUTH_GITHUB ? AUTH_GITHUB_PATH : AUTH_GOOGLE_PATH;
-    const url = cmsLoginApiUrl(path);
-    if (!url) {
-      setOauthError(true);
-      return;
-    }
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        setOauthError(true);
-        return;
-      }
-      const data = (await response.json()) as GoogleAuthStartResponse;
-      if (!data.url) {
-        setOauthError(true);
-        return;
-      }
-      window.location.href = data.url;
-    } catch {
-      setOauthError(true);
-    }
-  };
-
-  const isRegister = mode === CMS_AUTH_MODE.REGISTER;
-  const showError = Boolean(error || oauthError);
-  const errorText = isRegister ? t.login.registerError : t.login.error;
-  let submitLabel = t.login.signIn;
-  if (loading) {
-    submitLabel = isRegister ? t.login.registering : t.login.signingIn;
-  } else if (isRegister) {
-    submitLabel = t.login.signUp;
-  }
+  const {
+    t,
+    setMode,
+    username,
+    setUsername,
+    password,
+    setPassword,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
+    email,
+    setEmail,
+    termsAccepted,
+    setTermsAccepted,
+    loading,
+    user,
+    isRegister,
+    showError,
+    errorText,
+    submitLabel,
+    onSubmit,
+    onOauth,
+  } = useCmsLogin();
 
   return (
     <div className="bifrost-cms-login">
@@ -149,10 +45,8 @@ export const CmsLogin: FC = () => {
         />
         <div className="bifrost-cms-login__form-panel">
           <Flex direction="column" gap={3} className="bifrost-cms-login__formbox">
-            <Typography variant="h3" className="bifrost-cms-login__title mb-0">
-              {isRegister ? t.cmsShell.registerTitle : t.cmsShell.loginTitle}
-            </Typography>
-            <Typography variant="body2" className="bifrost-cms-login__lead mb-0">
+            <Typography variant="h3">{isRegister ? t.cmsShell.registerTitle : t.cmsShell.loginTitle}</Typography>
+            <Typography variant="body2">
               {isRegister ? t.cmsShell.registerDescription : t.login.description}
             </Typography>
             {showError && (
@@ -211,19 +105,18 @@ export const CmsLogin: FC = () => {
                   required
                 />
                 {isRegister && (
-                  <label className="bifrost-cms-login__terms">
-                    <input
-                      type="checkbox"
-                      checked={termsAccepted}
-                      onChange={(e) => setTermsAccepted(e.target.checked)}
-                      required
-                    />
-                    <span>
-                      {t.login.agreeTerms}
-                      {SPACE_STRING}
-                      <a href={ROUTES.TERMS}>{t.login.terms}</a>
-                    </span>
-                  </label>
+                  <Checkbox
+                    checked={termsAccepted}
+                    required
+                    onChange={(event) => setTermsAccepted(event.target.checked)}
+                    label={
+                      <span>
+                        {t.login.agreeTerms}
+                        {SPACE_STRING}
+                        <a href={ROUTES.TERMS}>{t.login.terms}</a>
+                      </span>
+                    }
+                  />
                 )}
                 <Button type="submit" variant="primary" className="bifrost-cms-login__submit" disabled={loading}>
                   {submitLabel}
@@ -232,9 +125,7 @@ export const CmsLogin: FC = () => {
             </form>
             <div className="bifrost-cms-login__divider">
               <span className="bifrost-cms-login__divider-line" />
-              <Typography variant="caption" className="bifrost-cms-login__divider-label mb-0">
-                {t.login.oauthDivider}
-              </Typography>
+              <Typography variant="caption">{t.login.oauthDivider}</Typography>
               <span className="bifrost-cms-login__divider-line" />
             </div>
             <Flex direction="column" gap={2} className="bifrost-cms-login__oauth">
@@ -257,24 +148,19 @@ export const CmsLogin: FC = () => {
                 {t.login.github}
               </Button>
             </Flex>
-            <Typography variant="body2" className="bifrost-cms-login__register mb-0">
+            <Typography variant="body2">
               {isRegister ? t.login.haveAccount : t.login.needAccount}
               {SPACE_STRING}
-              <button
+              <Button
                 type="button"
-                className="bifrost-cms-login__register-btn"
-                onClick={() =>
-                  setMode(isRegister ? CMS_AUTH_MODE.LOGIN : CMS_AUTH_MODE.REGISTER)
-                }
+                size="sm"
+                variant="ghost"
+                onClick={() => setMode(isRegister ? CMS_AUTH_MODE.LOGIN : CMS_AUTH_MODE.REGISTER)}
               >
                 {isRegister ? t.login.signIn : t.login.register}
-              </button>
+              </Button>
             </Typography>
-            {user && (
-              <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                {user.email}
-              </Typography>
-            )}
+            {user && <Typography variant="caption">{user.email}</Typography>}
           </Flex>
         </div>
       </div>

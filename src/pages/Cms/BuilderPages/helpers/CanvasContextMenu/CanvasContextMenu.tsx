@@ -1,62 +1,61 @@
 import type { FC } from 'react';
-import { Flex, Typography } from '@forgedevstack/bear';
-import { BUILDER_MENU_ACTION } from '../../BuilderPages.const';
+import { Button, Flex, Typography } from '@forgedevstack/bear';
+import {
+  CONTEXT_MENU_DANGER,
+  CONTEXT_MENU_REUSE,
+  CONTEXT_MENU_STRUCTURE,
+  CONTEXT_MENU_STYLE,
+  type CanvasContextMenuItem,
+} from './CanvasContextMenu.const';
 import type { CanvasContextMenuProps } from './CanvasContextMenu.types';
+import { canvasMenuVars } from './CanvasContextMenu.utils';
 
 export const CanvasContextMenu: FC<CanvasContextMenuProps> = (props) => {
   const { title, canPasteStyles, labels, onAction } = props;
+  const renderItem = (item: CanvasContextMenuItem) => {
+    const disabled = Boolean(item.paste) && !canPasteStyles;
+    const variant = item.danger ? 'danger' : 'ghost';
+    const itemClass = item.danger
+      ? 'bifrost-cms-canvas-menu__item bifrost-cms-canvas-menu__item--danger'
+      : 'bifrost-cms-canvas-menu__item';
+    const onItem = () => {
+      if (disabled) {
+        return;
+      }
+      onAction(item.action);
+    };
+    return (
+      <Button
+        key={item.action}
+        type="button"
+        size="sm"
+        variant={variant}
+        className={itemClass}
+        disabled={disabled}
+        onClick={onItem}
+      >
+        {labels[item.labelKey]}
+        {item.kbdKey && <span className="bifrost-cms-canvas-menu__kbd">{labels[item.kbdKey]}</span>}
+      </Button>
+    );
+  };
   return (
     <Flex
       direction="column"
       className="bifrost-cms-canvas-menu"
-      style={{ left: props.x, top: props.y }}
+      style={canvasMenuVars(props.x, props.y)}
       onClick={(event) => event.stopPropagation()}
     >
-      <Typography variant="caption" className="bifrost-cms-canvas-menu__section mb-0">
+      <Typography variant="caption" className="bifrost-cms-canvas-menu__section">
         {title}
       </Typography>
-      <button type="button" className="bifrost-cms-canvas-menu__item" onClick={() => onAction(BUILDER_MENU_ACTION.EDIT_CONTENT)}>
-        {labels.edit}
-        <span className="bifrost-cms-canvas-menu__kbd">{labels.kbdEdit}</span>
-      </button>
-      <button type="button" className="bifrost-cms-canvas-menu__item" onClick={() => onAction(BUILDER_MENU_ACTION.DUPLICATE)}>
-        {labels.duplicate}
-        <span className="bifrost-cms-canvas-menu__kbd">{labels.kbdDuplicate}</span>
-      </button>
-      <button type="button" className="bifrost-cms-canvas-menu__item" onClick={() => onAction(BUILDER_MENU_ACTION.MOVE_UP)}>
-        {labels.moveUp}
-        <span className="bifrost-cms-canvas-menu__kbd">{labels.kbdUp}</span>
-      </button>
-      <button type="button" className="bifrost-cms-canvas-menu__item" onClick={() => onAction(BUILDER_MENU_ACTION.MOVE_DOWN)}>
-        {labels.moveDown}
-        <span className="bifrost-cms-canvas-menu__kbd">{labels.kbdDown}</span>
-      </button>
+      {CONTEXT_MENU_STRUCTURE.map(renderItem)}
       <div className="bifrost-cms-canvas-menu__divider" />
-      <button type="button" className="bifrost-cms-canvas-menu__item" onClick={() => onAction(BUILDER_MENU_ACTION.COPY_STYLES)}>
-        {labels.copyStyles}
-        <span className="bifrost-cms-canvas-menu__kbd">{labels.kbdCopy}</span>
-      </button>
-      <button
-        type="button"
-        className="bifrost-cms-canvas-menu__item"
-        disabled={!canPasteStyles}
-        onClick={() => onAction(BUILDER_MENU_ACTION.PASTE_STYLES)}
-      >
-        {labels.pasteStyles}
-      </button>
+      {CONTEXT_MENU_STYLE.map(renderItem)}
       <div className="bifrost-cms-canvas-menu__divider" />
-      <button type="button" className="bifrost-cms-canvas-menu__item" onClick={() => onAction(BUILDER_MENU_ACTION.SAVE_REUSABLE)}>
-        {labels.saveReusable}
-      </button>
+      {CONTEXT_MENU_REUSE.map(renderItem)}
       <div className="bifrost-cms-canvas-menu__divider" />
-      <button
-        type="button"
-        className="bifrost-cms-canvas-menu__item bifrost-cms-canvas-menu__item--danger"
-        onClick={() => onAction(BUILDER_MENU_ACTION.DELETE)}
-      >
-        {labels.remove}
-        <span className="bifrost-cms-canvas-menu__kbd">{labels.kbdDelete}</span>
-      </button>
+      {CONTEXT_MENU_DANGER.map(renderItem)}
     </Flex>
   );
 };

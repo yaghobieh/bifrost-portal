@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.11
+
+### Added
+- Marketing Pages builder follows the Elementor-style spec: searchable Bear widget library, hover toolbar, global colors, tablet viewport, and native HTML `<img>` (src, alt, width, height, loading).
+- Design source for Figma: `docs/cms-135/` (spec, Bear props, HTML artboards).
+
 ## 1.1.10
 
 ### Added

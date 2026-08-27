@@ -63,7 +63,7 @@ export const ContentPages: FC = () => {
   const { navigate } = useNavigate();
   const { token: providerToken } = useAuth();
   const { token } = useNucleus(authNucleus);
-  const { items, loading, error, saving, fetchContent } =
+  const { items, loading, error, saving, fetchContent, deleteContent } =
     useNucleus(contentNucleus);
   const activeToken = token || providerToken;
 
@@ -128,6 +128,11 @@ export const ContentPages: FC = () => {
     if (!item) return;
     await fetchContent(activeToken);
     navigate(saved ? cmsEditPath(item.id) : cmsBuilderPath({ doc: item.id }));
+  };
+
+  const onDeletePage = (id: string) => {
+    if (!activeToken) return;
+    void deleteContent(activeToken, id);
   };
 
   const savedTemplates = items.filter((item) => item.collection === TEMPLATES_COLLECTION);
@@ -258,8 +263,15 @@ export const ContentPages: FC = () => {
                       openLabel={t.dashboard.contentOpen}
                       moreLabel={t.dashboard.contentMore}
                       stageLabel={t.cmsBuilder.editInStage}
+                      deleteLabel={t.dashboard.contentDelete}
+                      deleteTitle={t.dashboard.contentDeleteTitle}
+                      deleteBody={t.dashboard.contentDeleteBody}
+                      deleteConfirm={t.dashboard.contentDeleteConfirm}
+                      deleteCancel={t.dashboard.contentDeleteCancel}
+                      deleting={saving}
                       onOpen={(id) => navigate(cmsEditPath(id))}
                       onStage={(id) => navigate(cmsBuilderPath({ doc: id }))}
+                      onDelete={onDeletePage}
                     />
                   ),
                 },

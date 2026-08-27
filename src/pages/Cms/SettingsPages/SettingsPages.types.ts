@@ -72,6 +72,15 @@ export type CmsCatalog = {
   source: string;
 };
 
+export type CmsTranslationMap = Record<string, string>;
+
+export type CmsTranslations = {
+  sourceLocale: string;
+  locales: Record<string, CmsTranslationMap>;
+  pages?: Record<string, Record<string, CmsTranslationMap>>;
+  suggested: Record<string, CmsTranslationMap>;
+};
+
 export type CmsDevPrefs = {
   showDeveloperPage: boolean;
 };

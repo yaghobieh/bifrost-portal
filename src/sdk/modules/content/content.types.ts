@@ -59,6 +59,7 @@ export type ContentState = {
   fetchContentByCollection: (token: string, collection: string) => Promise<boolean>;
   fetchPages: (token: string) => Promise<boolean>;
   saveContent: (token: string, input: ContentSaveInput) => Promise<boolean>;
+  deleteContent: (token: string, id: string) => Promise<boolean>;
   updatePage: (token: string, input: PageUpdateInput) => Promise<boolean>;
   reset: () => void;
 };

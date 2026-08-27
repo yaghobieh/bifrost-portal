@@ -10,9 +10,9 @@ export type CanvasKind =
 
 export type BuilderViewport = 'desktop' | 'tablet' | 'mobile';
 
-export type BuilderInspectorTab = 'content' | 'style' | 'code';
+export type BuilderInspectorTab = 'inspector-content' | 'inspector-style' | 'inspector-code';
 
-export type BuilderStageTab = 'canvas' | BuilderInspectorTab;
+export type BuilderStageTab = 'canvas';
 
 export type CanvasNodeStyles = {
   padding: string;
@@ -41,6 +41,7 @@ export type CanvasNodeStyles = {
 export type PageCode = {
   css: string;
   js: string;
+  scripts: string[];
 };
 
 export type CanvasNode = {
@@ -64,9 +65,18 @@ export type CanvasMenuAction =
   | 'move-up'
   | 'move-down'
   | 'edit-content'
+  | 'inspect-props'
+  | 'inspect-style'
   | 'copy-styles'
   | 'paste-styles'
   | 'save-reusable';
+
+export type BuilderLayerRow = {
+  id: string;
+  label: string;
+  kind: CanvasKind;
+  depth: number;
+};
 
 export type CanvasMenuState = {
   nodeId: string;

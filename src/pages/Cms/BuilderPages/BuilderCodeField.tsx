@@ -1,25 +1,22 @@
 import type { CodeEditorLanguage } from '@forgedevstack/bear';
-import { CodeEditor, Typography, useBear } from '@forgedevstack/bear';
+import { CodeEditor, Flex, Typography } from '@forgedevstack/bear';
 import type { FC } from 'react';
 import { BUILDER_CODE_EDITOR_FONT_SIZE, BUILDER_CODE_EDITOR_HEIGHT_PX } from '@const/numbers.const';
+import { BUILDER_CODE_THEME } from './BuilderPages.const';
 import type { BuilderCodeFieldProps } from './BuilderCodeField.types';
 
 export const BuilderCodeField: FC<BuilderCodeFieldProps> = (props) => {
   const { label, value, onChange, language } = props;
-  const { mode } = useBear();
-  const theme = mode === 'dark' ? 'dark' : 'light';
   const editorLanguage: CodeEditorLanguage = language;
 
   return (
-    <div className="bifrost-cms-code-field">
-      <Typography variant="caption" className="bifrost-cms-code-field__label mb-1">
-        {label}
-      </Typography>
+    <Flex direction="column" gap={1} className="bifrost-cms-code-field">
+      <Typography variant="caption">{label}</Typography>
       <CodeEditor
         value={value}
         onChange={onChange}
         language={editorLanguage}
-        theme={theme}
+        theme={BUILDER_CODE_THEME}
         showLineNumbers
         showGutter
         highlightActiveLine
@@ -27,6 +24,6 @@ export const BuilderCodeField: FC<BuilderCodeFieldProps> = (props) => {
         fontSize={BUILDER_CODE_EDITOR_FONT_SIZE}
         className="bifrost-cms-code-field__editor"
       />
-    </div>
+    </Flex>
   );
 };

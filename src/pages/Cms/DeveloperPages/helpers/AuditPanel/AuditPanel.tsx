@@ -54,6 +54,7 @@ export const AuditPanel: FC = () => {
         columns={[
           { id: 'action', accessor: 'action', header: t.cmsDeveloper.auditAction, sortable: true },
           { id: 'resource', accessor: 'resource', header: t.cmsDeveloper.auditResource, sortable: true },
+          { id: 'detail', accessor: 'detail', header: t.cmsDeveloper.auditDetail },
           { id: 'createdAt', accessor: 'createdAt', header: t.cmsDeveloper.auditAt, sortable: true },
           { id: 'userId', accessor: 'userId', header: t.cmsDeveloper.auditUser },
           { id: 'ipAddress', accessor: 'ipAddress', header: t.cmsDeveloper.auditIp },

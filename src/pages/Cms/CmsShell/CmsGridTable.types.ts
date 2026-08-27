@@ -7,4 +7,7 @@ export type CmsGridTableProps<T extends RowData> = {
   onRowClick?: (row: T) => void;
   emptyContent?: ReactNode;
   loading?: boolean;
+  enableCellEdit?: boolean;
+  onCellEdit?: (rowId: string | number, columnId: string, newValue: unknown) => void;
+  getRowId?: (row: T) => string | number;
 };

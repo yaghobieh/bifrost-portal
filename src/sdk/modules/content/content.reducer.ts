@@ -4,6 +4,7 @@ import {
   fetchContentRequest,
   fetchPagesRequest,
   saveContentRequest,
+  deleteContentRequest,
   updatePageRequest,
 } from './content.api';
 import type { ContentState } from './content.types';
@@ -68,6 +69,23 @@ export const contentNucleus = createNucleus<ContentState>((set, get) => ({
         ? items.map((entry) => (entry.id === item.id ? item : entry))
         : [item, ...items];
       set({ items: next, saving: false, error: false });
+      return true;
+    } catch {
+      set({ saving: false, error: true });
+      return false;
+    }
+  },
+
+  deleteContent: async (token, id) => {
+    set({ saving: true, error: false });
+    try {
+      const ok = await deleteContentRequest(token, id);
+      if (!ok) {
+        set({ saving: false, error: true });
+        return false;
+      }
+      const items = get().items.filter((entry) => entry.id !== id);
+      set({ items, saving: false, error: false });
       return true;
     } catch {
       set({ saving: false, error: true });
