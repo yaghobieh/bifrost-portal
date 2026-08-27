@@ -152,8 +152,9 @@ export const presencePingBody = (params: {
 };
 
 export const readPresenceStatus = (value: unknown): CmsPresenceStatus => {
-  if (typeof value === 'string' && (CMS_PRESENCE_STATUSES as readonly string[]).includes(value)) {
-    return value as CmsPresenceStatus;
+  const match = CMS_PRESENCE_STATUSES.find((status) => status === value);
+  if (match) {
+    return match;
   }
   return CMS_PRESENCE_ONLINE;
 };
