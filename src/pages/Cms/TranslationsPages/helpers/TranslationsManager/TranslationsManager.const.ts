@@ -31,6 +31,13 @@ export const TRANSLATION_STATUS = {
 } as const;
 
 export const TRANSLATION_SOURCE_LOCALE = 'en';
+export const TRANSLATION_DEFAULT_TARGET = 'fr';
+export const TRANSLATION_SOURCE_SEP = ' • ';
+export const TRANSLATION_EXPORT_NAME = 'translations.json';
+export const TRANSLATION_FILE_ACCEPT = '.json,application/json';
+export const TRANSLATION_IMPORT_ID = 'bifrost-cms-translations-import';
+export const TRANSLATION_LOCALE_PATTERN = /^[a-z]{2}(?:-[a-z]{2})?$/;
+export const TRANSLATION_JSON_INDENT = 2;
 
 export const TRANSLATION_LOCALES = ['en', 'fr', 'es', 'de', 'ja'] as const;
 
@@ -38,8 +45,9 @@ export const TRANSLATION_SEED: CmsTranslations = {
   sourceLocale: TRANSLATION_SOURCE_LOCALE,
   locales: {
     en: {
-      'marketing.heading': 'Heading',
-      'marketing.heroTitle': 'Content that reaches every surface',
+      'nav.docs': 'Docs',
+      'hero.eyebrow': 'ForgeStack',
+      'hero.headline': 'Content that reaches every surface',
       'marketing.cta': 'Start free',
       'auth.signIn': 'Sign in',
     },
@@ -52,6 +60,5 @@ export const TRANSLATION_SEED: CmsTranslations = {
   suggested: {},
 };
 
-export const TRANSLATION_JSON_INDENT = 2;
 export const TRANSLATION_NEW_LOCALE = EMPTY_STRING;
 export const TRANSLATION_SCOPE_GLOBAL = TRANSLATION_SCOPE.GLOBAL;
