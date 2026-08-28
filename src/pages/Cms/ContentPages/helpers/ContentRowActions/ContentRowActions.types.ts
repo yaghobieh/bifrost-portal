@@ -1,8 +1,10 @@
 export type ContentRowActionsProps = {
   id: string;
   status: string;
+  catalog?: boolean;
   openLabel: string;
   moreLabel: string;
+  editLabel: string;
   stageLabel: string;
   duplicateLabel: string;
   homepageLabel: string;

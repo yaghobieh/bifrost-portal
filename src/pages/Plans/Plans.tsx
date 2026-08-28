@@ -2,7 +2,7 @@ import { useState, type FC } from 'react';
 import { Link } from '@forgedevstack/forge-compass/react';
 import { Button, Card, Flex, Typography } from '@forgedevstack/bear';
 import { useLingo } from '@forgedevstack/lingo';
-import { DOC_PATH } from '@const/routes.const';
+import { DOC_PATH } from '@const/routes.utils';
 import { NUMBER_FOUR } from '@const/numbers.const';
 import { CMS_PLANS_SLUG } from '@const/strings.const';
 import { PortalNav } from '@components/PortalNav';

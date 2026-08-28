@@ -98,25 +98,29 @@ export const CONTENT_COLUMN_IDS = {
   TEMPLATE: 'template',
   FIELDS: 'fields',
   STATUS: 'status',
+  CREATED_BY: 'createdBy',
+  UPDATED_BY: 'updatedBy',
   UPDATED: 'updated',
   ACTIONS: 'actions',
 } as const;
+
+export const DOC_CATALOG_ID_PREFIX = 'doc-catalog:';
+export const TEMPLATE_KIND = {
+  DOC: 'doc',
+  MARKETING: 'marketing',
+  BLANK: 'blank',
+  PAGE: 'page',
+} as const;
+export const MARKETING_LAYOUT_IDS = ['landing-hero', 'marketing'] as const;
 
 export const CONTENT_DATE_LOCALE = 'en-CA';
 
 export const CONTENT_STATUS_PUBLISHED = 'published';
 export const CONTENT_STATUS_DRAFT = 'draft';
 export const CONTENT_TEMPLATE_EMPTY = '—';
-export const CONTENT_MORE_MENU_MIN_WIDTH = 200;
-
-export const CONTENT_NEW_PAGE_MENU_MIN_WIDTH = 220;
 export const SAVED_TEMPLATES_DIVIDER_KEY = 'saved-templates-divider';
 export const CONTENT_ROW_ID_ACCESSOR = 'id';
 export const CONTENT_STATUS_CLASS = {
   [CONTENT_STATUS_PUBLISHED]: 'bifrost-cms-status bifrost-cms-status--published',
   [CONTENT_STATUS_DRAFT]: 'bifrost-cms-status bifrost-cms-status--draft',
 } as const;
-export const CONTENT_STATUS_CLASS_FALLBACK = 'bifrost-cms-status';
-export const CONTENT_ERROR_CLASS = 'bifrost-cms-dashboard__error mb-0';
-export const CONTENT_EMPTY_CLASS = 'bifrost-cms__muted mb-0';
-export const CONTENT_TABLE_WRAP_CLASS = 'bifrost-cms-card bifrost-cms-pages-wrap';

@@ -1,24 +1,30 @@
 import { docsPath, EMPTY_STRING, SITE_URL } from '@const/index';
-import { isStringValue } from '@utils';
+import { NAV_GROUPS } from '@const/nav.const';
+import { isStringValue, titleFromSlug } from '@utils';
 import {
+  PAYLOAD_KEY_CREATED_BY,
   PAYLOAD_KEY_LAYOUT,
   PAYLOAD_KEY_TEMPLATE,
+  PAYLOAD_KEY_UPDATED_BY,
 } from '@pages/Cms/ContentEdit/ContentEdit.const';
 import type { Messages } from '@i18n/types';
+import type { ContentTableRow } from './ContentPages.types';
 import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
 import { createNamedCastField } from '@pages/Cms/CastPages/CastPages.utils';
 import type { CastField } from '@pages/Cms/CastPages/CastPages.types';
 import {
   CONTENT_COLLECTION_DOCS,
   CONTENT_STATUS_CLASS,
-  CONTENT_STATUS_CLASS_FALLBACK,
   CONTENT_STATUS_DRAFT,
   CONTENT_STATUS_PUBLISHED,
+  DOC_CATALOG_ID_PREFIX,
   DOCS_FIELD_DEFAULTS,
   DOCS_FIELD_NAME,
   DOCS_LAYOUT_IDS,
+  MARKETING_LAYOUT_IDS,
+  TEMPLATE_KIND,
 } from './ContentPages.const';
-import type { ContentTableRow } from './ContentPages.types';
+import { PAGE_START_LAYOUT } from './helpers/PageStart';
 
 export const formatContentUpdated = (iso: string, locale: string): string => {
   if (!iso) return EMPTY_STRING;
@@ -52,7 +58,7 @@ export const contentStatusClass = (status: string): string => {
   const key = status.toLowerCase();
   if (key === CONTENT_STATUS_PUBLISHED) return CONTENT_STATUS_CLASS[CONTENT_STATUS_PUBLISHED];
   if (key === CONTENT_STATUS_DRAFT) return CONTENT_STATUS_CLASS[CONTENT_STATUS_DRAFT];
-  return CONTENT_STATUS_CLASS_FALLBACK;
+  return 'bifrost-cms-status';
 };
 
 export const contentStatusLabel = (status: string, copy: Messages['dashboard']): string => {
@@ -70,6 +76,49 @@ export const isDocsLayout = (layoutId: string): boolean => {
     return true;
   }
   return false;
+};
+
+const isMarketingLayout = (layout: string): boolean =>
+  MARKETING_LAYOUT_IDS.some((id) => id === layout);
+
+export const payloadActor = (
+  payload: Record<string, unknown>,
+  key: typeof PAYLOAD_KEY_CREATED_BY | typeof PAYLOAD_KEY_UPDATED_BY,
+): string => {
+  const value = payload[key];
+  if (isStringValue(value) && value) {
+    return value;
+  }
+  return EMPTY_STRING;
+};
+
+export { titleFromSlug };
+
+export const catalogDocId = (slug: string): string => `${DOC_CATALOG_ID_PREFIX}${slug}`;
+
+export const isCatalogDocId = (id: string): boolean => id.startsWith(DOC_CATALOG_ID_PREFIX);
+
+export const slugFromCatalogId = (id: string): string => id.slice(DOC_CATALOG_ID_PREFIX.length);
+
+export const catalogDocSlugs = (): string[] =>
+  NAV_GROUPS.flatMap((group) => group.items.map((item) => item.slug));
+
+export const templateKindFromPayload = (
+  payload: Record<string, unknown>,
+  collection: string,
+): string => {
+  const layout = payload[PAYLOAD_KEY_LAYOUT];
+  const layoutId = isStringValue(layout) ? layout : EMPTY_STRING;
+  if (isDocsLayout(layoutId) || collection === CONTENT_COLLECTION_DOCS) {
+    return TEMPLATE_KIND.DOC;
+  }
+  if (isMarketingLayout(layoutId)) {
+    return TEMPLATE_KIND.MARKETING;
+  }
+  if (layoutId === PAGE_START_LAYOUT.BLANK) {
+    return TEMPLATE_KIND.BLANK;
+  }
+  return TEMPLATE_KIND.PAGE;
 };
 
 export const buildDocsCastFields = (): CastField[] => [

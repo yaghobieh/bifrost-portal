@@ -11,6 +11,7 @@ import { DOCS_LAYOUT_IDS } from '@pages/Cms/ContentPages/ContentPages.const';
 export const TEMPLATES_COLLECTION = 'templates';
 export const TEMPLATE_SLUG_PREFIX = 'template-';
 export const PAGE_SLUG_PREFIX = 'page-';
+export const TEMPLATES_CTA_VARIANT = 'outline';
 export const DOCS_ARTICLE_IMAGE_SRC =
   DOCUMENT_CLOUDINARY_IMAGE_SRC || '/docs/installation.svg';
 export const DOCS_ARTICLE_HTML = `<h1>Installation</h1><p><img src="${DOCS_ARTICLE_IMAGE_SRC}" alt="Install Ink and mount the editor" /></p><p>Ink is a React rich-text editor that stores content as HTML and exposes structured side-channel state (comments, track changes) as JSON-friendly payloads. Install the package once, import styles once, then mount InkEditor in any form or document surface.</p><h2>What you get</h2><ul><li><strong>npm package</strong> — Adds the editor runtime, toolbar presets, and CSS entry under @forgedevstack/ink.</li><li><strong>Styles entry</strong> — One import of @forgedevstack/ink/styles.css at the app root styles the chrome and content.</li><li><strong>Controlled mount</strong> — value / onChange keeps the parent as source of truth — ideal for forms and save APIs.</li></ul><pre><code>npm install @forgedevstack/ink@1.1.6</code></pre><pre><code>import { InkEditor } from '@forgedevstack/ink';

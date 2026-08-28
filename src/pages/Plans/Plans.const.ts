@@ -1,4 +1,5 @@
 import type { PlanId, TranslateStatus } from './Plans.types';
+import { TRANSLATE_CATALOGS_PATH } from '@const/strings.const';
 
 export const PLAN_ID = {
   STANDARD: 'standard',
@@ -14,7 +15,7 @@ export const TRANSLATE_STATUS = {
 
 export const TRANSLATE_LOCALES = ['es', 'he', 'fr', 'de'] as const;
 
-export const TRANSLATE_CATALOGS_PATH = '/api/cms/translate-catalogs';
+export { TRANSLATE_CATALOGS_PATH };
 
 export const PLANS_DOC_INSTALLATION = 'installation';
 

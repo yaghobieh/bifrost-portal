@@ -45,6 +45,7 @@ import {
   SETTINGS_MCP_INPUT_IDS,
   SETTINGS_MEDIA_INPUT_IDS,
   SETTINGS_NAV_TOGGLE_IDS,
+  SETTINGS_PUBLIC_NAV_IDS,
   SETTINGS_PERMALINK_VALUES,
   SETTINGS_API_ERROR_MODES,
   SETTINGS_API_FAIL_URL,
@@ -216,6 +217,22 @@ export const SettingsPages: FC = () => {
       [CMS_NAV_IDS.LIVE_EDIT]: t.cmsShell.liveEdit,
       [CMS_NAV_IDS.BUILDER]: t.cmsShell.builder,
       [CMS_NAV_IDS.CALENDAR]: t.cmsShell.calendar,
+    };
+    return labels[id] || id;
+  };
+
+  const publicNavLabel = (id: string): string => {
+    const labels: Record<string, string> = {
+      product: t.settings.publicNavProduct,
+      docs: t.settings.publicNavDocs,
+      plans: t.settings.publicNavPlans,
+      demo: t.settings.publicNavDemo,
+      changelog: t.settings.publicNavChangelog,
+      status: t.settings.publicNavStatus,
+      blog: t.settings.publicNavBlog,
+      guides: t.settings.publicNavGuides,
+      api: t.settings.publicNavApi,
+      askAi: t.settings.publicNavAskAi,
     };
     return labels[id] || id;
   };
@@ -809,6 +826,33 @@ export const SettingsPages: FC = () => {
                       ))}
                     </div>
                   </div>
+                  <div>
+                    <Typography variant="h5" className="mb-1">
+                      {t.settings.publicNavVisibility}
+                    </Typography>
+                    <Typography variant="caption" className="bifrost-cms__muted mb-2 block">
+                      {t.settings.publicNavHint}
+                    </Typography>
+                    <div className="bifrost-cms-settings__nav">
+                      {SETTINGS_PUBLIC_NAV_IDS.map((id) => (
+                        <Switch
+                          key={id}
+                          id={`bifrost-cms-public-nav-${id}`}
+                          label={publicNavLabel(id)}
+                          checked={!site.hiddenPublicNavIds.includes(id)}
+                          onCheckedChange={(checked) => {
+                            setSite((current) => ({
+                              ...current,
+                              hiddenPublicNavIds: checked
+                                ? current.hiddenPublicNavIds.filter((item) => item !== id)
+                                : [...current.hiddenPublicNavIds, id],
+                            }));
+                            markDirty();
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </SettingsSection>
                 ) : null}
                 {sitePanel === SETTINGS_SITE_PANELS.READING ? (
@@ -824,6 +868,18 @@ export const SettingsPages: FC = () => {
                       setSite((current) => ({
                         ...current,
                         homepagePath: event.target.value,
+                      }));
+                      markDirty();
+                    }}
+                  />
+                  <Input
+                    id={SETTINGS_SITE_INPUT_IDS.BLOG_PATH}
+                    label={t.settings.blogPath}
+                    value={site.blogPath}
+                    onChange={(event) => {
+                      setSite((current) => ({
+                        ...current,
+                        blogPath: event.target.value,
                       }));
                       markDirty();
                     }}

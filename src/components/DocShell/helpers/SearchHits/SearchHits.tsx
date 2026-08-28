@@ -1,5 +1,5 @@
 import { Link } from '@forgedevstack/forge-compass/react';
-import { DOC_PATH } from '@const/routes.const';
+import { DOC_PATH } from '@const/routes.utils';
 import type { FC } from 'react';
 
 export interface SearchHitsProps {

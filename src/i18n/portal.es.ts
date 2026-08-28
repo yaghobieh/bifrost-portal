@@ -58,6 +58,7 @@ export const es: Messages = {
     github: 'GitHub',
     signIn: 'Entrar',
     status: 'Estado',
+    blog: 'Blog',
   },
   status: {
     title: 'Estado',
@@ -198,5 +199,14 @@ export const es: Messages = {
     translating: 'Traduciendo…',
     translateSuccess: 'Catálogos traducidos para los locales seleccionados.',
     translateError: 'No se pudieron traducir los catálogos. Inténtalo cuando la API esté disponible.',
+  },
+  blog: {
+    title: 'Blog',
+    newest: 'Más nuevos',
+    mostViewed: 'Más vistos',
+    share: 'Compartir',
+    shareCopied: 'Enlace copiado',
+    empty: 'Aún no hay entradas.',
+    views: '{count} vistas',
   },
 };

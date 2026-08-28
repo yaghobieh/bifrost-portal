@@ -48,6 +48,8 @@ export type CmsSite = {
   fromEmail: string;
   chatSide: CmsChatSide;
   hiddenNavIds: string[];
+  hiddenPublicNavIds: string[];
+  blogPath: string;
   anyoneCanRegister: boolean;
   searchEngineVisible: boolean;
   allowComments: boolean;

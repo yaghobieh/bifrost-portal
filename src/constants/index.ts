@@ -1,5 +1,6 @@
 export * from './numbers.const';
 export * from './routes.const';
+export * from './routes.utils';
 export * from './env.const';
 export * from './hosts.const';
 export * from './strings.const';

@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { Link } from '@forgedevstack/forge-compass/react';
-import { DOC_PATH } from '@const/routes.const';
+import { DOC_PATH } from '@const/routes.utils';
 import { BIFROST_CLI, INSTALL_COMMAND } from '@const/strings.const';
 import { BlInstallCommand } from '@components/BlInstallCommand';
 import { HOME_DOC_INSTALLATION, HOME_DOC_OVERVIEW } from '../../Home.const';

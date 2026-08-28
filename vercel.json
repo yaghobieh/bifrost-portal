@@ -13,6 +13,10 @@
       "destination": "/api/health?rest=plugins"
     },
     {
+      "source": "/api/public/nav",
+      "destination": "/api/c/pages?rest=nav"
+    },
+    {
       "source": "/api/v1/version",
       "destination": "/api/health?rest=version"
     },
@@ -41,7 +45,7 @@
       "destination": "/api/c/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/"
     }
   ],

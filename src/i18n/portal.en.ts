@@ -58,6 +58,7 @@ export const en: Messages = {
     github: 'GitHub',
     signIn: 'Sign in',
     status: 'Status',
+    blog: 'Blog',
   },
   status: {
     title: 'Status',
@@ -198,5 +199,14 @@ export const en: Messages = {
     translating: 'Translating…',
     translateSuccess: 'Catalogs translated for the selected locales.',
     translateError: 'Could not translate catalogs. Try again when the API is available.',
+  },
+  blog: {
+    title: 'Blog',
+    newest: 'Newest',
+    mostViewed: 'Most viewed',
+    share: 'Share',
+    shareCopied: 'Link copied',
+    empty: 'No posts yet.',
+    views: '{count} views',
   },
 };

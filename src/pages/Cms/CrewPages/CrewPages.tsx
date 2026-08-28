@@ -201,10 +201,24 @@ export const CrewPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.CREW}>
-      <Flex direction="column" gap={6}>
+      <Flex direction="column" gap={6} className="bifrost-cms-page">
         <CmsPageHeader
           title={t.cmsCrew.pageTitle}
           subtitle={t.cmsCrew.subtitle}
+          extra={
+            <Card variant="elevated" padding="md">
+              <Flex justify="between" align="center" gap={3} className="flex-wrap">
+                <div>
+                  <Typography variant="h4" className="mb-1">
+                    {t.cmsCrew.usersTitle}
+                  </Typography>
+                  <Typography variant="body2" className="bifrost-cms__muted mb-0">
+                    {t.cmsCrew.subtitle}
+                  </Typography>
+                </div>
+              </Flex>
+            </Card>
+          }
           actions={
             <LiveEditors
               users={onlineUsers}

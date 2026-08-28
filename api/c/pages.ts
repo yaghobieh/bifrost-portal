@@ -2,16 +2,19 @@ import {
   emptyPages,
   listPublishedBlog,
   pageBySlugQuery,
+  publicSiteChrome,
   publishedBlogBySlug,
 } from '../../server/cmsAuth';
 import {
   API_BLOG_POSTS_PATH,
+  API_PUBLIC_NAV_PATH,
   API_V1_PAGE_PATH,
   EMPTY_STRING,
   METHOD_GET,
   QUERY_REST,
   QUERY_SLUG,
   REST_BLOG,
+  REST_NAV,
   REST_PAGE,
   SLASH_SIGN,
 } from '../../server/cmsAuth.const';
@@ -35,6 +38,9 @@ export default async function handler(request: Request): Promise<Response> {
   const pathname = url.pathname;
   const rest = (url.searchParams.get(QUERY_REST) ?? EMPTY_STRING).trim();
   const slugQuery = (url.searchParams.get(QUERY_SLUG) ?? EMPTY_STRING).trim();
+  if (rest === REST_NAV || pathname.includes(API_PUBLIC_NAV_PATH)) {
+    return handlePublicJson(request, [METHOD_GET], publicSiteChrome);
+  }
   if (rest === REST_BLOG || pathname.includes(API_BLOG_POSTS_PATH)) {
     if (isBlogList(pathname, slugQuery, rest)) {
       return handlePublicJson(request, [METHOD_GET], listPublishedBlog);

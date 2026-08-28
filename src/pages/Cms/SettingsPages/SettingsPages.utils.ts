@@ -253,8 +253,9 @@ export const parseCmsSite = (value: unknown): CmsSite => {
   if (!value || typeof value !== 'object') {
     return {
       ...SETTINGS_SITE_DEFAULTS,
-      hiddenNavIds: [...SETTINGS_SITE_DEFAULTS.hiddenNavIds],
-    };
+    hiddenNavIds: [...SETTINGS_SITE_DEFAULTS.hiddenNavIds],
+    hiddenPublicNavIds: [...SETTINGS_SITE_DEFAULTS.hiddenPublicNavIds],
+  };
   }
   const parsed = value as Partial<CmsSite>;
   return {
@@ -278,6 +279,8 @@ export const parseCmsSite = (value: unknown): CmsSite => {
       ? parsed.chatSide
       : SETTINGS_SITE_DEFAULTS.chatSide,
     hiddenNavIds: readHiddenNavIds(parsed.hiddenNavIds),
+    hiddenPublicNavIds: readHiddenNavIds(parsed.hiddenPublicNavIds),
+    blogPath: readString(parsed.blogPath, SETTINGS_SITE_DEFAULTS.blogPath),
     anyoneCanRegister: readBoolean(
       parsed.anyoneCanRegister,
       SETTINGS_SITE_DEFAULTS.anyoneCanRegister,

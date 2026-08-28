@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { Typography } from '@forgedevstack/bear';
 import { DocShell } from '@components/DocShell';
 import { useLingo } from '@forgedevstack/lingo';
-import { DOC_PATH, ROUTES } from '@const/routes.const';
+import { DOC_PATH, ROUTES } from '@const/index';
 import { CMS_DEMO_SLUG, DEMO_APP_URL, MIDDLE_DOT } from '@const/strings.const';
 import { usePublicPage } from '@hooks/usePublicPage';
 import { mapSitePage } from '@data/pages.mapper';

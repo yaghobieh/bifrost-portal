@@ -64,6 +64,7 @@ export interface Messages {
     github: string;
     signIn: string;
     status: string;
+    blog: string;
   };
   status: {
     title: string;
@@ -204,5 +205,14 @@ export interface Messages {
     translating: string;
     translateSuccess: string;
     translateError: string;
+  };
+  blog: {
+    title: string;
+    newest: string;
+    mostViewed: string;
+    share: string;
+    shareCopied: string;
+    empty: string;
+    views: string;
   };
 }

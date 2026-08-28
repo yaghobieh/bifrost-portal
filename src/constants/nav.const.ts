@@ -1,4 +1,5 @@
-import { DOC_PATH, ROUTES } from './routes.const.ts';
+import { ROUTES } from './routes.const';
+import { DOC_PATH } from './routes.utils';
 
 export type NavGroupId =
   | 'gettingStarted'

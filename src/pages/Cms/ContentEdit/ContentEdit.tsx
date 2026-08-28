@@ -19,11 +19,11 @@ import { InkEditor } from '@forgedevstack/ink';
 import { cmsInkAiProps } from '@/ai/index';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
-import { EMPTY_STRING, ROUTES, cmsBuilderPath, CMS_EDIT_SIDE_MAX_PX, CMS_EDIT_SIDE_MIN_PX, CMS_EDIT_SIDE_WIDTH_KEY, CMS_EDIT_SIDE_WIDTH_PX, DRAG_WIDGET_MIME } from '@const/index';
-import { CMS_ICON_SIZE } from '@const/numbers.const';
+import { EMPTY_STRING, ROUTES, SLASH, cmsBlogEditPath, cmsBuilderPath, CMS_EDIT_SIDE_MAX_PX, CMS_EDIT_SIDE_MIN_PX, CMS_EDIT_SIDE_WIDTH_KEY, CMS_EDIT_SIDE_WIDTH_PX, DRAG_WIDGET_MIME } from '@const/index';
+import { CMS_ICON_SIZE, NUMBER_FOUR_HUNDRED_TWENTY, NUMBER_THREE_HUNDRED_TWENTY } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import type { ContentStatus } from '@sdk/modules/content';
-import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING, LiveEditors } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING, LiveEditors, CmsPageHeader } from '../CmsShell';
 import { useCmsLive } from '../CmsShell/CmsLiveProvider';
 import { currentLiveLocation } from '../CmsShell/CmsLive.utils';
 import { isPageSubmitLocked, locationOwner } from '../CmsShell/helpers/LiveEditors';
@@ -33,10 +33,8 @@ import {
   BEAR_WIDGET_ID_TRANSLATION,
   CONTENT_EDIT_AUTHOR_ID,
   CONTENT_EDIT_CATEGORIES_ID,
-  CONTENT_EDIT_EDITOR_MIN_HEIGHT_PX,
   CONTENT_EDIT_FEATURED_ID,
   CONTENT_EDIT_KIND,
-  CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX,
   CONTENT_EDIT_OG_DESC_ID,
   CONTENT_EDIT_OG_IMAGE_ID,
   CONTENT_EDIT_OG_TITLE_ID,
@@ -45,16 +43,19 @@ import {
   CONTENT_EDIT_SEO_DESC_ID,
   CONTENT_EDIT_SEO_KEYWORD_ID,
   CONTENT_EDIT_SEO_TITLE_ID,
-  CONTENT_EDIT_SLUG_ID,
+  CONTENT_EDIT_SETTINGS_SLUG_ID,
   CONTENT_EDIT_STATUS_ORDER,
   CONTENT_EDIT_SUBTITLE_ID,
   CONTENT_EDIT_TAGS_ID,
   CONTENT_EDIT_TITLE_ID,
+  CONTENT_EDIT_SETTINGS_WIDTH_PX,
   PAYLOAD_KEY_AUTHOR,
   PAYLOAD_KEY_CAST_FIELDS,
   PAYLOAD_KEY_CAST_VALUES,
   PAYLOAD_KEY_CATEGORIES,
+  PAYLOAD_KEY_CREATED_BY,
   PAYLOAD_KEY_FEATURED,
+  PAYLOAD_KEY_FIELD_ORDER,
   PAYLOAD_KEY_LAYOUT,
   PAYLOAD_KEY_OG_DESCRIPTION,
   PAYLOAD_KEY_OG_IMAGE,
@@ -66,6 +67,7 @@ import {
   PAYLOAD_KEY_SUBTITLE,
   PAYLOAD_KEY_TAGS,
   PAYLOAD_KEY_TEMPLATE,
+  PAYLOAD_KEY_UPDATED_BY,
 } from './ContentEdit.const';
 import {
   appendWidgetHtml,
@@ -80,6 +82,8 @@ import {
 } from './ContentEdit.utils';
 import { CastPageFields } from './helpers/CastPageFields';
 import { ContentFieldStage } from './helpers/ContentFieldStage';
+import { dropIndexFromEvent } from './helpers/ContentFieldStage/ContentFieldStage.utils';
+import { ContentEditSettings } from './helpers/ContentEditSettings';
 import { ContentTranslationWidget } from './helpers/ContentTranslationWidget';
 import type { TranslationApplyParams } from './helpers/ContentTranslationWidget';
 import { createCastField, createNamedCastField } from '@pages/Cms/CastPages/CastPages.utils';
@@ -94,18 +98,24 @@ import {
 import {
   castFieldsFromPayload,
   castValuesFromPayload,
+  fieldOrderKeys,
   findLinkedTemplate,
+  insertCastFieldAt,
   mergeCastFields,
+  moveCastFields,
+  orderCastFields,
   pageOwnedCastFields,
   summarizeCastValues,
 } from './castFields.utils';
 import type { CastField } from '../CastPages/CastPages.types';
 import {
+  CONTENT_COLLECTION_DOCS,
   CONTENT_COLLECTION_PAGE_META,
   CONTENT_COLLECTION_PAGES,
   DOCUMENT_TEMPLATE_ID,
 } from '../ContentPages/ContentPages.const';
-import { loadCmsProfile } from '../SettingsPages';
+import { BLOG_COLLECTION } from '../BlogPages/BlogPages.const';
+import { loadCmsProfile, loadCmsSite, persistCmsSiteRemote } from '../SettingsPages';
 
 type ContentRevision = {
   id: string;
@@ -169,6 +179,8 @@ export const ContentEdit: FC = () => {
   );
   const [previewWidth, setPreviewWidth] = useState(0);
   const [pageFields, setPageFields] = useState<CastField[]>([]);
+  const [fieldOrder, setFieldOrder] = useState<string[]>([]);
+  const [homepage, setHomepage] = useState(false);
   const [castValues, setCastValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -213,10 +225,24 @@ export const ContentEdit: FC = () => {
     const templateFields = castFieldsFromPayload(templateItem?.payload);
     setPageFields(pageOwnedCastFields(castFieldsFromPayload(target.payload), templateFields));
     setCastValues(castValuesFromPayload(target.payload));
+    const orderRaw = target.payload?.[PAYLOAD_KEY_FIELD_ORDER];
+    if (Array.isArray(orderRaw)) {
+      setFieldOrder(orderRaw.filter((entry): entry is string => typeof entry === 'string'));
+    } else {
+      setFieldOrder([]);
+    }
+    const sitePath = loadCmsSite().homepagePath;
+    setHomepage(sitePath === `${SLASH}${target.slug}` || sitePath === target.slug);
     setRevisions([]);
     setSaveOk(false);
     setHydrated(true);
   }, [target?.id, target?.kind, target?.bodyHtml, target?.title, target?.status, items]);
+
+  useEffect(() => {
+    if (target?.collection === BLOG_COLLECTION) {
+      navigate(cmsBlogEditPath(target.id));
+    }
+  }, [navigate, target?.collection, target?.id]);
 
   const pushRevision = () => {
     const revision: ContentRevision = {
@@ -244,6 +270,15 @@ export const ContentEdit: FC = () => {
       setWidgetsOpen(false);
       return;
     }
+    const field = createNamedCastField({
+      id: `w-${widget.id}-${Date.now()}`,
+      name: `widget_${widget.id}_${Date.now()}`,
+      label: widget.label,
+      type: CAST_FIELD_TYPE.TEXTAREA,
+    });
+    setPageFields((current) => [...current, field]);
+    setFieldOrder((current) => [...current, field.name]);
+    setCastValues((current) => ({ ...current, [field.name]: widget.html }));
     setBodyHtml((current) => appendWidgetHtml(current, widget.html));
     setSaveOk(false);
   };
@@ -260,6 +295,38 @@ export const ContentEdit: FC = () => {
     if (widget) {
       insertWidget(widget);
     }
+  };
+
+  const onStageDrop = (index: number, event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const from = dropIndexFromEvent(event);
+    if (from !== null) {
+      const next = moveCastFields(displayFields, from, index);
+      setPageFields(pageOwnedCastFields(next, templateFields));
+      setFieldOrder(fieldOrderKeys(next));
+      setSaveOk(false);
+      return;
+    }
+    const widgetId = event.dataTransfer.getData(DRAG_WIDGET_MIME);
+    const widget = BEAR_WIDGET_CATALOG.find((entry) => entry.id === widgetId);
+    if (!widget) {
+      return;
+    }
+    if (widget.id === BEAR_WIDGET_ID_TRANSLATION) {
+      setTranslationOpen(true);
+      return;
+    }
+    const field = createNamedCastField({
+      id: `w-${widget.id}-${Date.now()}`,
+      name: `widget_${widget.id}_${Date.now()}`,
+      label: widget.label,
+      type: CAST_FIELD_TYPE.TEXTAREA,
+    });
+    const next = insertCastFieldAt(displayFields, index, field);
+    setPageFields(pageOwnedCastFields(next, templateFields));
+    setFieldOrder(fieldOrderKeys(next));
+    setCastValues((current) => ({ ...current, [field.name]: widget.html }));
+    setSaveOk(false);
   };
 
   const onStringInput =
@@ -288,7 +355,10 @@ export const ContentEdit: FC = () => {
 
   const templateItem = findLinkedTemplate(items, target?.payload, target?.id);
   const templateFields = castFieldsFromPayload(templateItem?.payload);
-  const displayFields = mergeCastFields(templateFields, pageFields);
+  const displayFields = orderCastFields(
+    mergeCastFields(templateFields, pageFields),
+    fieldOrder,
+  );
   const lockedFieldIds = templateFields.map((field) => field.id);
   const existingTemplate =
     target?.payload && typeof target.payload[PAYLOAD_KEY_TEMPLATE] === 'string'
@@ -348,8 +418,12 @@ export const ContentEdit: FC = () => {
       [PAYLOAD_KEY_FEATURED]: featuredImage,
       [PAYLOAD_KEY_CAST_FIELDS]: pageFields,
       [PAYLOAD_KEY_CAST_VALUES]: castValues,
+      [PAYLOAD_KEY_FIELD_ORDER]: fieldOrderKeys(displayFields),
       [PAYLOAD_KEY_TEMPLATE]: existingTemplate || undefined,
       [PAYLOAD_KEY_LAYOUT]: existingLayout || undefined,
+      [PAYLOAD_KEY_CREATED_BY]:
+        payloadString(target.payload, PAYLOAD_KEY_CREATED_BY) || loadCmsProfile().displayName,
+      [PAYLOAD_KEY_UPDATED_BY]: loadCmsProfile().displayName || loadCmsProfile().username,
     };
     if (target.kind === CONTENT_EDIT_KIND.PAGE) {
       const okPage = await updatePage(activeToken, {
@@ -434,72 +508,88 @@ export const ContentEdit: FC = () => {
     setSaveOk(false);
   };
 
+  const routePrefix =
+    target?.collection === CONTENT_COLLECTION_DOCS ? `${ROUTES.DOCS}${SLASH}` : SLASH;
+
+  const onToggleHomepage = (value: boolean) => {
+    setHomepage(value);
+    if (!activeToken || !target) {
+      return;
+    }
+    const site = loadCmsSite();
+    void persistCmsSiteRemote(activeToken, {
+      ...site,
+      homepagePath: value ? `${SLASH}${slug}` : SLASH,
+    });
+  };
+
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.PAGES}>
       <Flex direction="column" gap={4} className="bifrost-cms-edit">
-        <Flex
-          justify="between"
-          align="center"
-          className="bifrost-cms-edit__topbar gap-2 flex-wrap"
-        >
-          <Flex align="center" gap={2} className="flex-wrap">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => navigate(ROUTES.CMS_CONTENT)}
-            >
-              {t.contentEdit.backToContent}
-            </Button>
-            <Typography variant="h3" className="mb-0 bifrost-cms-edit__heading">
-              {title || t.contentEdit.title}
-            </Typography>
-            <LiveEditors
-              users={onlineUsers}
-              currentUserId={selfId}
-              location={currentLiveLocation().location}
-            />
-            {target ? (
-              <Badge variant="info" className="text-xs">
-                {target.slug}
-              </Badge>
-            ) : null}
-          </Flex>
-          <Flex align="center" gap={2} className="flex-wrap">
-            <Button
-              size="sm"
-              variant={widgetsOpen ? 'ink' : 'outline'}
-              onClick={() => setWidgetsOpen(true)}
-            >
-              {t.contentEdit.widgetsOpen}
-            </Button>
-            <Button
-              size="sm"
-              variant={preview ? 'ink' : 'outline'}
-              onClick={() => setPreview((value) => !value)}
-            >
-              {preview ? t.contentEdit.editMode : t.contentEdit.preview}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                if (target) navigate(cmsBuilderPath({ doc: target.id }));
-              }}
-              disabled={!target}
-            >
-              {t.contentEdit.openStage}
-            </Button>
-            <Button
-              size="sm"
-              variant="primary"
-              icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
-              onClick={() => void onSave()}
-              disabled={!target || saving || pageLocked}
-            >
-              {saving ? t.dashboard.saving : t.dashboard.save}
-            </Button>
-          </Flex>
-        </Flex>
+        <CmsPageHeader
+          title={title || t.contentEdit.title}
+          subtitle={t.dashboard.contentSubtitle}
+          extra={
+            <Card variant="elevated" padding="md">
+              <Flex justify="between" align="center" gap={3} className="flex-wrap">
+                <Flex align="center" gap={2} className="flex-wrap">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => navigate(ROUTES.CMS_CONTENT)}
+                  >
+                    {t.contentEdit.backToContent}
+                  </Button>
+                  <LiveEditors
+                    users={onlineUsers}
+                    currentUserId={selfId}
+                    location={currentLiveLocation().location}
+                  />
+                  {target ? (
+                    <Badge variant="info" className="text-xs">
+                      {target.slug}
+                    </Badge>
+                  ) : null}
+                </Flex>
+                <Flex align="center" gap={2} className="flex-wrap">
+                  <Button
+                    size="sm"
+                    variant={widgetsOpen ? 'ink' : 'outline'}
+                    onClick={() => setWidgetsOpen(true)}
+                  >
+                    {t.contentEdit.widgetsOpen}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={preview ? 'ink' : 'outline'}
+                    onClick={() => setPreview((value) => !value)}
+                  >
+                    {preview ? t.contentEdit.editMode : t.contentEdit.preview}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      if (target) navigate(cmsBuilderPath({ doc: target.id }));
+                    }}
+                    disabled={!target}
+                  >
+                    {t.contentEdit.openStage}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    icon={<BearIcons.SaveIcon size={CMS_ICON_SIZE} />}
+                    onClick={() => void onSave()}
+                    disabled={!target || saving || pageLocked}
+                  >
+                    {saving ? t.dashboard.saving : t.dashboard.save}
+                  </Button>
+                </Flex>
+              </Flex>
+            </Card>
+          }
+        />
 
         {pageLocked && pageOwner && (
           <Alert severity="warning">
@@ -531,8 +621,29 @@ export const ContentEdit: FC = () => {
         {target ? (
           <div
             className="bifrost-cms-edit__layout"
-            style={{ gridTemplateColumns: `minmax(0, 1fr) ${sideWidth}px` }}
+            style={{
+              gridTemplateColumns: `${CONTENT_EDIT_SETTINGS_WIDTH_PX}px minmax(0, 1fr) ${sideWidth}px`,
+            }}
           >
+            <ContentEditSettings
+              status={status}
+              statusOrder={CONTENT_EDIT_STATUS_ORDER}
+              slug={slug}
+              routePrefix={routePrefix}
+              homepage={homepage}
+              statusLabel={t.contentEdit.statusLabel}
+              routeLabel={t.contentEdit.routeLabel}
+              homepageLabel={t.dashboard.contentHomepage}
+              homepageHint={t.contentEdit.homepageHint}
+              visibilityHint={t.contentEdit.visibilityHint}
+              slugInputId={CONTENT_EDIT_SETTINGS_SLUG_ID}
+              onStatus={onStatusSelect}
+              onSlug={(value) => {
+                setSlug(value);
+                markUnsaved();
+              }}
+              onHomepage={onToggleHomepage}
+            />
             <Card className="bifrost-cms-edit__main" padding={CMS_CARD_PADDING}>
               <Flex direction="column" gap={3}>
                 <Input
@@ -547,12 +658,6 @@ export const ContentEdit: FC = () => {
                   label={t.contentEdit.subtitle}
                   value={subtitle}
                   onChange={onStringInput(setSubtitle)}
-                />
-                <Input
-                  id={CONTENT_EDIT_SLUG_ID}
-                  label={t.contentEdit.slug}
-                  value={slug}
-                  onChange={onStringInput(setSlug)}
                 />
                 {preview && (
                   <div
@@ -575,9 +680,9 @@ export const ContentEdit: FC = () => {
                       onMouseDown={(event) => {
                         event.preventDefault();
                         const startX = event.clientX;
-                        const startWidth = previewWidth || event.currentTarget.parentElement?.clientWidth || CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX;
+                        const startWidth = previewWidth || event.currentTarget.parentElement?.clientWidth || NUMBER_THREE_HUNDRED_TWENTY;
                         const onMove = (moveEvent: globalThis.MouseEvent) => {
-                          setPreviewWidth(Math.max(CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX, startWidth + moveEvent.clientX - startX));
+                          setPreviewWidth(Math.max(NUMBER_THREE_HUNDRED_TWENTY, startWidth + moveEvent.clientX - startX));
                         };
                         const onUp = () => {
                           window.removeEventListener('mousemove', onMove);
@@ -604,9 +709,10 @@ export const ContentEdit: FC = () => {
                         setCastValues((current) => ({ ...current, [name]: value }));
                         setSaveOk(false);
                       }}
-                      onDrop={onEditorDrop}
+                      onDropAt={onStageDrop}
                       attachLabel={t.contentEdit.attachTranslation}
                       hideLabel={t.contentEdit.hideForRole}
+                      reorderLabel={t.contentEdit.reorderHandle}
                       roleLabels={{
                         default: t.contentEdit.roleDefault,
                         editor: t.contentEdit.roleEditor,
@@ -620,6 +726,23 @@ export const ContentEdit: FC = () => {
                         setSaveOk(false);
                       }}
                     />
+                    <div className="bifrost-cms-ink-block">
+                      <Typography variant="caption" className="bifrost-cms-ink-block__tag mb-0">
+                        {t.contentEdit.inkBlock}
+                      </Typography>
+                      <InkEditor
+                        value={bodyHtml}
+                        onChange={(next) => {
+                          setBodyHtml(next);
+                          setSaveOk(false);
+                        }}
+                        colorMode="light"
+                        variant="document"
+                        minHeight={NUMBER_FOUR_HUNDRED_TWENTY}
+                        features={{ blocks: true, slash: true, table: true, ai: true }}
+                        ai={cmsInkAiProps()}
+                      />
+                    </div>
                   </Flex>
                 )}
                 {!preview && !useFieldEditor && (
@@ -642,7 +765,7 @@ export const ContentEdit: FC = () => {
                       }}
                       colorMode="light"
                       variant="document"
-                      minHeight={CONTENT_EDIT_EDITOR_MIN_HEIGHT_PX}
+                      minHeight={NUMBER_FOUR_HUNDRED_TWENTY}
                       features={{ blocks: true, slash: true, table: true, ai: true }}
                       ai={cmsInkAiProps()}
                     />

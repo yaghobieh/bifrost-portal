@@ -22,3 +22,5 @@ export type {
 } from './auth.types';
 export { usePublicPage } from './usePublicPage';
 export type { UsePublicPageResult } from './usePublicPage.types';
+export { useBlogEdit } from '@pages/Cms/BlogEdit/hooks';
+export type { UseBlogEditResult } from '@pages/Cms/BlogEdit/BlogEdit.types';

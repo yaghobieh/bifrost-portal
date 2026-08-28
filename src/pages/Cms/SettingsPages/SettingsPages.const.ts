@@ -95,6 +95,8 @@ export const SETTINGS_SITE_DEFAULTS = {
   fromEmail: EMPTY_STRING,
   chatSide: CMS_CHAT_SIDE_RIGHT,
   hiddenNavIds: [] as string[],
+  hiddenPublicNavIds: [] as string[],
+  blogPath: '/blog',
   anyoneCanRegister: false,
   searchEngineVisible: true,
   allowComments: false,
@@ -117,6 +119,19 @@ export const SETTINGS_CHAT_SIDES = {
   LEFT: CMS_CHAT_SIDE_LEFT,
   RIGHT: CMS_CHAT_SIDE_RIGHT,
 } as const;
+
+export const SETTINGS_PUBLIC_NAV_IDS = [
+  'product',
+  'docs',
+  'plans',
+  'demo',
+  'changelog',
+  'status',
+  'blog',
+  'guides',
+  'api',
+  'askAi',
+] as const;
 
 export const SETTINGS_NAV_TOGGLE_IDS = [
   CMS_NAV_IDS.DASHBOARD,
@@ -232,6 +247,7 @@ export const SETTINGS_SITE_INPUT_IDS = {
   API_ERROR: 'bifrost-cms-site-api-error',
   POSTS_PER_PAGE: 'bifrost-cms-site-posts-per-page',
   HOMEPAGE: 'bifrost-cms-site-homepage',
+  BLOG_PATH: 'bifrost-cms-site-blog-path',
   LOADING_MESSAGE: 'bifrost-cms-site-loading-message',
   LOADING_SIZE: 'bifrost-cms-site-loading-size',
 } as const;

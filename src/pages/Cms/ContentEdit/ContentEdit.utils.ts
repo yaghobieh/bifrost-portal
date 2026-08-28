@@ -41,9 +41,6 @@ import {
 } from './ContentEdit.const';
 import type { ContentEditTarget } from './ContentEdit.types';
 
-const HEADER_DEFAULT_LEVEL = NUMBER_TWO;
-const HEADER_MAX_LEVEL = NUMBER_FOUR;
-
 const escapeHtml = (value: string): string =>
   value
     .replace(/&/g, '&amp;')
@@ -66,9 +63,9 @@ const headerHtml = (entry: Record<string, unknown>): string => {
   if (!text) return EMPTY_STRING;
   const raw = entry[PAYLOAD_LEVEL_KEY];
   const level =
-    isNumberValue(raw) && raw >= NUMBER_ONE && raw <= HEADER_MAX_LEVEL
+    isNumberValue(raw) && raw >= NUMBER_ONE && raw <= NUMBER_FOUR
       ? raw
-      : HEADER_DEFAULT_LEVEL;
+      : NUMBER_TWO;
   return wrapTag(`${HTML_TAG_H}${level}`, escapeHtml(text));
 };
 
@@ -163,6 +160,16 @@ export const appendWidgetHtml = (bodyHtml: string, widgetHtml: string): string =
   return `${bodyHtml}${HTML_NEWLINE}${widgetHtml}`;
 };
 
+export const insertWidgetHtmlAt = (bodyHtml: string, widgetHtml: string, atStart: boolean): string => {
+  if (!bodyHtml) {
+    return widgetHtml;
+  }
+  if (atStart) {
+    return `${widgetHtml}${HTML_NEWLINE}${bodyHtml}`;
+  }
+  return appendWidgetHtml(bodyHtml, widgetHtml);
+};
+
 export { loadSeoCollapsed, saveSeoCollapsed } from '@utils';
 
 export const resolveEditTarget = (
@@ -213,12 +220,42 @@ export const resolveEditTarget = (
   return null;
 };
 
+const payloadValueText = (value: unknown): string => {
+  if (isStringValue(value) && value) {
+    return value;
+  }
+  if (Array.isArray(value) && value.length > NUMBER_ZERO) {
+    return payloadValueText(value[NUMBER_ZERO]);
+  }
+  return EMPTY_STRING;
+};
+
+/**
+ * Reads the first non-empty string from `payload` for the given keys.
+ * Arrays use the first item. Pass several keys to fall through.
+ */
 export const payloadString = (
   payload: Record<string, unknown> | undefined,
-  key: string,
+  ...keys: string[]
 ): string => {
-  const value = payload?.[key];
-  return isStringValue(value) ? value : EMPTY_STRING;
+  for (const key of keys) {
+    const text = payloadValueText(payload?.[key]);
+    if (text) {
+      return text;
+    }
+  }
+  return EMPTY_STRING;
+};
+
+/**
+ * Same as {@link payloadString}, and accepts a Promise payload.
+ */
+export const payloadStringPromise = async (
+  payload: Record<string, unknown> | undefined | Promise<Record<string, unknown> | undefined>,
+  ...keys: string[]
+): Promise<string> => {
+  const resolved = await payload;
+  return payloadString(resolved, ...keys);
 };
 
 const pad = (value: number): string => String(value).padStart(NUMBER_TWO, PAD_CHAR_ZERO);

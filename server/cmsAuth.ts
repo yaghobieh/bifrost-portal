@@ -28,6 +28,7 @@ import {
   METHOD_GET,
   METHOD_PUT,
   NUMBER_ZERO,
+  NUMBER_ONE,
   PACKAGE_VERSION,
   PLAN_FREE,
   PRODUCT_BIFROST,
@@ -38,6 +39,9 @@ import {
   SERVICE_NAME,
   SETTINGS_BODY_VALUE,
   SETTINGS_KV_KEYS,
+  SETTINGS_KV_SITE,
+  DEFAULT_BLOG_PATH,
+  PAYLOAD_VIEWS_KEY,
   SPRINT_VERSION,
   WEEK_DAY_COUNT,
   COLLECTION_BLOG,
@@ -419,6 +423,56 @@ const ensureKvTable = async (databaseUrl: string): Promise<void> => {
   `;
 };
 
+const payloadViews = (payload: Record<string, unknown>): number => {
+  const value = payload[PAYLOAD_VIEWS_KEY];
+  if (typeof value === 'number' && Number.isFinite(value) && value >= NUMBER_ZERO) {
+    return value;
+  }
+  return NUMBER_ZERO;
+};
+
+export const publicSiteChrome = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl } = params;
+  try {
+    await ensureKvTable(databaseUrl);
+    const sql = neon(databaseUrl);
+    const rows = await sql`
+      SELECT key, value
+      FROM cms_kv
+      WHERE key = ${SETTINGS_KV_SITE}
+      LIMIT 1
+    `;
+    const row = firstRow<CmsKvRow>(rows);
+    const parsed = row ? parseKvValue(row.value) : null;
+    let hiddenPublicNavIds: string[] = [];
+    let blogPath = DEFAULT_BLOG_PATH;
+    let showTopNav = true;
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const record = parsed as Record<string, unknown>;
+      if (Array.isArray(record.hiddenPublicNavIds)) {
+        hiddenPublicNavIds = record.hiddenPublicNavIds.filter(
+          (id): id is string => typeof id === 'string',
+        );
+      }
+      if (typeof record.blogPath === 'string' && record.blogPath.trim()) {
+        blogPath = record.blogPath.trim();
+      }
+      if (record.showTopNav === false) {
+        showTopNav = false;
+      }
+    }
+    return {
+      status: HTTP_STATUS_OK,
+      body: { hiddenPublicNavIds, blogPath, showTopNav },
+    };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
+};
+
 export const handleSettings = async (params: {
   databaseUrl: string;
   request: Request;
@@ -600,7 +654,17 @@ export const publishedBlogBySlug = async (params: {
     if (!item || item.collection !== COLLECTION_BLOG) {
       return { status: HTTP_STATUS_OK, body: { item: null } };
     }
-    return { status: HTTP_STATUS_OK, body: { item } };
+    const nextPayload = {
+      ...item.payload,
+      [PAYLOAD_VIEWS_KEY]: payloadViews(item.payload) + NUMBER_ONE,
+    };
+    const sql = neon(databaseUrl);
+    await sql`
+      UPDATE cms_content
+      SET payload = ${JSON.stringify(nextPayload)}
+      WHERE id = ${item.id}
+    `;
+    return { status: HTTP_STATUS_OK, body: { item: { ...item, payload: nextPayload } } };
   } catch {
     return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
   }

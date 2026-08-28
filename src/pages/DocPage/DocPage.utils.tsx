@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Link } from '@forgedevstack/forge-compass/react';
 import { NUMBER_ONE, NUMBER_TWO } from '@const/numbers.const';
 import { BACKTICK } from '@const/strings.const';
-import { DOC_PATH } from '@const/routes.const';
+import { DOC_PATH } from '@const/routes.utils';
 import { GUIDE_SLUGS } from '@const/nav.const';
 import { DOC_FOOT_NEXT_MODIFIER, DOC_TAB_DOCS, DOC_TAB_GUIDES } from './DocPage.const';
 import type { DocFootLinkParams, DocPageTab } from './DocPage.types';

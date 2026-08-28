@@ -2,7 +2,7 @@ import { type FC } from 'react';
 import { Link } from '@forgedevstack/forge-compass/react';
 import { Flex, Typography } from '@forgedevstack/bear';
 import { useLingo } from '@forgedevstack/lingo';
-import { DOC_PATH, ROUTES } from '@const/routes.const';
+import { DOC_PATH, ROUTES } from '@const/index';
 import { NUMBER_TEN } from '@const/numbers.const';
 import {
   BIFROST_REPO_URL,

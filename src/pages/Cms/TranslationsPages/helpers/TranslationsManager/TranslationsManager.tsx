@@ -6,7 +6,7 @@ import { CONTENT_TYPE_JSON, EMPTY_STRING, HEADER_CONTENT_TYPE } from '@const/str
 import { HTTP_METHOD_POST, HTTP_NOT_IMPLEMENTED } from '@const/http.const';
 import { INK_API_URL } from '@const/billing.const';
 import { NUMBER_ZERO } from '@const/numbers.const';
-import { TRANSLATE_CATALOGS_PATH } from '@pages/Plans/Plans.const';
+import { TRANSLATE_CATALOGS_PATH } from '@const/strings.const';
 import { CmsGridTable } from '@pages/Cms/CmsShell';
 import {
   loadCmsTranslationsLocal,

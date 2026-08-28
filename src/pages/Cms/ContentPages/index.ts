@@ -5,3 +5,4 @@ export {
 } from './ContentPages.const';
 export type { ContentKind } from './ContentPages.const';
 export { buildDocsCastFields, docsCastValues, docsHtmlFromValues, isDocsLayout } from './ContentPages.utils';
+export { useContentPages } from './hooks';

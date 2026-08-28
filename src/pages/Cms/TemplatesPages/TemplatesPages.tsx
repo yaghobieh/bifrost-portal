@@ -27,6 +27,7 @@ import {
   PAGE_LAYOUT_TEMPLATES,
   PAGE_SLUG_PREFIX,
   TEMPLATES_COLLECTION,
+  TEMPLATES_CTA_VARIANT,
   TEMPLATE_SLUG_PREFIX,
 } from './TemplatesPages.const';
 
@@ -146,8 +147,8 @@ export const TemplatesPages: FC = () => {
         </Typography>
         <div className="bifrost-cms-templates-grid">
           {PAGE_LAYOUT_TEMPLATES.map((layout) => (
-            <Card padding="md" key={layout.id}>
-              <Flex direction="column" gap={2}>
+            <Card padding="md" key={layout.id} className="bifrost-cms-template-card">
+              <Flex direction="column" gap={2} className="bifrost-cms-template-card__inner">
                 <Typography variant="h4" className="mb-0">
                   {layout.title}
                 </Typography>
@@ -161,10 +162,10 @@ export const TemplatesPages: FC = () => {
                     </Typography>
                   ))}
                 </div>
-                <Flex gap={2} className="flex-wrap">
+                <Flex gap={2} className="flex-wrap bifrost-cms-template-card__cta">
                   <Button
                     size="sm"
-                    variant="primary"
+                    variant={TEMPLATES_CTA_VARIANT}
                     icon={<BearIcons.GridIcon size={CMS_ICON_SIZE} />}
                     onClick={() => navigate(cmsBuilderPath({ layout: layout.id }))}
                   >
@@ -172,7 +173,7 @@ export const TemplatesPages: FC = () => {
                   </Button>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant={TEMPLATES_CTA_VARIANT}
                     onClick={() => void onUseLayout(layout.id)}
                     disabled={saving || !activeToken}
                   >
@@ -206,8 +207,8 @@ export const TemplatesPages: FC = () => {
         ) : (
           <div className="bifrost-cms-templates-grid">
             {templates.map((item) => (
-              <Card padding="md" key={item.id}>
-                <Flex direction="column" gap={2}>
+              <Card padding="md" key={item.id} className="bifrost-cms-template-card">
+                <Flex direction="column" gap={2} className="bifrost-cms-template-card__inner">
                   <Typography variant="h4" className="mb-0">
                     {item.title || item.slug}
                   </Typography>
@@ -215,10 +216,10 @@ export const TemplatesPages: FC = () => {
                     {item.collection} · {item.status} · {t.cmsTemplates.fieldCount}{' '}
                     {castFieldsFromPayload(item.payload).length}
                   </Typography>
-                  <Flex gap={2} className="flex-wrap">
+                  <Flex gap={2} className="flex-wrap bifrost-cms-template-card__cta">
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant={TEMPLATES_CTA_VARIANT}
                       icon={<BearIcons.EditIcon size={CMS_ICON_SIZE} />}
                       onClick={() => navigate(cmsBuilderPath({ doc: item.id }))}
                     >
@@ -226,14 +227,14 @@ export const TemplatesPages: FC = () => {
                     </Button>
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant={TEMPLATES_CTA_VARIANT}
                       onClick={() => navigate(cmsEditPath(item.id))}
                     >
                       {t.cmsTemplates.editFields}
                     </Button>
                     <Button
                       size="sm"
-                      variant="primary"
+                      variant={TEMPLATES_CTA_VARIANT}
                       onClick={() => void onUseSaved(item.id)}
                       disabled={saving || !activeToken}
                     >

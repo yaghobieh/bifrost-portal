@@ -1,7 +1,7 @@
 import { useState, type FC, type MouseEvent } from 'react';
 import { AlertDialog, BearIcons, Dropdown } from '@forgedevstack/bear';
-import { CMS_ICON_SIZE } from '@const/numbers.const';
-import { CONTENT_MORE_MENU_MIN_WIDTH, CONTENT_STATUS_DRAFT } from '@pages/Cms/ContentPages/ContentPages.const';
+import { CMS_ICON_SIZE, NUMBER_TWO_HUNDRED } from '@const/numbers.const';
+import { CONTENT_STATUS_DRAFT } from '@pages/Cms/ContentPages/ContentPages.const';
 import {
   CONTENT_ACTIONS_CLASS,
   CONTENT_ICON_BTN_CLASS,
@@ -9,6 +9,7 @@ import {
   CONTENT_MENU_KEY_DELETE,
   CONTENT_MENU_KEY_DRAFT,
   CONTENT_MENU_KEY_DUPLICATE,
+  CONTENT_MENU_KEY_EDIT,
   CONTENT_MENU_KEY_HOMEPAGE,
   CONTENT_MENU_KEY_PUBLISH,
   CONTENT_MENU_KEY_STAGE,
@@ -20,8 +21,10 @@ export const ContentRowActions: FC<ContentRowActionsProps> = (props) => {
   const {
     id,
     status,
+    catalog,
     openLabel,
     moreLabel,
+    editLabel,
     stageLabel,
     duplicateLabel,
     homepageLabel,
@@ -68,6 +71,40 @@ export const ContentRowActions: FC<ContentRowActionsProps> = (props) => {
     statusLabel = publishLabel;
     statusClick = () => onPublish(id);
   }
+  const menuItems = [
+    {
+      key: CONTENT_MENU_KEY_EDIT,
+      label: editLabel,
+      onClick: () => onOpen(id),
+    },
+    {
+      key: CONTENT_MENU_KEY_STAGE,
+      label: stageLabel,
+      onClick: () => onStage(id),
+    },
+    {
+      key: CONTENT_MENU_KEY_DUPLICATE,
+      label: duplicateLabel,
+      onClick: () => onDuplicate(id),
+    },
+    {
+      key: CONTENT_MENU_KEY_HOMEPAGE,
+      label: homepageLabel,
+      onClick: () => onHomepage(id),
+    },
+    {
+      key: statusKey,
+      label: statusLabel,
+      onClick: statusClick,
+    },
+  ];
+  if (!catalog) {
+    menuItems.push({
+      key: CONTENT_MENU_KEY_DELETE,
+      label: deleteLabel,
+      onClick: onAskDelete,
+    });
+  }
   return (
     <div className={CONTENT_ACTIONS_CLASS}>
       <button type="button" className={CONTENT_LINK_CLASS} onClick={stopOpen}>
@@ -75,39 +112,13 @@ export const ContentRowActions: FC<ContentRowActionsProps> = (props) => {
       </button>
       <Dropdown
         placement={CONTENT_MENU_PLACEMENT}
-        minWidth={CONTENT_MORE_MENU_MIN_WIDTH}
+        minWidth={NUMBER_TWO_HUNDRED}
         trigger={
           <button type="button" className={CONTENT_ICON_BTN_CLASS} aria-label={moreLabel}>
             <BearIcons.MoreHorizIcon size={CMS_ICON_SIZE} />
           </button>
         }
-        items={[
-          {
-            key: CONTENT_MENU_KEY_STAGE,
-            label: stageLabel,
-            onClick: () => onStage(id),
-          },
-          {
-            key: CONTENT_MENU_KEY_DUPLICATE,
-            label: duplicateLabel,
-            onClick: () => onDuplicate(id),
-          },
-          {
-            key: CONTENT_MENU_KEY_HOMEPAGE,
-            label: homepageLabel,
-            onClick: () => onHomepage(id),
-          },
-          {
-            key: statusKey,
-            label: statusLabel,
-            onClick: statusClick,
-          },
-          {
-            key: CONTENT_MENU_KEY_DELETE,
-            label: deleteLabel,
-            onClick: onAskDelete,
-          },
-        ]}
+        items={menuItems}
       />
       <AlertDialog
         isOpen={confirmOpen}
