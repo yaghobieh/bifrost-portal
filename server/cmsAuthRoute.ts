@@ -45,6 +45,40 @@ export const handleGetAuth = async (request: Request, run: AuthRunner): Promise<
   return jsonResponse(result.status, result.body);
 };
 
+export const handleAuthedJson = async (
+  request: Request,
+  methods: readonly string[],
+  run: AuthRunner,
+): Promise<Response> => {
+  const options = allowOptions(request);
+  if (options) {
+    return options;
+  }
+  const allowed = methods.includes(request.method);
+  if (!allowed) {
+    return jsonResponse(HTTP_STATUS_METHOD_NOT_ALLOWED, { error: ERROR_METHOD });
+  }
+  const result = await run({ databaseUrl: databaseUrl(), request });
+  return jsonResponse(result.status, result.body);
+};
+
+export const handlePublicJson = async (
+  request: Request,
+  methods: readonly string[],
+  run: AuthRunner,
+): Promise<Response> => {
+  const options = allowOptions(request);
+  if (options) {
+    return options;
+  }
+  const allowed = methods.includes(request.method);
+  if (!allowed) {
+    return jsonResponse(HTTP_STATUS_METHOD_NOT_ALLOWED, { error: ERROR_METHOD });
+  }
+  const result = await run({ databaseUrl: databaseUrl(), request });
+  return jsonResponse(result.status, result.body);
+};
+
 export const handleGetHealth = (request: Request, result: CmsAuthResult): Response => {
   const options = allowOptions(request);
   if (options) {

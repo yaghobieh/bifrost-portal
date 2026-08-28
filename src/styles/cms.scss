@@ -2054,17 +2054,19 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms__agent-bubble--ai {
-  width: auto;
-  min-width: 3.5rem;
-  padding: 0 1rem;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
   background: var(--bear-success-600);
 }
 
 .bifrost-cms__agent-bubble--chat {
-  width: auto;
-  min-width: 3.5rem;
-  padding: 0 1rem;
-  background: var(--bear-info-600);
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  background: #8A3FD4;
 }
 
 .bifrost-cms__agent-chat-badge {
@@ -4337,4 +4339,118 @@ html.bifrost-cms-host #root {
 .bifrost-cms-translations__json-key {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color: var(--bifrost-cms-ai);
+}
+
+.bifrost-cms-page-start {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.bifrost-cms-page-start__card--rec {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bear-primary-500) 18%, transparent);
+}
+
+.bifrost-cms-page-start__tag {
+  color: var(--bear-primary-600);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.bifrost-cms-field-attach {
+  position: relative;
+}
+
+.bifrost-cms-field-attach__menu {
+  position: fixed;
+  z-index: 80;
+  min-width: 14rem;
+  padding: 0.35rem;
+  border: 1px solid var(--bifrost-cms-border);
+  border-radius: 0.6rem;
+  background: var(--bifrost-cms-surface);
+  box-shadow: 0 16px 40px rgb(20 22 28 / 0.2);
+}
+
+.bifrost-cms-field-attach__item,
+.bifrost-cms-field-attach__sub {
+  display: block;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  border: 0;
+  background: none;
+  text-align: start;
+  font-size: 0.75rem;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 0.4rem;
+}
+
+.bifrost-cms-field-attach__sub {
+  cursor: default;
+  color: var(--bear-text-secondary);
+  font-weight: 600;
+}
+
+.bifrost-cms-crew__empty-channels {
+  border: 1.5px dashed var(--bifrost-cms-border);
+  border-radius: 0.5rem;
+  padding: 0.85rem 0.6rem;
+  text-align: center;
+}
+
+.bifrost-cms-crew__status-pill {
+  border-color: var(--bear-success-600) !important;
+}
+
+@media (max-width: 768px) {
+  .bifrost-cms-login__brand {
+    display: none;
+  }
+
+  .bifrost-cms-login__form-panel,
+  .bifrost-cms-login__formbox {
+    width: 100%;
+    max-width: none;
+  }
+
+  .bifrost-cms-page-start {
+    grid-template-columns: 1fr;
+  }
+
+  .bifrost-cms-crew-blob {
+    width: calc(100vw - 1.5rem);
+    height: min(32rem, calc(100vh - 6rem));
+    right: 0.25rem;
+  }
+
+  .bifrost-cms-crew {
+    flex-direction: column;
+  }
+
+  .bifrost-cms-crew__nav {
+    width: 100%;
+    flex: 0 0 auto;
+    max-height: 40%;
+    border-right: 0;
+    border-bottom: 1px solid var(--bear-border-default);
+  }
+
+  .bifrost-cms__agent-bubble,
+  .bifrost-cms__agent-bubble--ai,
+  .bifrost-cms__agent-bubble--chat {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+  }
+
+  .bifrost-cms-field-stage,
+  .bifrost-cms-editor-stage {
+    min-width: 0;
+  }
+
+  .bifrost-cms-pages-wrap {
+    overflow-x: auto;
+  }
 }

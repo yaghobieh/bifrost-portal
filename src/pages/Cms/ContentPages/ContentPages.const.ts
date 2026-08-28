@@ -107,7 +107,7 @@ export const CONTENT_DATE_LOCALE = 'en-CA';
 export const CONTENT_STATUS_PUBLISHED = 'published';
 export const CONTENT_STATUS_DRAFT = 'draft';
 export const CONTENT_TEMPLATE_EMPTY = '—';
-export const CONTENT_MORE_MENU_MIN_WIDTH = 160;
+export const CONTENT_MORE_MENU_MIN_WIDTH = 200;
 
 export const CONTENT_NEW_PAGE_MENU_MIN_WIDTH = 220;
 export const SAVED_TEMPLATES_DIVIDER_KEY = 'saved-templates-divider';

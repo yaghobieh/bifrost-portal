@@ -35,3 +35,32 @@ export type CmsAuthResult = {
 };
 
 export type CmsJsonBody = Record<string, string | undefined>;
+
+export type CmsKvRow = {
+  key: string;
+  value: unknown;
+};
+
+export type CmsAdminContentRow = {
+  id: string;
+  collection: string;
+  slug: string;
+  locale: string;
+  title: string;
+  payload: Record<string, unknown> | string;
+  status: string;
+  created_at: string | Date;
+  updated_at: string | Date;
+};
+
+export type CmsAdminContentItem = {
+  id: string;
+  collection: string;
+  slug: string;
+  locale: string;
+  title: string;
+  payload: Record<string, unknown>;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};

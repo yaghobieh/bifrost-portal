@@ -10,7 +10,7 @@ alwaysApply: true
 1. Open the CMS Jira board (key `CMS`).
 2. Move the issue to **In Progress**.
 3. Branch from the **portal sprint release branch**, not from `main`.
-4. This portal sprint is **1.0.0** → `release/1.0.0`.
+4. CMS admin sprint is **1.1.12** → `release/1.1.12`. Product version stays **1.0.0**.
 5. Ticket branch: `{feature|bug}/{PROJECT}-{n}`.
 
 ## Prefix
@@ -26,11 +26,11 @@ Label portal work `bifrost-portal` and `portal`. CMS admin work uses `library` /
 
 ## Stories and subtasks
 
-- Story in progress: branch `feature/CMS-128` from `release/1.0.0`.
+- Story in progress: branch `feature/CMS-128` from `release/1.1.12`.
 - Subtasks open PRs **into the story branch**.
-- After checks: merge the story into `release/1.0.0` (Jira → In Review).
+- After checks: merge the story into `release/1.1.12` (Jira → In Review).
 - Do not merge portal WIP into `main` mid-sprint.
 
 ## Sprint end
 
-Merge `release/1.0.0` → `main`, then deploy the public docs site.
+Merge `release/1.1.12` → `main`, then deploy the public docs site and `/cms`.

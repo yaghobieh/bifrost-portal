@@ -47,6 +47,7 @@ export const ROUTES = {
   CMS_TRANSLATIONS: '/cms/translations',
   CMS_CAST: '/cms/cast',
   CMS_TASKS: '/cms/tasks',
+  CMS_BLOG: '/cms/blog',
   SENSORS: '/sensors',
   PAGES: '/pages',
   NOT_FOUND: '/404',

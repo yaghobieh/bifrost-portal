@@ -181,9 +181,14 @@ export const CrewChatSidebar: FC<CrewChatSidebarProps> = (props) => {
           );
         })}
         {visibleChannels.length === NUMBER_ZERO && (
-          <Typography variant="caption" className="bifrost-cms__muted mb-0">
-            {roomsEmptyLabel}
-          </Typography>
+          <div className="bifrost-cms-crew__empty-channels">
+            <Typography variant="caption" className="bifrost-cms__muted mb-0">
+              {roomsEmptyLabel}
+            </Typography>
+            <Button size="sm" variant="ghost" onClick={onToggleNewRoom}>
+              {newRoomLabel}
+            </Button>
+          </div>
         )}
       </Flex>
       <Typography variant="caption" className="bifrost-cms-crew__section mb-0">

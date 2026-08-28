@@ -163,7 +163,7 @@ export const registerWithPassword = async (params: {
   return { status: HTTP_STATUS_OK, body: { user: toPublicUser(user), token } };
 };
 
-const requireUser = async (params: {
+export const requireUser = async (params: {
   databaseUrl: string;
   request: Request;
 }): Promise<{ user: CmsUserRow } | CmsAuthResult> => {
@@ -183,7 +183,7 @@ const requireUser = async (params: {
   return { user };
 };
 
-const isAuthResult = (value: { user: CmsUserRow } | CmsAuthResult): value is CmsAuthResult =>
+export const isAuthResult = (value: { user: CmsUserRow } | CmsAuthResult): value is CmsAuthResult =>
   'status' in value;
 
 export const currentUser = async (params: {

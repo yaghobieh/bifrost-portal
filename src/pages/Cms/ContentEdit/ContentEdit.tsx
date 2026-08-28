@@ -605,6 +605,20 @@ export const ContentEdit: FC = () => {
                         setSaveOk(false);
                       }}
                       onDrop={onEditorDrop}
+                      attachLabel={t.contentEdit.attachTranslation}
+                      hideLabel={t.contentEdit.hideForRole}
+                      roleLabels={{
+                        default: t.contentEdit.roleDefault,
+                        editor: t.contentEdit.roleEditor,
+                        manager: t.contentEdit.roleManager,
+                        captain: t.contentEdit.roleCaptain,
+                      }}
+                      onAttach={() => {
+                        setTranslationOpen(true);
+                      }}
+                      onHideRole={() => {
+                        setSaveOk(false);
+                      }}
                     />
                   </Flex>
                 )}
