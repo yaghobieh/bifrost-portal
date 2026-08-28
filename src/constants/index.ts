@@ -1,6 +1,7 @@
 export * from './numbers.const';
 export * from './routes.const';
 export * from './env.const';
+export * from './hosts.const';
 export * from './strings.const';
 export * from './urls.const';
 export * from './billing.const';
