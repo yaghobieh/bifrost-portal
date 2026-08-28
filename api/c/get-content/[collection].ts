@@ -1,4 +1,4 @@
-import { listAdminContent } from '../../../server/cmsAdminContent';
+import { listAdminContent } from '../../../server/cmsAuth';
 import { handleGetAuth } from '../../../server/cmsAuthRoute';
 
 export const config = { runtime: 'edge' };

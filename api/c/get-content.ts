@@ -1,6 +1,6 @@
-import { handleAdminContent } from '../../server/cmsAdminContent';
-import { handleAuthedJson } from '../../server/cmsAuthRoute';
+import { handleAdminContent } from '../../server/cmsAuth';
 import { METHOD_GET, METHOD_POST } from '../../server/cmsAuth.const';
+import { handleAuthedJson } from '../../server/cmsAuthRoute';
 
 export const config = { runtime: 'edge' };
 

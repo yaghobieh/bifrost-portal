@@ -1,13 +1,48 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/((?!api/|assets/).*)",
-      "destination": "/index.html"
+      "source": "/api/cms/media/config",
+      "destination": "/api/health?rest=media-config"
+    },
+    {
+      "source": "/api/public/plugins",
+      "destination": "/api/health?rest=plugins"
+    },
+    {
+      "source": "/api/v1/version",
+      "destination": "/api/health?rest=version"
+    },
+    {
+      "source": "/api/version",
+      "destination": "/api/health?rest=version"
+    },
+    {
+      "source": "/api/cms/settings/:key",
+      "destination": "/api/c/dashboard?rest=settings&key=:key"
+    },
+    {
+      "source": "/api/v1/page",
+      "destination": "/api/c/pages?rest=page"
+    },
+    {
+      "source": "/api/blog/posts",
+      "destination": "/api/c/pages?rest=blog"
+    },
+    {
+      "source": "/api/blog/posts/:slug",
+      "destination": "/api/c/pages?rest=blog&slug=:slug"
+    },
+    {
+      "source": "/api/cms/:path*",
+      "destination": "/api/c/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
     }
   ],
   "headers": [

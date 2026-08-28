@@ -1,11 +1,14 @@
 import { neon } from '@neondatabase/serverless';
 import {
+  EMPTY_STRING,
+  ERROR_INTERNAL,
   ERROR_INVALID_SETTINGS_KEY,
   ERROR_SETTINGS_VALUE_REQUIRED,
   HTTP_STATUS_BAD_REQUEST,
   HTTP_STATUS_OK,
   METHOD_GET,
   METHOD_PUT,
+  QUERY_KEY,
   SETTINGS_BODY_VALUE,
   SETTINGS_KV_KEYS,
 } from './cmsAuth.const';
@@ -13,7 +16,6 @@ import type { CmsAuthResult, CmsKvRow } from './cmsAuth.types';
 import { isAuthResult, requireUser } from './cmsAuth';
 import { firstRow, readUnknownObject } from './cmsAuth.utils';
 import { HTTP_STATUS_INTERNAL_SERVER_ERROR } from './cmsDocs.const';
-import { ERROR_INTERNAL } from './cmsAuth.const';
 
 const isSettingsKey = (value: string): boolean => {
   for (const key of SETTINGS_KV_KEYS) {
@@ -26,8 +28,12 @@ const isSettingsKey = (value: string): boolean => {
 
 const keyFromUrl = (request: Request): string => {
   const url = new URL(request.url);
+  const fromQuery = (url.searchParams.get(QUERY_KEY) ?? EMPTY_STRING).trim();
+  if (fromQuery) {
+    return fromQuery;
+  }
   const parts = url.pathname.split('/').filter(Boolean);
-  const last = parts[parts.length - 1] ?? '';
+  const last = parts[parts.length - 1] ?? EMPTY_STRING;
   return last.trim();
 };
 
