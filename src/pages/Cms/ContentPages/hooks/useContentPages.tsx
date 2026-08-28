@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import type { ColumnDefinition } from '@forgedevstack/grid-table';
@@ -38,6 +38,7 @@ import {
   slugFromCatalogId,
   templateKindFromPayload,
   titleFromSlug,
+  uniqueSlugs,
   buildDocsCastFields,
 } from '../ContentPages.utils';
 import { ContentRowActions } from '../helpers/ContentRowActions';
@@ -47,6 +48,8 @@ import {
   PAGE_START_LAYOUT_BY_ID,
 } from '../helpers/PageStart';
 import type { PageStartId } from '../helpers/PageStart';
+import { fetchPublicDocsList } from '@data/index';
+import type { CmsDocItem } from '@data/docs.types';
 import { cloneCanvasTree, canvasFromPayload } from '@pages/Cms/BuilderPages/BuilderPages.utils';
 import {
   PAYLOAD_KEY_CAST_FIELDS,
@@ -82,6 +85,13 @@ export const useContentPages = (): UseContentPagesResult => {
     useNucleus(contentNucleus);
   const activeToken = token || providerToken;
   const actorName = loadCmsProfile().displayName || loadCmsProfile().username;
+  const [publicDocs, setPublicDocs] = useState<CmsDocItem[]>([]);
+
+  useEffect(() => {
+    void fetchPublicDocsList().then((next) => {
+      setPublicDocs(next);
+    });
+  }, []);
 
   useEffect(() => {
     if (!activeToken) {
@@ -131,23 +141,32 @@ export const useContentPages = (): UseContentPagesResult => {
       catalog: false,
     }));
   const knownSlugs = new Set(cmsRows.map((row) => row.slug));
-  const catalogRows: ContentTableRow[] = catalogDocSlugs()
-    .filter((slug) => !knownSlugs.has(slug))
-    .map((slug) => ({
+  const publishedBySlug = new Map(publicDocs.map((item) => [item.slug, item]));
+  const catalogSlugs = uniqueSlugs([
+    ...catalogDocSlugs(),
+    ...publicDocs.map((item) => item.slug),
+  ]).filter((slug) => !knownSlugs.has(slug));
+  const catalogRows: ContentTableRow[] = catalogSlugs.map((slug) => {
+    const published = publishedBySlug.get(slug);
+    const publishedAt = published?.updatedAt || EMPTY_STRING;
+    return {
       id: catalogDocId(slug),
       kind: CONTENT_KIND_ITEM as typeof CONTENT_KIND_ITEM,
-      title: titleFromSlug(slug),
+      title: published?.title || titleFromSlug(slug),
       slug,
-      collection: CONTENT_COLLECTION_DOCS,
+      collection: CONTENT_COLLECTION_PAGES,
       template: templateKindLabel(TEMPLATE_KIND.DOC),
       fields: EMPTY_STRING,
-      status: CONTENT_STATUS_DRAFT,
+      status: published ? CONTENT_STATUS_PUBLISHED : CONTENT_STATUS_DRAFT,
       createdBy: EMPTY_STRING,
       updatedBy: EMPTY_STRING,
-      updatedAt: EMPTY_STRING,
-      updated: CONTENT_TEMPLATE_EMPTY,
+      updatedAt: publishedAt,
+      updated: publishedAt
+        ? formatContentUpdated(publishedAt, CONTENT_DATE_LOCALE)
+        : CONTENT_TEMPLATE_EMPTY,
       catalog: true,
-    }));
+    };
+  });
   const rows: ContentTableRow[] = [...catalogRows, ...cmsRows];
 
   const onNewPage = async (layoutId: string) => {
@@ -164,9 +183,8 @@ export const useContentPages = (): UseContentPagesResult => {
         : [];
     const title = layout?.title || saved?.title || t.dashboard.newPageBlank;
     const slug = `${PAGE_SLUG_PREFIX}${Date.now()}`;
-    const docsLayout = Boolean(layout && isDocsLayout(layout.id));
     const item = await saveContentRequest(activeToken, {
-      collection: docsLayout ? CONTENT_COLLECTION_DOCS : CONTENT_COLLECTION_PAGES,
+      collection: CONTENT_COLLECTION_PAGES,
       slug,
       locale: DOCUMENT_DEFAULT_LOCALE,
       title,
@@ -206,14 +224,17 @@ export const useContentPages = (): UseContentPagesResult => {
     }
     const slug = slugFromCatalogId(id);
     const existing = items.find(
-      (item) => item.collection === CONTENT_COLLECTION_DOCS && item.slug === slug,
+      (item) =>
+        item.slug === slug &&
+        (item.collection === CONTENT_COLLECTION_PAGES ||
+          item.collection === CONTENT_COLLECTION_DOCS),
     );
     if (existing) {
       navigate(cmsEditPath(existing.id));
       return;
     }
     const item = await saveContentRequest(activeToken, {
-      collection: CONTENT_COLLECTION_DOCS,
+      collection: CONTENT_COLLECTION_PAGES,
       slug,
       locale: DOCUMENT_DEFAULT_LOCALE,
       title: titleFromSlug(slug),

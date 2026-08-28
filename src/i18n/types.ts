@@ -377,6 +377,8 @@ export interface Messages {
     searchShortcut: string;
     searchEmpty: string;
     resizeNav: string;
+    openNav: string;
+    closeNav: string;
     notifications: string;
     installment: string;
     general: string;

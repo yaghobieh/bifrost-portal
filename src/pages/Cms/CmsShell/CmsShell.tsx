@@ -73,6 +73,7 @@ import {
   CMS_SEARCH_KEY,
   CMS_KEY_ENTER,
   CMS_SIDEBAR_COLLAPSED_WIDTH_PX,
+  CMS_BOTTOM_NAV_IDS,
   CMS_CREW_PENDING_PREFIX,
   CMS_CREW_DRAWER_OPEN,
 } from './CmsShell.const';
@@ -90,6 +91,8 @@ import {
 } from './CmsShell.utils';
 import { ErrorHost } from './ErrorHost';
 import { CmsUpdateBanner } from './helpers/CmsUpdateBanner';
+import { CmsBottomNav } from './helpers/CmsBottomNav';
+import { CmsNavOverlay } from './helpers/CmsNavOverlay';
 import { useCmsLive } from './CmsLiveProvider';
 import { CMS_LIVE_LOCAL_ROOM_PREFIX } from './CmsLive.const';
 import { findDirectRoom, findServerMatch } from './CmsLive.utils';
@@ -127,6 +130,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const { onlineUsers, rooms, createRoom, sendChat, selfId, tasks, availability, setAvailability } = useCmsLive();
   const [site, setSite] = useState(() => loadCmsSite());
   const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
+  const [navOpen, setNavOpen] = useState(false);
   const resolvedMode = resolveCmsMode(modePreference);
 
   useEffect(() => {
@@ -495,13 +499,31 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     if (item.onClick) {
       item.onClick();
       setFlyoutId(null);
+      setNavOpen(false);
       return;
     }
     const href = item.href || CMS_NAV_ROUTES[item.id];
     if (!href) return;
     setFlyoutId(null);
+    setNavOpen(false);
     navigate(href);
   };
+
+  const bottomNavItems = CMS_BOTTOM_NAV_IDS.flatMap((id) => {
+    const item = leafItems.find((leaf) => leaf.id === id);
+    if (!item) {
+      return [];
+    }
+    return [
+      {
+        id: item.id,
+        label: item.label,
+        icon: item.icon,
+        active: item.id === activeNavId,
+        onClick: () => onItemClick(item),
+      },
+    ];
+  });
 
   useEffect(() => {
     const rail = shellRef.current?.querySelector('.bifrost-cms__rail');
@@ -569,6 +591,23 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     site.showAgent &&
     (activeNavId === CMS_NAV_IDS.BUILDER || activeNavId === CMS_NAV_IDS.CONTENT);
 
+  const navToggle = (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="bifrost-cms__menu"
+      icon={
+        navOpen ? (
+          <BearIcons.XIcon size={CMS_ICON_SIZE} />
+        ) : (
+          <BearIcons.MenuIcon size={CMS_ICON_SIZE} />
+        )
+      }
+      aria-label={navOpen ? t.cmsShell.closeNav : t.cmsShell.openNav}
+      onClick={() => setNavOpen((open) => !open)}
+    />
+  );
+
   if (userLoading) {
     return <CmsGlowLoader label={t.cmsShell.sessionChecking} />;
   }
@@ -582,9 +621,15 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     <CmsUpdateBanner token={activeToken} />
     <div
       ref={shellRef}
-      className={`bifrost-cms bifrost-cms--${resolvedMode}`}
+      className={`bifrost-cms bifrost-cms--${resolvedMode}${navOpen ? ' is-nav-open' : ''}`}
       data-color-mode={resolvedMode}
     >
+      {navOpen && (
+        <CmsNavOverlay
+          label={t.cmsShell.closeNav}
+          onClose={() => setNavOpen(false)}
+        />
+      )}
       <div className="bifrost-cms__rail">
       <div className="bifrost-cms__rail-stack">
       <Sidebar
@@ -625,7 +670,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               <span className="bifrost-cms__avatar-swatch">
                 <Avatar src={avatarSrc} initials={avatarInitials} size="sm" />
               </span>
-              {collapsed ? null : (
+              {!collapsed && (
                 <Typography variant="caption" className="bifrost-cms__footer-name mb-0">
                   {displayName}
                 </Typography>
@@ -644,7 +689,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
           </Flex>
       </div>
       </div>
-      {collapsed ? null : (
+      {!collapsed && (
         <button
           type="button"
           className="bifrost-cms__resize"
@@ -652,7 +697,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
           onMouseDown={onResizeStart}
         />
       )}
-      {collapsed && flyoutGroup ? (
+      {collapsed && flyoutGroup && (
         <div className="bifrost-cms__nav-flyout" role="menu">
           <Typography variant="caption" className="bifrost-cms__nav-flyout-title mb-0">
             {flyoutGroup.label}
@@ -669,7 +714,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             </button>
           ))}
         </div>
-      ) : null}
+      )}
       </div>
       <div className="bifrost-cms__main">
         {site.showTopNav ? (
@@ -679,7 +724,9 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             color="default"
             className="bifrost-cms__appbar"
             leftContent={
-              <div className="bifrost-cms__search-wrap">
+              <Flex align="center" gap={2} className="bifrost-cms__appbar-left">
+                {navToggle}
+                <div className="bifrost-cms__search-wrap">
                 <Input
                   id={CMS_SEARCH_INPUT_ID}
                   size="sm"
@@ -721,6 +768,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
                   </div>
                 ) : null}
               </div>
+              </Flex>
             }
             centerContent={
               showAgentBar ? <CmsAgentBar onApply={onAgentApply} /> : undefined
@@ -824,7 +872,9 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               </Flex>
             }
           />
-        ) : null}
+        ) : (
+          <div className="bifrost-cms__mobile-bar">{navToggle}</div>
+        )}
         <ErrorHost />
         {chatToast ? (
           <div className="bifrost-cms-error-toast">
@@ -850,6 +900,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
         ) : null}
         <main className="bifrost-cms__content fade-in">{children}</main>
       </div>
+      <CmsBottomNav items={bottomNavItems} label={t.cmsShell.brand} />
       <CmsAgentDock
         side={site.chatSide}
         onOpenAi={() => setChatOpen(true)}

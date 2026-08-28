@@ -424,6 +424,8 @@ export const es: Messages = {
     searchShortcut: '⌘K',
     searchEmpty: 'Sin coincidencias',
     resizeNav: 'Cambiar tamaño del menú',
+    openNav: 'Abrir menú',
+    closeNav: 'Cerrar menú',
     notifications: 'Notificaciones',
     installment: 'Instalar sitio',
     general: 'Ajustes generales',

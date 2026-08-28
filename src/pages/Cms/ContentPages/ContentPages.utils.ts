@@ -14,6 +14,7 @@ import { createNamedCastField } from '@pages/Cms/CastPages/CastPages.utils';
 import type { CastField } from '@pages/Cms/CastPages/CastPages.types';
 import {
   CONTENT_COLLECTION_DOCS,
+  CONTENT_COLLECTION_PAGES,
   CONTENT_STATUS_CLASS,
   CONTENT_STATUS_DRAFT,
   CONTENT_STATUS_PUBLISHED,
@@ -48,8 +49,20 @@ export const templateFromPayload = (payload: Record<string, unknown>): string =>
   return EMPTY_STRING;
 };
 
+export const isDocsCatalogCollection = (collection: string): boolean => {
+  if (collection === CONTENT_COLLECTION_DOCS) {
+    return true;
+  }
+  if (collection === CONTENT_COLLECTION_PAGES) {
+    return true;
+  }
+  return false;
+};
+
 export const openContentRowTarget = (row: ContentTableRow): void => {
-  if (row.collection !== CONTENT_COLLECTION_DOCS) return;
+  if (!isDocsCatalogCollection(row.collection)) {
+    return;
+  }
   const url = resolveDocsPublicUrl(row.slug);
   window.open(url, '_blank', 'noopener,noreferrer');
 };
@@ -102,6 +115,19 @@ export const slugFromCatalogId = (id: string): string => id.slice(DOC_CATALOG_ID
 
 export const catalogDocSlugs = (): string[] =>
   NAV_GROUPS.flatMap((group) => group.items.map((item) => item.slug));
+
+export const uniqueSlugs = (slugs: string[]): string[] => {
+  const seen = new Set<string>();
+  const next: string[] = [];
+  for (const slug of slugs) {
+    if (seen.has(slug)) {
+      continue;
+    }
+    seen.add(slug);
+    next.push(slug);
+  }
+  return next;
+};
 
 export const templateKindFromPayload = (
   payload: Record<string, unknown>,

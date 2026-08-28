@@ -425,6 +425,8 @@ export const en: Messages = {
     searchShortcut: '⌘K',
     searchEmpty: 'No matching pages',
     resizeNav: 'Resize sidebar',
+    openNav: 'Open menu',
+    closeNav: 'Close menu',
     notifications: 'Notifications',
     installment: 'Install site',
     general: 'General settings',
