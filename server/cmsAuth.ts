@@ -5,6 +5,8 @@ import {
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_OK,
   HTTP_STATUS_SERVICE_UNAVAILABLE,
+  CMS_CONTENT_STATUS_PUBLISHED,
+  CMS_DOCS_LOCALE,
 } from './cmsDocs.const';
 import {
   EMPTY_STRING,
@@ -12,7 +14,9 @@ import {
   ERROR_EMAIL_TAKEN,
   ERROR_INTERNAL,
   ERROR_INVALID_CREDENTIALS,
+  ERROR_INVALID_SETTINGS_KEY,
   ERROR_NOT_FOUND,
+  ERROR_SETTINGS_VALUE_REQUIRED,
   ERROR_UNAUTHORIZED,
   ERROR_USERNAME_PASSWORD,
   HEALTH_OK,
@@ -21,23 +25,43 @@ import {
   HTTP_STATUS_UNAUTHORIZED,
   INK_PACKAGE_VERSION,
   JWT_SECRET_DEV_FALLBACK,
+  METHOD_GET,
+  METHOD_PUT,
   NUMBER_ZERO,
   PACKAGE_VERSION,
   PLAN_FREE,
   PRODUCT_BIFROST,
   PROVIDER_PASSWORD,
+  QUERY_KEY,
+  QUERY_SLUG,
   ROLE_USER,
   SERVICE_NAME,
+  SETTINGS_BODY_VALUE,
+  SETTINGS_KV_KEYS,
   SPRINT_VERSION,
   WEEK_DAY_COUNT,
+  COLLECTION_BLOG,
+  COLLECTION_DOCS,
+  COLLECTION_PAGES,
+  PATH_SEGMENT_POSTS,
+  PAYLOAD_BODY_KEY,
+  PAYLOAD_LEAD_KEY,
 } from './cmsAuth.const';
-import type { CmsAuthResult, CmsJwtPayload, CmsUserRow } from './cmsAuth.types';
+import type {
+  CmsAdminContentItem,
+  CmsAdminContentRow,
+  CmsAuthResult,
+  CmsJwtPayload,
+  CmsKvRow,
+  CmsUserRow,
+} from './cmsAuth.types';
 import {
   bearerToken,
   firstRow,
   hashPassword,
   jwtSecrets,
   readJsonBody,
+  readUnknownObject,
   safeEqual,
   signJwt,
   str,
@@ -347,3 +371,231 @@ export const pluginCatalogPayload = (): CmsAuthResult => ({
     items: [],
   },
 });
+
+const isSettingsKey = (value: string): boolean => {
+  for (const key of SETTINGS_KV_KEYS) {
+    if (key === value) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const settingsKeyFromUrl = (request: Request): string => {
+  const url = new URL(request.url);
+  const fromQuery = (url.searchParams.get(QUERY_KEY) ?? EMPTY_STRING).trim();
+  if (fromQuery) {
+    return fromQuery;
+  }
+  const parts = url.pathname.split('/').filter(Boolean);
+  return (parts[parts.length - 1] ?? EMPTY_STRING).trim();
+};
+
+const parseKvValue = (value: unknown): unknown => {
+  if (typeof value !== 'string') {
+    return value;
+  }
+  try {
+    return JSON.parse(value) as unknown;
+  } catch {
+    return value;
+  }
+};
+
+const ensureKvTable = async (databaseUrl: string): Promise<void> => {
+  const sql = neon(databaseUrl);
+  await sql`
+    CREATE TABLE IF NOT EXISTS cms_kv (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL DEFAULT '',
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+};
+
+export const handleSettings = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl, request } = params;
+  const loaded = await requireUser(params);
+  if (isAuthResult(loaded)) {
+    return loaded;
+  }
+  const key = settingsKeyFromUrl(request);
+  if (!isSettingsKey(key)) {
+    return { status: HTTP_STATUS_BAD_REQUEST, body: { error: ERROR_INVALID_SETTINGS_KEY } };
+  }
+  const sql = neon(databaseUrl);
+  if (request.method === METHOD_GET) {
+    try {
+      await ensureKvTable(databaseUrl);
+      const rows = await sql`
+        SELECT key, value
+        FROM cms_kv
+        WHERE key = ${key}
+        LIMIT 1
+      `;
+      const row = firstRow<CmsKvRow>(rows);
+      return { status: HTTP_STATUS_OK, body: { key, value: row ? parseKvValue(row.value) : null } };
+    } catch {
+      return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+    }
+  }
+  if (request.method === METHOD_PUT) {
+    const body = await readUnknownObject(request);
+    if (!(SETTINGS_BODY_VALUE in body)) {
+      return { status: HTTP_STATUS_BAD_REQUEST, body: { error: ERROR_SETTINGS_VALUE_REQUIRED } };
+    }
+    try {
+      await ensureKvTable(databaseUrl);
+      const json = JSON.stringify(body[SETTINGS_BODY_VALUE]);
+      const rows = await sql`
+        INSERT INTO cms_kv (key, value, updated_at)
+        VALUES (${key}, ${json}, NOW())
+        ON CONFLICT (key) DO UPDATE SET
+          value = EXCLUDED.value,
+          updated_at = NOW()
+        RETURNING key, value
+      `;
+      const row = firstRow<CmsKvRow>(rows);
+      const stored = row ? parseKvValue(row.value) : body[SETTINGS_BODY_VALUE];
+      return { status: HTTP_STATUS_OK, body: { key, value: stored } };
+    } catch {
+      return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+    }
+  }
+  return { status: HTTP_STATUS_BAD_REQUEST, body: { error: ERROR_INVALID_SETTINGS_KEY } };
+};
+
+const toIso = (value: string | Date): string =>
+  value instanceof Date ? value.toISOString() : value;
+
+const parsePayload = (value: Record<string, unknown> | string): Record<string, unknown> => {
+  if (typeof value === 'string') {
+    return JSON.parse(value) as Record<string, unknown>;
+  }
+  return value ?? {};
+};
+
+const mapContentItem = (row: CmsAdminContentRow): CmsAdminContentItem => ({
+  id: row.id,
+  collection: row.collection,
+  slug: row.slug,
+  locale: row.locale,
+  title: row.title,
+  payload: parsePayload(row.payload),
+  status: row.status,
+  createdAt: toIso(row.created_at),
+  updatedAt: toIso(row.updated_at),
+});
+
+const payloadText = (payload: Record<string, unknown>, key: string): string => {
+  const value = payload[key];
+  if (typeof value !== 'string') {
+    return EMPTY_STRING;
+  }
+  return value;
+};
+
+const publishedContentBySlug = async (params: {
+  databaseUrl: string;
+  slug: string;
+}): Promise<CmsAdminContentItem | null> => {
+  const { databaseUrl, slug } = params;
+  const sql = neon(databaseUrl);
+  const collections = [COLLECTION_PAGES, COLLECTION_DOCS, COLLECTION_BLOG];
+  for (const collection of collections) {
+    const rows = (await sql`
+      SELECT id, collection, slug, locale, title, payload, status, created_at, updated_at
+      FROM cms_content
+      WHERE collection = ${collection}
+        AND slug = ${slug}
+        AND status = ${CMS_CONTENT_STATUS_PUBLISHED}
+        AND locale = ${CMS_DOCS_LOCALE}
+      LIMIT 1
+    `) as CmsAdminContentRow[];
+    const row = firstRow<CmsAdminContentRow>(rows);
+    if (row) {
+      return mapContentItem(row);
+    }
+  }
+  return null;
+};
+
+export const pageBySlugQuery = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl, request } = params;
+  const url = new URL(request.url);
+  const slug = (url.searchParams.get(QUERY_SLUG) ?? EMPTY_STRING).trim();
+  if (!slug) {
+    return { status: HTTP_STATUS_OK, body: { items: [] } };
+  }
+  try {
+    const item = await publishedContentBySlug({ databaseUrl, slug });
+    if (!item) {
+      return { status: HTTP_STATUS_OK, body: { items: [] } };
+    }
+    return {
+      status: HTTP_STATUS_OK,
+      body: {
+        items: [
+          {
+            title: item.title,
+            body: payloadText(item.payload, PAYLOAD_BODY_KEY),
+            meta: { lead: payloadText(item.payload, PAYLOAD_LEAD_KEY) },
+          },
+        ],
+      },
+    };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
+};
+
+export const listPublishedBlog = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl } = params;
+  try {
+    const sql = neon(databaseUrl);
+    const rows = (await sql`
+      SELECT id, collection, slug, locale, title, payload, status, created_at, updated_at
+      FROM cms_content
+      WHERE collection = ${COLLECTION_BLOG}
+        AND status = ${CMS_CONTENT_STATUS_PUBLISHED}
+        AND locale = ${CMS_DOCS_LOCALE}
+      ORDER BY updated_at DESC
+    `) as CmsAdminContentRow[];
+    return { status: HTTP_STATUS_OK, body: { items: rows.map(mapContentItem) } };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
+};
+
+export const publishedBlogBySlug = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl, request } = params;
+  const url = new URL(request.url);
+  const fromQuery = (url.searchParams.get(QUERY_SLUG) ?? EMPTY_STRING).trim();
+  const parts = url.pathname.split('/').filter(Boolean);
+  const last = parts[parts.length - 1] ?? EMPTY_STRING;
+  const slug = fromQuery || last;
+  if (!slug || slug === PATH_SEGMENT_POSTS) {
+    return { status: HTTP_STATUS_OK, body: { item: null } };
+  }
+  try {
+    const item = await publishedContentBySlug({ databaseUrl, slug });
+    if (!item || item.collection !== COLLECTION_BLOG) {
+      return { status: HTTP_STATUS_OK, body: { item: null } };
+    }
+    return { status: HTTP_STATUS_OK, body: { item } };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
+};

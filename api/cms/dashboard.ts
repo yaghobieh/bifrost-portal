@@ -1,4 +1,7 @@
-import { dashboardForUser } from '../../server/cmsAuth';
+import {
+  dashboardForUser,
+  handleSettings,
+} from '../../server/cmsAuth';
 import {
   API_CMS_SETTINGS_PREFIX,
   EMPTY_STRING,
@@ -8,7 +11,6 @@ import {
   REST_SETTINGS,
 } from '../../server/cmsAuth.const';
 import { handleAuthedJson, handleGetAuth } from '../../server/cmsAuthRoute';
-import { handleSettings } from '../../server/cmsKv';
 
 export const config = { runtime: 'edge' };
 
