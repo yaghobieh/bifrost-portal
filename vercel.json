@@ -6,6 +6,50 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/cms/settings/:key",
+      "destination": "/api/cms/rest?rest=settings&key=:key"
+    },
+    {
+      "source": "/api/cms/media/config",
+      "destination": "/api/cms/rest?rest=media-config"
+    },
+    {
+      "source": "/api/cms/content",
+      "destination": "/api/cms/rest?rest=content"
+    },
+    {
+      "source": "/api/public/plugins",
+      "destination": "/api/cms/rest?rest=plugins"
+    },
+    {
+      "source": "/api/v1/page",
+      "destination": "/api/cms/rest?rest=page"
+    },
+    {
+      "source": "/api/v1/version",
+      "destination": "/api/cms/rest?rest=version"
+    },
+    {
+      "source": "/api/version",
+      "destination": "/api/cms/rest?rest=version"
+    },
+    {
+      "source": "/api/blog/posts",
+      "destination": "/api/cms/rest?rest=blog"
+    },
+    {
+      "source": "/api/blog/posts/:slug",
+      "destination": "/api/cms/rest?rest=blog&slug=:slug"
+    },
+    {
+      "source": "/cms",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/cms/:path*",
+      "destination": "/index.html"
+    },
+    {
       "source": "/((?!api/|assets/).*)",
       "destination": "/index.html"
     }

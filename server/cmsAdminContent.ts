@@ -193,8 +193,9 @@ export const publishedBlogBySlug = async (params: {
 }): Promise<CmsAuthResult> => {
   const { databaseUrl, request } = params;
   const url = new URL(request.url);
+  const fromQuery = (url.searchParams.get(QUERY_SLUG) ?? EMPTY_STRING).trim();
   const parts = url.pathname.split('/').filter(Boolean);
-  const slug = (parts[parts.length - 1] ?? EMPTY_STRING).trim();
+  const slug = fromQuery || (parts[parts.length - 1] ?? EMPTY_STRING).trim();
   if (!slug) {
     return { status: HTTP_STATUS_OK, body: { item: null } };
   }
