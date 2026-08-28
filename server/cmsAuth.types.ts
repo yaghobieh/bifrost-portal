@@ -1,11 +1,3 @@
-import type { IncomingMessage, ServerResponse } from 'node:http';
-
-export type CmsApiRequest = IncomingMessage & {
-  body?: unknown;
-};
-
-export type CmsApiResponse = ServerResponse;
-
 export type CmsUserRow = {
   id: string;
   email: string;
@@ -37,9 +29,9 @@ export type CmsJwtPayload = {
   exp?: number;
 };
 
-export type CmsJsonBody = Record<string, string | undefined>;
+export type CmsAuthResult = {
+  status: number;
+  body: unknown;
+};
 
-export type CmsRouteHandler = (
-  req: CmsApiRequest,
-  res: CmsApiResponse,
-) => Promise<void>;
+export type CmsJsonBody = Record<string, string | undefined>;
