@@ -70,6 +70,7 @@ export const API_VERSION_PATH = '/api/version';
 export const API_BLOG_POSTS_PATH = '/api/blog/posts';
 export const PATH_SEGMENT_POSTS = 'posts';
 export const PATH_SEGMENT_REST = 'rest';
+export const PATH_SEGMENT_GET_CONTENT = 'get-content';
 export const DEFAULT_LOCALE = 'en';
 export const STATUS_PUBLISHED = 'published';
 export const COLLECTION_PAGES = 'pages';

@@ -43,9 +43,15 @@ import {
   COLLECTION_BLOG,
   COLLECTION_DOCS,
   COLLECTION_PAGES,
+  DEFAULT_LOCALE,
+  ERROR_COLLECTION_SLUG,
+  HTTP_STATUS_CREATED,
+  METHOD_POST,
+  PATH_SEGMENT_GET_CONTENT,
   PATH_SEGMENT_POSTS,
   PAYLOAD_BODY_KEY,
   PAYLOAD_LEAD_KEY,
+  STATUS_PUBLISHED,
 } from './cmsAuth.const';
 import type {
   CmsAdminContentItem,
@@ -598,4 +604,106 @@ export const publishedBlogBySlug = async (params: {
   } catch {
     return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
   }
+};
+
+export const listAdminContent = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl, request } = params;
+  const loaded = await requireUser(params);
+  if (isAuthResult(loaded)) {
+    return loaded;
+  }
+  const url = new URL(request.url);
+  const parts = url.pathname.split('/').filter(Boolean);
+  const last = parts[parts.length - 1] ?? EMPTY_STRING;
+  let collection: string | undefined;
+  if (last && last !== PATH_SEGMENT_GET_CONTENT) {
+    collection = last;
+  }
+  try {
+    const sql = neon(databaseUrl);
+    const rows = collection
+      ? ((await sql`
+          SELECT id, collection, slug, locale, title, payload, status, created_at, updated_at
+          FROM cms_content
+          WHERE collection = ${collection}
+          ORDER BY updated_at DESC
+        `) as CmsAdminContentRow[])
+      : ((await sql`
+          SELECT id, collection, slug, locale, title, payload, status, created_at, updated_at
+          FROM cms_content
+          ORDER BY collection ASC, updated_at DESC
+        `) as CmsAdminContentRow[]);
+    if (collection) {
+      return { status: HTTP_STATUS_OK, body: { collection, items: rows.map(mapContentItem) } };
+    }
+    return { status: HTTP_STATUS_OK, body: { items: rows.map(mapContentItem) } };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
+};
+
+export const upsertAdminContent = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl } = params;
+  const loaded = await requireUser(params);
+  if (isAuthResult(loaded)) {
+    return loaded;
+  }
+  const body = await readUnknownObject(params.request);
+  const collection = typeof body.collection === 'string' ? body.collection.trim() : EMPTY_STRING;
+  const slug = typeof body.slug === 'string' ? body.slug.trim() : EMPTY_STRING;
+  const locale = typeof body.locale === 'string' ? body.locale.trim() : DEFAULT_LOCALE;
+  const title = typeof body.title === 'string' ? body.title.trim() : EMPTY_STRING;
+  const status = typeof body.status === 'string' ? body.status.trim() : STATUS_PUBLISHED;
+  let payload: Record<string, unknown> = {};
+  if (body.payload && typeof body.payload === 'object' && !Array.isArray(body.payload)) {
+    payload = body.payload as Record<string, unknown>;
+  }
+  if (!collection || !slug) {
+    return { status: HTTP_STATUS_BAD_REQUEST, body: { error: ERROR_COLLECTION_SLUG } };
+  }
+  try {
+    const sql = neon(databaseUrl);
+    const payloadJson = JSON.stringify(payload);
+    const rows = (await sql`
+      INSERT INTO cms_content (collection, slug, locale, title, payload, status)
+      VALUES (
+        ${collection},
+        ${slug},
+        ${locale},
+        ${title},
+        ${payloadJson},
+        ${status}
+      )
+      ON CONFLICT (collection, slug, locale)
+      DO UPDATE SET
+        title = EXCLUDED.title,
+        payload = EXCLUDED.payload,
+        status = EXCLUDED.status,
+        updated_at = NOW()
+      RETURNING id, collection, slug, locale, title, payload, status, created_at, updated_at
+    `) as CmsAdminContentRow[];
+    const row = firstRow<CmsAdminContentRow>(rows);
+    if (!row) {
+      return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+    }
+    return { status: HTTP_STATUS_CREATED, body: { item: mapContentItem(row) } };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
+};
+
+export const handleAdminContent = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  if (params.request.method === METHOD_POST) {
+    return upsertAdminContent(params);
+  }
+  return listAdminContent(params);
 };
