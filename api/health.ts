@@ -1,18 +1,21 @@
-import { healthPayload } from '../server/cmsAuth';
+import {
+  healthPayload,
+  mediaConfigPayload,
+  pluginCatalogPayload,
+  versionPayload,
+} from '../server/cmsAuth';
 import {
   API_CMS_MEDIA_CONFIG_PATH,
   API_PUBLIC_PLUGINS_PATH,
   API_V1_VERSION_PATH,
   API_VERSION_PATH,
   EMPTY_STRING,
-  ENV_DATABASE_URL,
   QUERY_REST,
   REST_MEDIA_CONFIG,
   REST_PLUGINS,
   REST_VERSION,
 } from '../server/cmsAuth.const';
 import { handleGetHealth } from '../server/cmsAuthRoute';
-import { mediaConfigPayload, pluginCatalogPayload, versionPayload } from '../server/cmsVersion';
 
 export const config = { runtime: 'edge' };
 
@@ -29,6 +32,6 @@ export default async function handler(request: Request): Promise<Response> {
   if (rest === REST_PLUGINS || pathname.includes(API_PUBLIC_PLUGINS_PATH)) {
     return handleGetHealth(request, pluginCatalogPayload());
   }
-  const databaseUrl = process.env[ENV_DATABASE_URL] ?? EMPTY_STRING;
+  const databaseUrl = process.env.DATABASE_URL ?? '';
   return handleGetHealth(request, healthPayload(databaseUrl));
 }
