@@ -6,22 +6,6 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/api/cms/media/config",
-      "destination": "/api/health"
-    },
-    {
-      "source": "/api/public/plugins",
-      "destination": "/api/health"
-    },
-    {
-      "source": "/api/v1/version",
-      "destination": "/api/health"
-    },
-    {
-      "source": "/api/version",
-      "destination": "/api/health"
-    },
-    {
       "source": "/cms",
       "destination": "/index.html"
     },
