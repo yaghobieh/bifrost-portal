@@ -2,6 +2,7 @@ export { CmsShell, CMS_NAV_IDS } from './CmsShell';
 export { Dashboard } from './Dashboard';
 export { CmsLogin } from './CmsLogin';
 export { ContentPages } from './ContentPages';
+export { BlogPages } from './BlogPages';
 export { ContentEdit } from './ContentEdit';
 export { MediaPages } from './MediaPages';
 export { EditorsPages } from './EditorsPages';

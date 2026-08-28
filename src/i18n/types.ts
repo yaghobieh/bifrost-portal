@@ -396,6 +396,7 @@ export interface Messages {
     support: string;
     dashboard: string;
     pages: string;
+    blog: string;
     bundles: string;
     aiUsage: string;
     askAi: string;
@@ -723,6 +724,26 @@ export interface Messages {
     templateDocumentBody: string;
     newPage: string;
     newPageBlank: string;
+    startBlankTitle: string;
+    startBlankBody: string;
+    startBlankCta: string;
+    startDocTitle: string;
+    startDocBody: string;
+    startDocCta: string;
+    startMarketingTitle: string;
+    startMarketingBody: string;
+    startMarketingCta: string;
+    startReuseTitle: string;
+    startReuseBody: string;
+    startReuseCta: string;
+    startRecommended: string;
+    contentDuplicate: string;
+    contentHomepage: string;
+    contentDraft: string;
+    contentPublish: string;
+    blogTitle: string;
+    blogSubtitle: string;
+    blogNewPost: string;
     save: string;
     saving: string;
     saved: string;
@@ -839,6 +860,12 @@ export interface Messages {
     castValue: string;
     castPreviewTitle: string;
     castEmpty: string;
+    attachTranslation: string;
+    hideForRole: string;
+    roleDefault: string;
+    roleEditor: string;
+    roleManager: string;
+    roleCaptain: string;
   };
   cmsTemplates: {
     title: string;

@@ -1,8 +1,9 @@
-import { emptyItems } from '../../server/cmsAuth';
-import { handleGetAuth } from '../../server/cmsAuthRoute';
+import { handleAdminContent } from '../../server/cmsAdminContent';
+import { handleAuthedJson } from '../../server/cmsAuthRoute';
+import { METHOD_GET, METHOD_POST } from '../../server/cmsAuth.const';
 
 export const config = { runtime: 'edge' };
 
 export default async function handler(request: Request): Promise<Response> {
-  return handleGetAuth(request, emptyItems);
+  return handleAuthedJson(request, [METHOD_GET, METHOD_POST], handleAdminContent);
 }

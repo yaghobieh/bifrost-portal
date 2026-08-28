@@ -14,6 +14,7 @@ export type VersionBuildInfo = {
 export type VersionInfo = {
   product: string;
   version: string;
+  sprint: string;
   ink: string;
   portal: string;
   node: string;

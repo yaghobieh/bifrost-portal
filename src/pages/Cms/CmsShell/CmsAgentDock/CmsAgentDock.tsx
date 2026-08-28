@@ -1,8 +1,8 @@
 import type { FC } from 'react';
-import { Badge, Flex } from '@forgedevstack/bear';
+import { Badge, BearIcons, Flex } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
 import { CMS_CHAT_SIDE_LEFT } from '@const/index';
-import { NUMBER_ZERO } from '@const/numbers.const';
+import { CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
 import {
   AGENT_BUBBLE_CLASS,
   AGENT_DOCK_CLASS,
@@ -24,7 +24,7 @@ export const CmsAgentDock: FC<CmsAgentDockProps> = (props) => {
           aria-label={t.cmsShell.dockAi}
           onClick={onOpenAi}
         >
-          {t.cmsShell.dockAi}
+          <BearIcons.SparklesIcon size={CMS_ICON_SIZE} />
         </button>
         <span className="bifrost-cms__agent-chat-wrap">
           {crewOpen && crewPanel}
@@ -34,7 +34,7 @@ export const CmsAgentDock: FC<CmsAgentDockProps> = (props) => {
             aria-label={t.cmsShell.dockChat}
             onClick={onOpenCrew}
           >
-            {t.cmsShell.dockChat}
+            <BearIcons.ChatIcon size={CMS_ICON_SIZE} />
           </button>
           {crewUnread > NUMBER_ZERO && (
             <Badge variant="error" className="bifrost-cms__agent-chat-badge text-xs">

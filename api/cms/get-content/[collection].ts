@@ -1,8 +1,8 @@
-import { emptyItems } from '../../../server/cmsAuth';
+import { listAdminContent } from '../../../server/cmsAdminContent';
 import { handleGetAuth } from '../../../server/cmsAuthRoute';
 
 export const config = { runtime: 'edge' };
 
 export default async function handler(request: Request): Promise<Response> {
-  return handleGetAuth(request, emptyItems);
+  return handleGetAuth(request, listAdminContent);
 }

@@ -198,6 +198,18 @@ export const firstRow = <T>(rows: unknown): T | null => {
   return rows[0] as T;
 };
 
+export const readUnknownObject = async (request: Request): Promise<Record<string, unknown>> => {
+  try {
+    const parsed: unknown = await request.json();
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {};
+    }
+    return parsed as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+};
+
 export const readJsonBody = async (request: Request): Promise<CmsJsonBody> => {
   try {
     const parsed: unknown = await request.json();

@@ -1,8 +1,10 @@
 export const HTTP_STATUS_BAD_REQUEST = 400;
 export const HTTP_STATUS_UNAUTHORIZED = 401;
+export const HTTP_STATUS_FORBIDDEN = 403;
 export const HTTP_STATUS_CONFLICT = 409;
 export const HTTP_STATUS_METHOD_NOT_ALLOWED = 405;
 export const HTTP_STATUS_NO_CONTENT = 204;
+export const HTTP_STATUS_CREATED = 201;
 export const JWT_EXPIRES_IN_SEC = 604800;
 export const WEEK_DAY_COUNT = 7;
 export const HEX_RADIX = 16;
@@ -21,6 +23,7 @@ export const HASH_SHA256 = 'SHA-256';
 export const COLON = ':';
 export const DOT = '.';
 export const EMPTY_STRING = '';
+export const NUMBER_ZERO = 0;
 export const PLAN_FREE = 'free';
 export const ROLE_USER = 'user';
 export const PROVIDER_PASSWORD = 'password';
@@ -30,7 +33,35 @@ export const HEALTH_OK = 'ok';
 export const SERVICE_NAME = 'bifrost-portal';
 export const METHOD_GET = 'GET';
 export const METHOD_POST = 'POST';
+export const METHOD_PUT = 'PUT';
+export const METHOD_DELETE = 'DELETE';
 export const METHOD_OPTIONS = 'OPTIONS';
+export const SETTINGS_KV_SITE = 'site';
+export const SETTINGS_KV_PLUGINS = 'plugins';
+export const SETTINGS_KV_EXTERNAL_PLUGINS = 'external-plugins';
+export const SETTINGS_KV_TRANSLATIONS = 'translations';
+export const SETTINGS_KV_ROUTES = 'routes';
+export const SETTINGS_KV_KEYS = [
+  SETTINGS_KV_SITE,
+  SETTINGS_KV_PLUGINS,
+  SETTINGS_KV_EXTERNAL_PLUGINS,
+  SETTINGS_KV_TRANSLATIONS,
+  SETTINGS_KV_ROUTES,
+] as const;
+export const SETTINGS_BODY_VALUE = 'value';
+export const QUERY_SLUG = 'slug';
+export const QUERY_ID = 'id';
+export const DEFAULT_LOCALE = 'en';
+export const STATUS_PUBLISHED = 'published';
+export const COLLECTION_PAGES = 'pages';
+export const COLLECTION_DOCS = 'docs';
+export const COLLECTION_BLOG = 'blog';
+export const PAYLOAD_LEAD_KEY = 'lead';
+export const PAYLOAD_BODY_KEY = 'body';
+export const PRODUCT_BIFROST = 'Bifrost';
+export const INK_PACKAGE_VERSION = '1.1.7';
+export const ERROR_INVALID_SETTINGS_KEY = 'invalidSettingsKey';
+export const ERROR_SETTINGS_VALUE_REQUIRED = 'settingsValueRequired';
 export const ERROR_USERNAME_PASSWORD = 'usernamePasswordRequired';
 export const ERROR_INVALID_CREDENTIALS = 'invalidCredentials';
 export const ERROR_UNAUTHORIZED = 'unauthorized';
@@ -39,6 +70,9 @@ export const ERROR_EMAIL_NAME_PASSWORD = 'emailNamePasswordRequired';
 export const ERROR_EMAIL_TAKEN = 'emailAlreadyRegistered';
 export const ERROR_METHOD = 'methodNotAllowed';
 export const ERROR_INTERNAL = 'internal';
+export const ERROR_COLLECTION_SLUG = 'collectionAndSlugRequired';
+export const ERROR_ID_REQUIRED = 'idRequired';
+export const ERROR_FORBIDDEN = 'forbidden';
 export const PLUS_SIGN = '+';
 export const SLASH_SIGN = '/';
 export const BASE64_PLUS = '+';
