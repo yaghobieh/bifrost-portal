@@ -30,6 +30,22 @@
       "destination": "/api/health?rest=version"
     },
     {
+      "source": "/api/cms/settings/:key",
+      "destination": "/api/cms/dashboard?rest=settings&key=:key"
+    },
+    {
+      "source": "/api/v1/page",
+      "destination": "/api/cms/pages?rest=page"
+    },
+    {
+      "source": "/api/blog/posts",
+      "destination": "/api/cms/pages?rest=blog"
+    },
+    {
+      "source": "/api/blog/posts/:slug",
+      "destination": "/api/cms/pages?rest=blog&slug=:slug"
+    },
+    {
       "source": "/((?!api/|assets/).*)",
       "destination": "/index.html"
     }
