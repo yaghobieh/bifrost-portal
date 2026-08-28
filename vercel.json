@@ -7,39 +7,35 @@
   "rewrites": [
     {
       "source": "/api/cms/settings/:key",
-      "destination": "/api/cms/rest?rest=settings&key=:key"
+      "destination": "/api/cms/dashboard?rest=settings&key=:key"
     },
     {
       "source": "/api/cms/media/config",
-      "destination": "/api/cms/rest?rest=media-config"
-    },
-    {
-      "source": "/api/cms/content",
-      "destination": "/api/cms/rest?rest=content"
+      "destination": "/api/health?rest=media-config"
     },
     {
       "source": "/api/public/plugins",
-      "destination": "/api/cms/rest?rest=plugins"
+      "destination": "/api/health?rest=plugins"
     },
     {
       "source": "/api/v1/page",
-      "destination": "/api/cms/rest?rest=page"
+      "destination": "/api/cms/pages?rest=page"
     },
     {
       "source": "/api/v1/version",
-      "destination": "/api/cms/rest?rest=version"
+      "destination": "/api/health?rest=version"
     },
     {
       "source": "/api/version",
-      "destination": "/api/cms/rest?rest=version"
+      "destination": "/api/health?rest=version"
     },
     {
       "source": "/api/blog/posts",
-      "destination": "/api/cms/rest?rest=blog"
+      "destination": "/api/cms/pages?rest=blog"
     },
     {
       "source": "/api/blog/posts/:slug",
-      "destination": "/api/cms/rest?rest=blog&slug=:slug"
+      "destination": "/api/cms/pages?rest=blog&slug=:slug"
     },
     {
       "source": "/cms",
