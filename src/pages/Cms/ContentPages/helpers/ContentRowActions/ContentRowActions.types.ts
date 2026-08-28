@@ -1,8 +1,13 @@
 export type ContentRowActionsProps = {
   id: string;
+  status: string;
   openLabel: string;
   moreLabel: string;
   stageLabel: string;
+  duplicateLabel: string;
+  homepageLabel: string;
+  draftLabel: string;
+  publishLabel: string;
   deleteLabel: string;
   deleteTitle: string;
   deleteBody: string;
@@ -11,5 +16,9 @@ export type ContentRowActionsProps = {
   deleting: boolean;
   onOpen: (id: string) => void;
   onStage: (id: string) => void;
+  onDuplicate: (id: string) => void;
+  onHomepage: (id: string) => void;
+  onDraft: (id: string) => void;
+  onPublish: (id: string) => void;
   onDelete: (id: string) => void;
 };

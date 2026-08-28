@@ -6,4 +6,9 @@ export type ContentFieldStageProps = {
   values: Record<string, string>;
   onValueChange: (name: string, value: string) => void;
   onDrop: (event: DragEvent<HTMLDivElement>) => void;
+  attachLabel: string;
+  hideLabel: string;
+  roleLabels: Record<string, string>;
+  onAttach: (fieldName: string) => void;
+  onHideRole: (fieldName: string, role: string) => void;
 };

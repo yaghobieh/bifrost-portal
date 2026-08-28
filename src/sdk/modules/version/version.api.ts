@@ -10,6 +10,8 @@ import {
   NOTES_JOIN,
   PAYLOAD_BODY_KEY,
   PAYLOAD_LEAD_KEY,
+  TARGET_CMS_SPRINT,
+  TARGET_CMS_VERSION,
 } from './version.const';
 import type { VersionInfo, WhatsNewCopy } from './version.types';
 
@@ -22,6 +24,7 @@ export const EMPTY_WHATS_NEW: WhatsNewCopy = {
 export const EMPTY_VERSION_INFO: VersionInfo = {
   product: EMPTY_STRING,
   version: EMPTY_STRING,
+  sprint: EMPTY_STRING,
   ink: EMPTY_STRING,
   portal: EMPTY_STRING,
   node: EMPTY_STRING,
@@ -178,6 +181,8 @@ const mergeVersionInfo = (
       ...withPackages(fromNest || EMPTY_VERSION_INFO),
     },
     notes,
+    version: base.version || TARGET_CMS_VERSION,
+    sprint: base.sprint || other?.sprint || TARGET_CMS_SPRINT,
   };
 };
 

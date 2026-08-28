@@ -2,10 +2,21 @@ import type { FC } from 'react';
 import { Flex } from '@forgedevstack/bear';
 import { EMPTY_STRING } from '@const/index';
 import { CastValueInput } from '../CastPageFields/helpers/CastValueInput';
+import { FieldAttachMenu } from '../FieldAttachMenu';
 import type { ContentFieldStageProps } from './ContentFieldStage.types';
 
 export const ContentFieldStage: FC<ContentFieldStageProps> = (props) => {
-  const { fields, values, onValueChange, onDrop } = props;
+  const {
+    fields,
+    values,
+    onValueChange,
+    onDrop,
+    attachLabel,
+    hideLabel,
+    roleLabels,
+    onAttach,
+    onHideRole,
+  } = props;
 
   return (
     <Flex
@@ -16,13 +27,22 @@ export const ContentFieldStage: FC<ContentFieldStageProps> = (props) => {
       onDrop={onDrop}
     >
       {fields.map((field) => (
-        <CastValueInput
+        <FieldAttachMenu
           key={field.id}
-          field={field}
-          value={values[field.name] ?? EMPTY_STRING}
-          label={field.label || field.name}
-          onValueChange={onValueChange}
-        />
+          fieldName={field.name}
+          attachLabel={attachLabel}
+          hideLabel={hideLabel}
+          roleLabels={roleLabels}
+          onAttach={onAttach}
+          onHideRole={onHideRole}
+        >
+          <CastValueInput
+            field={field}
+            value={values[field.name] ?? EMPTY_STRING}
+            label={field.label || field.name}
+            onValueChange={onValueChange}
+          />
+        </FieldAttachMenu>
       ))}
     </Flex>
   );

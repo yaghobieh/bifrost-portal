@@ -6,9 +6,10 @@ import { GridTable } from '@forgedevstack/grid-table';
 import type { ColumnDefinition } from '@forgedevstack/grid-table';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
-import { cmsBuilderPath, cmsEditPath, EMPTY_STRING } from '@const/index';
+import { cmsBuilderPath, cmsEditPath, EMPTY_STRING, SLASH } from '@const/index';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
+import { loadCmsSite, persistCmsSiteRemote } from '../SettingsPages';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   CONTENT_COLLECTION_PAGES,
@@ -20,6 +21,8 @@ import {
   CONTENT_LIST_COLLECTIONS,
   CONTENT_NEW_PAGE_MENU_MIN_WIDTH,
   CONTENT_ROW_ID_ACCESSOR,
+  CONTENT_STATUS_DRAFT,
+  CONTENT_STATUS_PUBLISHED,
   CONTENT_TABLE_WRAP_CLASS,
   CONTENT_TEMPLATE_EMPTY,
   DOCUMENT_DEFAULT_LOCALE,
@@ -35,6 +38,8 @@ import {
   templateFromPayload,
 } from './ContentPages.utils';
 import { ContentRowActions } from './helpers/ContentRowActions';
+import { PAGE_START_IDS, PAGE_START_LAYOUT, PageStart } from './helpers/PageStart';
+import type { PageStartId } from './helpers/PageStart';
 import { cloneCanvasTree, canvasFromPayload } from '../BuilderPages/BuilderPages.utils';
 import {
   PAYLOAD_KEY_CAST_FIELDS,
@@ -144,6 +149,79 @@ export const ContentPages: FC = () => {
     void deleteContent(activeToken, id);
   };
 
+  const onStartPage = (id: PageStartId) => {
+    if (id === PAGE_START_IDS.BLANK) {
+      void onNewPage(PAGE_START_LAYOUT.BLANK);
+      return;
+    }
+    if (id === PAGE_START_IDS.DOC) {
+      void onNewPage(PAGE_START_LAYOUT.DOC);
+      return;
+    }
+    if (id === PAGE_START_IDS.MARKETING) {
+      void onNewPage(PAGE_START_LAYOUT.MARKETING);
+      return;
+    }
+    const firstSaved = items.find((item) => item.collection === TEMPLATES_COLLECTION);
+    if (firstSaved) {
+      void onNewPage(firstSaved.id);
+    }
+  };
+
+  const onDuplicatePage = async (id: string) => {
+    if (!activeToken) {
+      return;
+    }
+    const source = items.find((item) => item.id === id);
+    if (!source) {
+      return;
+    }
+    const item = await saveContentRequest(activeToken, {
+      collection: source.collection,
+      slug: `${PAGE_SLUG_PREFIX}${Date.now()}`,
+      locale: DOCUMENT_DEFAULT_LOCALE,
+      title: source.title,
+      status: CONTENT_STATUS_DRAFT,
+      payload: source.payload,
+    });
+    if (!item) {
+      return;
+    }
+    await fetchContent(activeToken);
+  };
+
+  const onHomepage = async (id: string) => {
+    if (!activeToken) {
+      return;
+    }
+    const source = items.find((item) => item.id === id);
+    if (!source) {
+      return;
+    }
+    const site = loadCmsSite();
+    const next = { ...site, homepagePath: `${SLASH}${source.slug}` };
+    await persistCmsSiteRemote(activeToken, next);
+  };
+
+  const onSetStatus = async (id: string, status: typeof CONTENT_STATUS_DRAFT | typeof CONTENT_STATUS_PUBLISHED) => {
+    if (!activeToken) {
+      return;
+    }
+    const source = items.find((item) => item.id === id);
+    if (!source) {
+      return;
+    }
+    await saveContentRequest(activeToken, {
+      collection: source.collection,
+      slug: source.slug,
+      locale: DOCUMENT_DEFAULT_LOCALE,
+      title: source.title,
+      status,
+      payload: source.payload,
+    });
+    await fetchContent(activeToken);
+  };
+
   const savedTemplates = items.filter((item) => item.collection === TEMPLATES_COLLECTION);
   const newPageItems = [
     ...PAGE_LAYOUT_TEMPLATES.map((layout) => ({
@@ -197,6 +275,44 @@ export const ContentPages: FC = () => {
               </Flex>
             </Card>
           }
+        />
+
+        <PageStart
+          cards={[
+            {
+              id: PAGE_START_IDS.BLANK,
+              title: t.dashboard.startBlankTitle,
+              body: t.dashboard.startBlankBody,
+              cta: t.dashboard.startBlankCta,
+              tag: EMPTY_STRING,
+              recommended: false,
+            },
+            {
+              id: PAGE_START_IDS.DOC,
+              title: t.dashboard.startDocTitle,
+              body: t.dashboard.startDocBody,
+              cta: t.dashboard.startDocCta,
+              tag: t.dashboard.startRecommended,
+              recommended: true,
+            },
+            {
+              id: PAGE_START_IDS.MARKETING,
+              title: t.dashboard.startMarketingTitle,
+              body: t.dashboard.startMarketingBody,
+              cta: t.dashboard.startMarketingCta,
+              tag: EMPTY_STRING,
+              recommended: false,
+            },
+            {
+              id: PAGE_START_IDS.REUSE,
+              title: t.dashboard.startReuseTitle,
+              body: t.dashboard.startReuseBody,
+              cta: t.dashboard.startReuseCta,
+              tag: EMPTY_STRING,
+              recommended: false,
+            },
+          ]}
+          onStart={onStartPage}
         />
 
         {error && (
@@ -269,9 +385,14 @@ export const ContentPages: FC = () => {
                   render: (_value, row) => (
                     <ContentRowActions
                       id={String(row.id)}
+                      status={String(row.status)}
                       openLabel={t.dashboard.contentOpen}
                       moreLabel={t.dashboard.contentMore}
                       stageLabel={t.cmsBuilder.editInStage}
+                      duplicateLabel={t.dashboard.contentDuplicate}
+                      homepageLabel={t.dashboard.contentHomepage}
+                      draftLabel={t.dashboard.contentDraft}
+                      publishLabel={t.dashboard.contentPublish}
                       deleteLabel={t.dashboard.contentDelete}
                       deleteTitle={t.dashboard.contentDeleteTitle}
                       deleteBody={t.dashboard.contentDeleteBody}
@@ -280,6 +401,18 @@ export const ContentPages: FC = () => {
                       deleting={saving}
                       onOpen={(id) => navigate(cmsEditPath(id))}
                       onStage={(id) => navigate(cmsBuilderPath({ doc: id }))}
+                      onDuplicate={(id) => {
+                        void onDuplicatePage(id);
+                      }}
+                      onHomepage={(id) => {
+                        void onHomepage(id);
+                      }}
+                      onDraft={(id) => {
+                        void onSetStatus(id, CONTENT_STATUS_DRAFT);
+                      }}
+                      onPublish={(id) => {
+                        void onSetStatus(id, CONTENT_STATUS_PUBLISHED);
+                      }}
                       onDelete={onDeletePage}
                     />
                   ),
