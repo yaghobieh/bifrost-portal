@@ -14,6 +14,22 @@
       "destination": "/index.html"
     },
     {
+      "source": "/api/cms/media/config",
+      "destination": "/api/health?rest=media-config"
+    },
+    {
+      "source": "/api/public/plugins",
+      "destination": "/api/health?rest=plugins"
+    },
+    {
+      "source": "/api/v1/version",
+      "destination": "/api/health?rest=version"
+    },
+    {
+      "source": "/api/version",
+      "destination": "/api/health?rest=version"
+    },
+    {
       "source": "/((?!api/|assets/).*)",
       "destination": "/index.html"
     }
