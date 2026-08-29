@@ -420,6 +420,7 @@ export const es: Messages = {
   },
   cmsShell: {
     brand: 'Bifrost',
+    backToPortal: 'Volver al portal',
     search: 'Buscar…',
     searchShortcut: '⌘K',
     searchEmpty: 'Sin coincidencias',

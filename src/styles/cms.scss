@@ -215,6 +215,22 @@ html.bifrost-cms-host #root {
   flex: 1 1 auto;
 }
 
+.bifrost-cms__brand-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+}
+
+.bifrost-cms__brand-link:hover .bifrost-cms__brand {
+  color: #fff;
+}
+
 .bifrost-cms__sidebar .Bear-Sidebar__toggle {
   color: #e8eaef !important;
   background: transparent !important;

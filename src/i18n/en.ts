@@ -421,6 +421,7 @@ export const en: Messages = {
   },
   cmsShell: {
     brand: 'Bifrost',
+    backToPortal: 'Back to portal',
     search: 'Search…',
     searchShortcut: '⌘K',
     searchEmpty: 'No matching pages',
