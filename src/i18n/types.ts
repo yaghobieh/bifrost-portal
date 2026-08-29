@@ -706,6 +706,14 @@ export interface Messages {
     contentColStatus: string;
     contentColUpdated: string;
     contentColTemplate: string;
+    contentColKind: string;
+    contentColCreatedBy: string;
+    contentKindFilterAll: string;
+    contentTemplateDoc: string;
+    contentTemplateArticle: string;
+    contentTemplateLanding: string;
+    contentTemplateBlank: string;
+    contentTemplatePage: string;
     contentColFields: string;
     contentOpenHint: string;
     contentColActions: string;

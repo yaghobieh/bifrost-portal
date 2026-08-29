@@ -96,11 +96,39 @@ export const CONTENT_COLUMN_IDS = {
   SLUG: 'slug',
   COLLECTION: 'collection',
   TEMPLATE: 'template',
+  KIND: 'templateKind',
   FIELDS: 'fields',
   STATUS: 'status',
+  CREATED_BY: 'createdBy',
   UPDATED: 'updated',
   ACTIONS: 'actions',
 } as const;
+
+export const TEMPLATE_KIND = {
+  DOC: 'doc',
+  ARTICLE: 'article',
+  LANDING: 'landing',
+  MARKETING: 'marketing',
+  BLANK: 'blank',
+  PAGE: 'page',
+} as const;
+
+export const CONTENT_TEMPLATE_FILTER_ALL = 'all';
+
+export const CONTENT_KIND_FILTER_ORDER = [
+  CONTENT_TEMPLATE_FILTER_ALL,
+  TEMPLATE_KIND.DOC,
+  TEMPLATE_KIND.ARTICLE,
+  TEMPLATE_KIND.LANDING,
+  TEMPLATE_KIND.MARKETING,
+  TEMPLATE_KIND.BLANK,
+  TEMPLATE_KIND.PAGE,
+] as const;
+
+export const CONTENT_KIND_FILTER_TYPE = 'select' as const;
+export const CONTENT_KIND_FILTER_OPERATOR = 'equals' as const;
+
+export const MARKETING_LAYOUT_IDS = ['landing-hero', 'marketing'] as const;
 
 export const CONTENT_DATE_LOCALE = 'en-CA';
 
