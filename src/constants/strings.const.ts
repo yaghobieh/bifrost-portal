@@ -124,6 +124,7 @@ export const POSTMAN_SCHEMA = 'https://schema.getpostman.com/json/collection/v2.
 export const DEFAULT_API_BASE = 'http://localhost:4100';
 export const PUBLIC_PAGES_PATH = '/api/public/pages';
 export const PUBLIC_DOCS_PATH = '/api/public/docs';
+export const PUBLIC_NAV_PATH = '/api/public/nav';
 export const ABORT_ERROR_NAME = 'AbortError';
 export const CMS_HOME_SLUG = 'home';
 export const CMS_CHANGELOG_SLUG = 'changelog';

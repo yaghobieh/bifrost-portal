@@ -1059,6 +1059,22 @@ html.bifrost-cms-host #root {
   gap: 0.65rem;
 }
 
+.bifrost-cms-public-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.bifrost-cms-public-nav__row {
+  padding: 0.75rem;
+  border: 1px solid var(--bifrost-cms-border);
+  border-radius: 0.65rem;
+}
+
+.bifrost-cms-public-nav__tools {
+  flex-wrap: wrap;
+}
+
 .bifrost-cms-template-preview {
   min-height: 120px;
   padding: 0.75rem;

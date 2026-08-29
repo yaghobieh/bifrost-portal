@@ -11,7 +11,9 @@ import {
   QUERY_KEY,
   SETTINGS_BODY_VALUE,
   SETTINGS_KV_KEYS,
+  SETTINGS_KV_SITE,
 } from './cmsAuth.const';
+import { toPublicNavChrome } from './publicNav.utils';
 import type { CmsAuthResult, CmsKvRow } from './cmsAuth.types';
 import { isAuthResult, requireUser } from './cmsAuth';
 import { firstRow, readUnknownObject } from './cmsAuth.utils';
@@ -86,6 +88,18 @@ const writeValue = async (params: {
     return value;
   }
   return row.value;
+};
+
+export const publicSiteChrome = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  try {
+    const value = await readValue(params.databaseUrl, SETTINGS_KV_SITE);
+    return { status: HTTP_STATUS_OK, body: toPublicNavChrome(value) };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
 };
 
 export const handleSettings = async (params: {

@@ -50,7 +50,10 @@ import {
   SETTINGS_MCP_TOOL_SUFFIXES,
   SETTINGS_SITE_SLUG_FALLBACK,
   SETTINGS_STALE_THEME_PRIMARIES,
+  SETTINGS_PUBLIC_NAV_CUSTOM_PREFIX,
+  SETTINGS_PUBLIC_NAV_DEFAULT_ITEMS,
 } from './SettingsPages.const';
+import { NUMBER_ONE, NUMBER_ZERO } from '@const/numbers.const';
 import type {
   CmsApiErrorMode,
   CmsCatalog,
@@ -66,6 +69,7 @@ import type {
   CmsPermalinkStyle,
   CmsProfile,
   CmsSite,
+  PublicNavItem,
   CmsThemeColors,
   CmsTranslations,
 } from './SettingsPages.types';
@@ -249,14 +253,123 @@ const resolveSiteName = (value: string): string => {
   return value;
 };
 
+const toPublicNavItem = (value: unknown): PublicNavItem | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+  const parsed = value as Partial<PublicNavItem>;
+  if (typeof parsed.id !== 'string' || !parsed.id) {
+    return null;
+  }
+  if (typeof parsed.label !== 'string' || typeof parsed.href !== 'string') {
+    return null;
+  }
+  return {
+    id: parsed.id,
+    label: parsed.label,
+    href: parsed.href,
+    visible: parsed.visible !== false,
+  };
+};
+
+export const defaultPublicNavItems = (hiddenIds: string[]): PublicNavItem[] =>
+  SETTINGS_PUBLIC_NAV_DEFAULT_ITEMS.map((item) => ({
+    id: item.id,
+    label: item.label,
+    href: item.href,
+    visible: item.visible && !hiddenIds.includes(item.id),
+  }));
+
+export const readPublicNavItems = (value: unknown, hiddenIds: string[]): PublicNavItem[] => {
+  if (!Array.isArray(value)) {
+    return defaultPublicNavItems(hiddenIds);
+  }
+  const items = value
+    .map((entry) => toPublicNavItem(entry))
+    .filter((item): item is PublicNavItem => Boolean(item));
+  if (!items.length) {
+    return defaultPublicNavItems(hiddenIds);
+  }
+  return items;
+};
+
+export const hiddenIdsFromPublicNav = (items: PublicNavItem[]): string[] =>
+  items.filter((item) => !item.visible).map((item) => item.id);
+
+export const movePublicNavItem = (params: {
+  items: PublicNavItem[];
+  id: string;
+  delta: number;
+}): PublicNavItem[] => {
+  const { items, id, delta } = params;
+  const from = items.findIndex((item) => item.id === id);
+  if (from < NUMBER_ZERO) {
+    return items;
+  }
+  const to = from + delta;
+  if (to < NUMBER_ZERO || to >= items.length) {
+    return items;
+  }
+  const next = [...items];
+  const [row] = next.splice(from, NUMBER_ONE);
+  next.splice(to, NUMBER_ZERO, row);
+  return next;
+};
+
+export const nextPublicNavId = (items: PublicNavItem[]): string => {
+  const used = new Set(items.map((item) => item.id));
+  let index = NUMBER_ONE;
+  let candidate = `${SETTINGS_PUBLIC_NAV_CUSTOM_PREFIX}-${index}`;
+  while (used.has(candidate)) {
+    index += NUMBER_ONE;
+    candidate = `${SETTINGS_PUBLIC_NAV_CUSTOM_PREFIX}-${index}`;
+  }
+  return candidate;
+};
+
+export const addPublicNavItem = (items: PublicNavItem[]): PublicNavItem[] => [
+  ...items,
+  {
+    id: nextPublicNavId(items),
+    label: SETTINGS_PROFILE_EMPTY,
+    href: SETTINGS_PROFILE_EMPTY,
+    visible: true,
+  },
+];
+
+export const removePublicNavItem = (params: {
+  items: PublicNavItem[];
+  id: string;
+}): PublicNavItem[] => {
+  const { items, id } = params;
+  return items.filter((item) => item.id !== id);
+};
+
+export const updatePublicNavItem = (params: {
+  items: PublicNavItem[];
+  id: string;
+  patch: Partial<PublicNavItem>;
+}): PublicNavItem[] => {
+  const { items, id, patch } = params;
+  return items.map((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+    return { ...item, ...patch };
+  });
+};
+
 export const parseCmsSite = (value: unknown): CmsSite => {
   if (!value || typeof value !== 'object') {
     return {
       ...SETTINGS_SITE_DEFAULTS,
       hiddenNavIds: [...SETTINGS_SITE_DEFAULTS.hiddenNavIds],
+      hiddenPublicNavIds: [...SETTINGS_SITE_DEFAULTS.hiddenPublicNavIds],
+      publicNavItems: defaultPublicNavItems([]),
     };
   }
   const parsed = value as Partial<CmsSite>;
+  const hiddenPublicNavIds = readHiddenNavIds(parsed.hiddenPublicNavIds);
   return {
     siteName: resolveSiteName(
       readString(parsed.siteName, SETTINGS_SITE_DEFAULTS.siteName),
@@ -278,6 +391,9 @@ export const parseCmsSite = (value: unknown): CmsSite => {
       ? parsed.chatSide
       : SETTINGS_SITE_DEFAULTS.chatSide,
     hiddenNavIds: readHiddenNavIds(parsed.hiddenNavIds),
+    hiddenPublicNavIds,
+    publicNavItems: readPublicNavItems(parsed.publicNavItems, hiddenPublicNavIds),
+    blogPath: readString(parsed.blogPath, SETTINGS_SITE_DEFAULTS.blogPath),
     anyoneCanRegister: readBoolean(
       parsed.anyoneCanRegister,
       SETTINGS_SITE_DEFAULTS.anyoneCanRegister,

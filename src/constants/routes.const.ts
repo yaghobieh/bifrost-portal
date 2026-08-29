@@ -48,6 +48,7 @@ export const ROUTES = {
   CMS_CAST: '/cms/cast',
   CMS_TASKS: '/cms/tasks',
   CMS_BLOG: '/cms/blog',
+  BLOG: '/blog',
   SENSORS: '/sensors',
   PAGES: '/pages',
   NOT_FOUND: '/404',

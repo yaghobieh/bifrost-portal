@@ -35,6 +35,7 @@ import { uploadAndRegisterMedia, fetchMediaConfig, saveMediaCloudName } from '@s
 import { parseCloudinaryCloudName, parseCloudinaryCredentials } from '@sdk/modules/media/media.utils';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { DeveloperPanel } from '../DeveloperPages';
+import { SettingsPublicNav } from './helpers/SettingsPublicNav';
 import {
   SETTINGS_AVATAR_ACCEPT,
   SETTINGS_CHAT_SIDES,
@@ -96,6 +97,7 @@ import {
   saveCmsMcp,
   saveCmsProfile,
   persistCmsSiteRemote,
+  hiddenIdsFromPublicNav,
   saveCmsThemeColors,
   saveUserNotifyPrefs,
   saveUserThemeColors,
@@ -809,6 +811,27 @@ export const SettingsPages: FC = () => {
                       ))}
                     </div>
                   </div>
+                  <SettingsPublicNav
+                    items={site.publicNavItems}
+                    disabled={!canEditSettings}
+                    title={t.settings.publicNavVisibility}
+                    hint={t.settings.publicNavHint}
+                    labelTitle={t.settings.publicNavLabel}
+                    hrefTitle={t.settings.publicNavHref}
+                    addLabel={t.settings.publicNavAdd}
+                    removeLabel={t.settings.publicNavRemove}
+                    moveUpLabel={t.settings.publicNavMoveUp}
+                    moveDownLabel={t.settings.publicNavMoveDown}
+                    visibleLabel={t.settings.publicNavVisible}
+                    onChange={(items) => {
+                      setSite((current) => ({
+                        ...current,
+                        publicNavItems: items,
+                        hiddenPublicNavIds: hiddenIdsFromPublicNav(items),
+                      }));
+                      markDirty();
+                    }}
+                  />
                 </SettingsSection>
                 ) : null}
                 {sitePanel === SETTINGS_SITE_PANELS.READING ? (

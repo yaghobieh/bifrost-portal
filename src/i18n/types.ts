@@ -1343,6 +1343,15 @@ export interface Messages {
     chatRight: string;
     navVisibility: string;
     navHint: string;
+    publicNavVisibility: string;
+    publicNavHint: string;
+    publicNavLabel: string;
+    publicNavHref: string;
+    publicNavAdd: string;
+    publicNavRemove: string;
+    publicNavMoveUp: string;
+    publicNavMoveDown: string;
+    publicNavVisible: string;
     locale: string;
     localeEn: string;
     localeEs: string;

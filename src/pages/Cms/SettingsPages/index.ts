@@ -13,4 +13,4 @@ export {
   saveUserChatPrefs,
   saveUserDevPrefs,
 } from './SettingsPages.utils';
-export type { CmsCatalog, CmsChatPrefs, CmsChatSide, CmsDevPrefs, CmsSite } from './SettingsPages.types';
+export type { CmsCatalog, CmsChatPrefs, CmsChatSide, CmsDevPrefs, CmsSite, PublicNavItem } from './SettingsPages.types';

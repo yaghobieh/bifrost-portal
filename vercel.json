@@ -37,11 +37,15 @@
       "destination": "/api/c/pages?rest=blog&slug=:slug"
     },
     {
+      "source": "/api/public/nav",
+      "destination": "/api/c/pages?rest=nav"
+    },
+    {
       "source": "/api/cms/:path*",
       "destination": "/api/c/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/"
     }
   ],
