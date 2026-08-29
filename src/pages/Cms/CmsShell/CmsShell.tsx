@@ -89,6 +89,7 @@ import {
   saveSidebarWidth,
 } from './CmsShell.utils';
 import { ErrorHost } from './ErrorHost';
+import { CmsBrandLink } from './helpers/CmsBrandLink';
 import { CmsUpdateBanner } from './helpers/CmsUpdateBanner';
 import { useCmsLive } from './CmsLiveProvider';
 import { CMS_LIVE_LOCAL_ROOM_PREFIX } from './CmsLive.const';
@@ -602,20 +603,15 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
         className="bifrost-cms__sidebar"
         header={
           <Flex direction="column" gap={2} className="bifrost-cms__brand-block">
-            <Flex align="center" gap={2}>
-              <img
-                src={toCloudinarySrc(site.logoDataUrl || BIFROST_ICON_SRC, cloudName)}
-                alt={site.siteName || t.cmsShell.brand}
-                className="bifrost-cms__logo"
-                width={CMS_LOGO_SIZE_PX}
-                height={CMS_LOGO_SIZE_PX}
-              />
-              {collapsed ? null : (
-                <Typography variant="h6" className="bifrost-cms__brand mb-0">
-                  {site.siteName || t.cmsShell.brand}
-                </Typography>
-              )}
-            </Flex>
+            <CmsBrandLink
+              src={toCloudinarySrc(site.logoDataUrl || BIFROST_ICON_SRC, cloudName)}
+              alt={site.siteName || t.cmsShell.brand}
+              name={site.siteName || t.cmsShell.brand}
+              collapsed={collapsed}
+              href={ROUTES.HOME}
+              label={t.cmsShell.backToPortal}
+              logoSize={CMS_LOGO_SIZE_PX}
+            />
           </Flex>
         }
       />

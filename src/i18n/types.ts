@@ -373,6 +373,7 @@ export interface Messages {
   };
   cmsShell: {
     brand: string;
+    backToPortal: string;
     search: string;
     searchShortcut: string;
     searchEmpty: string;
