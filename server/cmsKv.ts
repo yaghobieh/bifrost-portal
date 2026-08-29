@@ -5,7 +5,6 @@ import {
   ERROR_INVALID_SETTINGS_KEY,
   ERROR_SETTINGS_VALUE_REQUIRED,
   HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_OK,
   METHOD_GET,
   METHOD_PUT,
   QUERY_KEY,
@@ -17,7 +16,7 @@ import { toPublicNavChrome } from './publicNav.utils';
 import type { CmsAuthResult, CmsKvRow } from './cmsAuth.types';
 import { isAuthResult, requireUser } from './cmsAuth';
 import { firstRow, readUnknownObject } from './cmsAuth.utils';
-import { HTTP_STATUS_INTERNAL_SERVER_ERROR } from './cmsDocs.const';
+import { HTTP_STATUS_INTERNAL_SERVER_ERROR, HTTP_STATUS_OK } from './cmsDocs.const';
 
 const isSettingsKey = (value: string): boolean => {
   for (const key of SETTINGS_KV_KEYS) {
