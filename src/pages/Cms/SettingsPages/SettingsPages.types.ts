@@ -35,6 +35,13 @@ export type CmsChatSide = 'left' | 'right';
 
 export type CmsApiErrorMode = 'page' | 'modal' | 'snackbar';
 
+export type PublicNavItem = {
+  id: string;
+  label: string;
+  href: string;
+  visible: boolean;
+};
+
 export type CmsSite = {
   siteName: string;
   tagline: string;
@@ -48,6 +55,9 @@ export type CmsSite = {
   fromEmail: string;
   chatSide: CmsChatSide;
   hiddenNavIds: string[];
+  hiddenPublicNavIds: string[];
+  publicNavItems: PublicNavItem[];
+  blogPath: string;
   anyoneCanRegister: boolean;
   searchEngineVisible: boolean;
   allowComments: boolean;
