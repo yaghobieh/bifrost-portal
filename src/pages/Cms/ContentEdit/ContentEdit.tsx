@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type DragEvent, type FC } from 'react';
+import { useEffect, useState, type ChangeEvent, type DragEvent, type FC, type MouseEvent } from 'react';
 import { useNavigate, useParams } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
 import {
@@ -20,7 +20,7 @@ import { cmsInkAiProps } from '@/ai/index';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
 import { EMPTY_STRING, ROUTES, cmsBuilderPath, CMS_EDIT_SIDE_MAX_PX, CMS_EDIT_SIDE_MIN_PX, CMS_EDIT_SIDE_WIDTH_KEY, CMS_EDIT_SIDE_WIDTH_PX, DRAG_WIDGET_MIME } from '@const/index';
-import { CMS_ICON_SIZE } from '@const/numbers.const';
+import { CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import type { ContentStatus } from '@sdk/modules/content';
 import { CmsShell, CMS_NAV_IDS, CMS_CARD_PADDING, LiveEditors } from '../CmsShell';
@@ -54,6 +54,7 @@ import {
   PAYLOAD_KEY_CAST_FIELDS,
   PAYLOAD_KEY_CAST_VALUES,
   PAYLOAD_KEY_CATEGORIES,
+  PAYLOAD_KEY_CREATED_BY,
   PAYLOAD_KEY_FEATURED,
   PAYLOAD_KEY_LAYOUT,
   PAYLOAD_KEY_OG_DESCRIPTION,
@@ -77,16 +78,17 @@ import {
   resolveEditTarget,
   saveSeoCollapsed,
   splitScheduleAt,
+  startPreviewResize,
 } from './ContentEdit.utils';
+import type { BearWidgetDef, ContentRevision } from './ContentEdit.types';
 import { CastPageFields } from './helpers/CastPageFields';
 import { ContentFieldStage } from './helpers/ContentFieldStage';
 import { ContentTranslationWidget } from './helpers/ContentTranslationWidget';
 import type { TranslationApplyParams } from './helpers/ContentTranslationWidget';
 import { createCastField, createNamedCastField } from '@pages/Cms/CastPages/CastPages.utils';
 import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
-import { docsHtmlFromValues, isDocsLayout } from '@pages/Cms/ContentPages/ContentPages.utils';
+import { isDocsLayout, buildDocsCastFields, docsCastValues } from '@pages/Cms/ContentPages/ContentPages.utils';
 import { TRANSLATION_CONTENT_COLLECTIONS } from '@pages/Cms/TranslationsPages/TranslationsPages.const';
-import type { BearWidgetDef } from './ContentEdit.types';
 import {
   CAST_VALUE_SUMMARY_JOIN,
   CAST_VALUE_SUMMARY_SEP,
@@ -106,14 +108,6 @@ import {
   DOCUMENT_TEMPLATE_ID,
 } from '../ContentPages/ContentPages.const';
 import { loadCmsProfile } from '../SettingsPages';
-
-type ContentRevision = {
-  id: string;
-  title: string;
-  bodyHtml: string;
-  status: ContentStatus;
-  savedAt: string;
-};
 
 export const ContentEdit: FC = () => {
   const { t } = useI18n();
@@ -167,7 +161,7 @@ export const ContentEdit: FC = () => {
       CMS_EDIT_SIDE_MAX_PX,
     ),
   );
-  const [previewWidth, setPreviewWidth] = useState(0);
+  const [previewWidth, setPreviewWidth] = useState(NUMBER_ZERO);
   const [pageFields, setPageFields] = useState<CastField[]>([]);
   const [castValues, setCastValues] = useState<Record<string, string>>({});
 
@@ -211,8 +205,17 @@ export const ContentEdit: FC = () => {
     setScheduleAt(payloadString(target.payload, PAYLOAD_KEY_SCHEDULE) || nowScheduleAt());
     const templateItem = findLinkedTemplate(items, target.payload, target.id);
     const templateFields = castFieldsFromPayload(templateItem?.payload);
-    setPageFields(pageOwnedCastFields(castFieldsFromPayload(target.payload), templateFields));
-    setCastValues(castValuesFromPayload(target.payload));
+    const ownedFields = pageOwnedCastFields(castFieldsFromPayload(target.payload), templateFields);
+    const layoutId = payloadString(target.payload, PAYLOAD_KEY_LAYOUT);
+    const seededFields =
+      ownedFields.length || !isDocsLayout(layoutId) ? ownedFields : buildDocsCastFields();
+    const loadedValues = castValuesFromPayload(target.payload);
+    const seededValues =
+      Object.keys(loadedValues).length || !isDocsLayout(layoutId)
+        ? loadedValues
+        : docsCastValues();
+    setPageFields(seededFields);
+    setCastValues(seededValues);
     setRevisions([]);
     setSaveOk(false);
     setHydrated(true);
@@ -279,6 +282,54 @@ export const ContentEdit: FC = () => {
     saveSeoCollapsed(next);
   };
 
+  const onPreviewResizeStart = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const parentWidth = event.currentTarget.parentElement?.clientWidth;
+    const startWidth = previewWidth || parentWidth || CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX;
+    startPreviewResize({
+      startX: event.clientX,
+      startWidth,
+      minWidth: CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX,
+      onWidth: setPreviewWidth,
+    });
+  };
+
+  const onSideResizeStart = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    startHorizontalResize(
+      event.clientX,
+      sideWidth,
+      CMS_EDIT_SIDE_MIN_PX,
+      CMS_EDIT_SIDE_MAX_PX,
+      true,
+      setSideWidth,
+      (width) => {
+        setSideWidth(width);
+        saveStoredWidth(CMS_EDIT_SIDE_WIDTH_KEY, width);
+      },
+    );
+  };
+
+  const onCastValueChange = (name: string, value: string) => {
+    setCastValues((current) => ({ ...current, [name]: value }));
+    markUnsaved();
+  };
+
+  const onBodyHtmlChange = (next: string) => {
+    setBodyHtml(next);
+    markUnsaved();
+  };
+
+  const onAddCastField = () => {
+    setPageFields((current) => [...current, createCastField()]);
+    markUnsaved();
+  };
+
+  const onRemoveCastField = (id: string) => {
+    setPageFields((current) => current.filter((field) => field.id !== id));
+    markUnsaved();
+  };
+
   const seoChevron = () => {
     if (seoCollapsed) {
       return <BearIcons.ChevronRightIcon size={CMS_ICON_SIZE} />;
@@ -298,7 +349,7 @@ export const ContentEdit: FC = () => {
     target?.payload && typeof target.payload[PAYLOAD_KEY_LAYOUT] === 'string'
       ? String(target.payload[PAYLOAD_KEY_LAYOUT])
       : EMPTY_STRING;
-  const useFieldEditor = displayFields.length > 0 || isDocsLayout(existingLayout);
+  const useFieldEditor = displayFields.length > NUMBER_ZERO || isDocsLayout(existingLayout);
 
   const onFieldChange = (id: string, patch: Partial<CastField>) => {
     setPageFields((current) =>
@@ -344,6 +395,10 @@ export const ContentEdit: FC = () => {
       [PAYLOAD_KEY_TAGS]: tags,
       [PAYLOAD_KEY_CATEGORIES]: categories,
       [PAYLOAD_KEY_AUTHOR]: author,
+      [PAYLOAD_KEY_CREATED_BY]:
+        payloadString(target.payload, PAYLOAD_KEY_CREATED_BY) ||
+        author ||
+        loadCmsProfile().displayName,
       [PAYLOAD_KEY_SCHEDULE]: scheduleAt || null,
       [PAYLOAD_KEY_FEATURED]: featuredImage,
       [PAYLOAD_KEY_CAST_FIELDS]: pageFields,
@@ -434,6 +489,36 @@ export const ContentEdit: FC = () => {
     setSaveOk(false);
   };
 
+  const renderRevisions = () => {
+    if (revisions.length === NUMBER_ZERO) {
+      return (
+        <Typography variant="caption" color="muted">
+          {t.contentEdit.revisionsEmpty}
+        </Typography>
+      );
+    }
+    return (
+      <Flex direction="column" gap={2}>
+        {revisions.map((revision) => (
+          <Button
+            key={revision.id}
+            type="button"
+            variant="outline"
+            className="bifrost-cms-widget-chip"
+            onClick={() => restoreRevision(revision)}
+          >
+            <Typography variant="body2">
+              {revision.status}
+            </Typography>
+            <Typography variant="caption">
+              {new Date(revision.savedAt).toLocaleString()}
+            </Typography>
+          </Button>
+        ))}
+      </Flex>
+    );
+  };
+
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.PAGES}>
       <Flex direction="column" gap={4} className="bifrost-cms-edit">
@@ -458,11 +543,11 @@ export const ContentEdit: FC = () => {
               currentUserId={selfId}
               location={currentLiveLocation().location}
             />
-            {target ? (
+            {target && (
               <Badge variant="info" className="text-xs">
                 {target.slug}
               </Badge>
-            ) : null}
+            )}
           </Flex>
           <Flex align="center" gap={2} className="flex-wrap">
             <Button
@@ -507,28 +592,28 @@ export const ContentEdit: FC = () => {
           </Alert>
         )}
 
-        {loading && !hydrated ? (
+        {loading && !hydrated && (
           <Flex align="center" gap={2}>
             <Spinner size="sm" />
-            <Typography variant="body2" className="mb-0">
+            <Typography variant="body2">
               {t.contentEdit.loading}
             </Typography>
           </Flex>
-        ) : null}
+        )}
 
-        {error ? (
-          <Typography variant="body2" className="bifrost-cms-dashboard__error mb-0">
+        {error && (
+          <Typography variant="body2" className="bifrost-cms-dashboard__error">
             {t.contentEdit.loadError}
           </Typography>
-        ) : null}
+        )}
 
-        {!loading && !target && id ? (
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
+        {!loading && !target && id && (
+          <Typography variant="body2">
             {t.contentEdit.notFound}
           </Typography>
-        ) : null}
+        )}
 
-        {target ? (
+        {target && (
           <div
             className="bifrost-cms-edit__layout"
             style={{ gridTemplateColumns: `minmax(0, 1fr) ${sideWidth}px` }}
@@ -541,18 +626,6 @@ export const ContentEdit: FC = () => {
                   label={t.contentEdit.titleField}
                   value={title}
                   onChange={onStringInput(setTitle)}
-                />
-                <Input
-                  id={CONTENT_EDIT_SUBTITLE_ID}
-                  label={t.contentEdit.subtitle}
-                  value={subtitle}
-                  onChange={onStringInput(setSubtitle)}
-                />
-                <Input
-                  id={CONTENT_EDIT_SLUG_ID}
-                  label={t.contentEdit.slug}
-                  value={slug}
-                  onChange={onStringInput(setSlug)}
                 />
                 {preview && (
                   <div
@@ -568,29 +641,20 @@ export const ContentEdit: FC = () => {
                       title={t.contentEdit.preview}
                       srcDoc={`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;font-family:Inter,system-ui,sans-serif;padding:24px;color:#12141a;}</style></head><body>${bodyHtml}</body></html>`}
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      iconOnly
                       className="bifrost-cms-preview-resize"
                       aria-label={t.cmsBuilder.viewportLabel}
-                      onMouseDown={(event) => {
-                        event.preventDefault();
-                        const startX = event.clientX;
-                        const startWidth = previewWidth || event.currentTarget.parentElement?.clientWidth || CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX;
-                        const onMove = (moveEvent: globalThis.MouseEvent) => {
-                          setPreviewWidth(Math.max(CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX, startWidth + moveEvent.clientX - startX));
-                        };
-                        const onUp = () => {
-                          window.removeEventListener('mousemove', onMove);
-                          window.removeEventListener('mouseup', onUp);
-                        };
-                        window.addEventListener('mousemove', onMove);
-                        window.addEventListener('mouseup', onUp);
-                      }}
+                      onMouseDown={onPreviewResizeStart}
                     />
                   </div>
                 )}
-                {!preview && useFieldEditor && (
+                {!preview && (
                   <Flex direction="column" gap={3} className="bifrost-cms-editor-stage">
+                    {useFieldEditor && (
+                      <>
                     {translationOpen && (
                       <ContentTranslationWidget
                         items={translationItems}
@@ -600,10 +664,7 @@ export const ContentEdit: FC = () => {
                     <ContentFieldStage
                       fields={displayFields}
                       values={castValues}
-                      onValueChange={(name, value) => {
-                        setCastValues((current) => ({ ...current, [name]: value }));
-                        setSaveOk(false);
-                      }}
+                      onValueChange={onCastValueChange}
                       onDrop={onEditorDrop}
                       attachLabel={t.contentEdit.attachTranslation}
                       hideLabel={t.contentEdit.hideForRole}
@@ -620,15 +681,14 @@ export const ContentEdit: FC = () => {
                         setSaveOk(false);
                       }}
                     />
-                  </Flex>
-                )}
-                {!preview && !useFieldEditor && (
-                  <div
-                    className="bifrost-cms-editor-stage ink-theme-snow"
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={onEditorDrop}
-                  >
-                    {translationOpen && (
+                      </>
+                    )}
+                    <div
+                      className="ink-theme-snow"
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={onEditorDrop}
+                    >
+                    {!useFieldEditor && translationOpen && (
                       <ContentTranslationWidget
                         items={translationItems}
                         onApply={onApplyTranslation}
@@ -636,29 +696,27 @@ export const ContentEdit: FC = () => {
                     )}
                     <InkEditor
                       value={bodyHtml}
-                      onChange={(next) => {
-                        setBodyHtml(next);
-                        setSaveOk(false);
-                      }}
+                      onChange={onBodyHtmlChange}
                       colorMode="light"
                       variant="document"
                       minHeight={CONTENT_EDIT_EDITOR_MIN_HEIGHT_PX}
                       features={{ blocks: true, slash: true, table: true, ai: true }}
                       ai={cmsInkAiProps()}
                     />
-                  </div>
+                    </div>
+                  </Flex>
                 )}
-                {saveOk ? (
-                  <Typography variant="caption" className="bifrost-cms-save-ok mb-0">
+                {saveOk && (
+                  <Typography variant="caption" className="bifrost-cms-save-ok">
                     {t.dashboard.saved}
                   </Typography>
-                ) : null}
-                {preview && displayFields.length ? (
+                )}
+                {preview && displayFields.length > NUMBER_ZERO && (
                   <Flex direction="column" gap={1}>
-                    <Typography variant="h5" className="mb-0">
+                    <Typography variant="h5">
                       {t.contentEdit.castPreviewTitle}
                     </Typography>
-                    <Typography variant="caption" className="bifrost-cms__muted mb-0">
+                    <Typography variant="caption">
                       {summarizeCastValues(
                         displayFields,
                         castValues,
@@ -667,43 +725,32 @@ export const ContentEdit: FC = () => {
                       ) || t.contentEdit.castEmpty}
                     </Typography>
                   </Flex>
-                ) : null}
+                )}
               </Flex>
             </Card>
 
             <div className="bifrost-cms-builder__pane bifrost-cms-builder__pane--inspector">
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              iconOnly
               className="bifrost-cms-panel-resize"
               aria-label={t.contentEdit.castFieldsTitle}
-              onMouseDown={(event) => {
-                event.preventDefault();
-                startHorizontalResize(
-                  event.clientX,
-                  sideWidth,
-                  CMS_EDIT_SIDE_MIN_PX,
-                  CMS_EDIT_SIDE_MAX_PX,
-                  true,
-                  setSideWidth,
-                  (width) => {
-                    setSideWidth(width);
-                    saveStoredWidth(CMS_EDIT_SIDE_WIDTH_KEY, width);
-                  },
-                );
-              }}
+              onMouseDown={onSideResizeStart}
             />
             <aside className="bifrost-cms-edit__side">
               <Card className="mb-3" padding={CMS_CARD_PADDING}>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   className="bifrost-cms-edit__seo-toggle"
                   onClick={onToggleSeoCollapsed}
                 >
-                  <Typography variant="h4" className="mb-0">
+                  <Typography variant="h4">
                     {t.contentEdit.publishTitle}
                   </Typography>
                   {seoChevron()}
-                </button>
+                </Button>
                 {!seoCollapsed && (
                   <>
                 <Typography variant="caption" color="muted" className="mb-2">
@@ -721,6 +768,18 @@ export const ContentEdit: FC = () => {
                     </Button>
                   ))}
                 </Flex>
+                <Input
+                  id={CONTENT_EDIT_SLUG_ID}
+                  label={t.contentEdit.slug}
+                  value={slug}
+                  onChange={onStringInput(setSlug)}
+                />
+                <Input
+                  id={CONTENT_EDIT_SUBTITLE_ID}
+                  label={t.contentEdit.subtitle}
+                  value={subtitle}
+                  onChange={onStringInput(setSubtitle)}
+                />
                 <Input
                   id={CONTENT_EDIT_AUTHOR_ID}
                   label={t.contentEdit.author}
@@ -817,19 +876,10 @@ export const ContentEdit: FC = () => {
                 fields={displayFields}
                 values={castValues}
                 lockedFieldIds={lockedFieldIds}
-                onAddField={() => {
-                  setPageFields((current) => [...current, createCastField()]);
-                  setSaveOk(false);
-                }}
+                onAddField={onAddCastField}
                 onFieldChange={onFieldChange}
-                onRemoveField={(id) => {
-                  setPageFields((current) => current.filter((field) => field.id !== id));
-                  setSaveOk(false);
-                }}
-                onValueChange={(name, value) => {
-                  setCastValues((current) => ({ ...current, [name]: value }));
-                  setSaveOk(false);
-                }}
+                onRemoveField={onRemoveCastField}
+                onValueChange={onCastValueChange}
               />
 
               <Card className="mb-3" padding={CMS_CARD_PADDING}>
@@ -839,35 +889,13 @@ export const ContentEdit: FC = () => {
                 <Typography variant="caption" color="muted" className="mb-3">
                   {t.contentEdit.revisionsHint}
                 </Typography>
-                {revisions.length === 0 ? (
-                  <Typography variant="caption" color="muted" className="mb-0">
-                    {t.contentEdit.revisionsEmpty}
-                  </Typography>
-                ) : (
-                  <Flex direction="column" gap={2}>
-                    {revisions.map((revision) => (
-                      <button
-                        key={revision.id}
-                        type="button"
-                        className="bifrost-cms-widget-chip"
-                        onClick={() => restoreRevision(revision)}
-                      >
-                        <Typography variant="body2" className="mb-0 font-medium">
-                          {revision.status}
-                        </Typography>
-                        <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                          {new Date(revision.savedAt).toLocaleString()}
-                        </Typography>
-                      </button>
-                    ))}
-                  </Flex>
-                )}
+                {renderRevisions()}
               </Card>
 
             </aside>
             </div>
           </div>
-        ) : null}
+        )}
       </Flex>
       <Drawer
         isOpen={widgetsOpen}
@@ -881,21 +909,22 @@ export const ContentEdit: FC = () => {
         </Typography>
         <Flex direction="column" gap={2}>
           {BEAR_WIDGET_CATALOG.map((widget) => (
-            <button
+            <Button
               key={widget.id}
               type="button"
+              variant="outline"
               className="bifrost-cms-widget-chip"
               draggable
               onDragStart={(event) => onDragStart(event, widget.id)}
               onClick={() => insertWidget(widget)}
             >
-              <Typography variant="body2" className="mb-0 font-medium">
+              <Typography variant="body2">
                 {widget.label}
               </Typography>
-              <Typography variant="caption" className="bifrost-cms__muted mb-0">
+              <Typography variant="caption">
                 {widget.bearComponent}
               </Typography>
-            </button>
+            </Button>
           ))}
         </Flex>
       </Drawer>
