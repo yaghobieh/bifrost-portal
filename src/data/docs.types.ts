@@ -23,6 +23,7 @@ export type DocPageModel = {
 };
 
 export type CmsDocItem = {
+  id?: string;
   slug: string;
   title: string;
   status?: string;

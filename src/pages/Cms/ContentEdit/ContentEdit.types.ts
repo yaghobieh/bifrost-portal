@@ -11,21 +11,6 @@ export type BearWidgetDef = {
 export type ContentEditKind =
   (typeof CONTENT_EDIT_KIND)[keyof typeof CONTENT_EDIT_KIND];
 
-export type ContentRevision = {
-  id: string;
-  title: string;
-  bodyHtml: string;
-  status: ContentStatus;
-  savedAt: string;
-};
-
-export type PreviewResizeParams = {
-  startX: number;
-  startWidth: number;
-  minWidth: number;
-  onWidth: (width: number) => void;
-};
-
 export type ContentEditTarget = {
   kind: ContentEditKind;
   id: string;

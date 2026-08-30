@@ -1,4 +1,10 @@
 import { DOCUMENT_CLOUDINARY_IMAGE_SRC } from '@const/docsCloudinary.const';
+import {
+  NUMBER_FIFTY,
+  NUMBER_ONE_HUNDRED,
+  NUMBER_TEN,
+  NUMBER_TWENTY_FIVE,
+} from '@const/numbers.const';
 
 export const CONTENT_KIND_PAGE = 'page';
 export const CONTENT_KIND_ITEM = 'item';
@@ -96,14 +102,15 @@ export const CONTENT_COLUMN_IDS = {
   SLUG: 'slug',
   COLLECTION: 'collection',
   TEMPLATE: 'template',
-  KIND: 'templateKind',
   FIELDS: 'fields',
   STATUS: 'status',
   CREATED_BY: 'createdBy',
+  UPDATED_BY: 'updatedBy',
   UPDATED: 'updated',
   ACTIONS: 'actions',
 } as const;
 
+export const DOC_CATALOG_ID_PREFIX = 'doc-catalog:';
 export const TEMPLATE_KIND = {
   DOC: 'doc',
   ARTICLE: 'article',
@@ -115,19 +122,13 @@ export const TEMPLATE_KIND = {
 
 export const CONTENT_TEMPLATE_FILTER_ALL = 'all';
 
-export const CONTENT_KIND_FILTER_ORDER = [
-  CONTENT_TEMPLATE_FILTER_ALL,
+export const CONTENT_CUBE_KIND_ORDER = [
   TEMPLATE_KIND.DOC,
   TEMPLATE_KIND.ARTICLE,
   TEMPLATE_KIND.LANDING,
   TEMPLATE_KIND.MARKETING,
-  TEMPLATE_KIND.BLANK,
   TEMPLATE_KIND.PAGE,
 ] as const;
-
-export const CONTENT_KIND_FILTER_TYPE = 'select' as const;
-export const CONTENT_KIND_FILTER_OPERATOR = 'equals' as const;
-
 export const MARKETING_LAYOUT_IDS = ['landing-hero', 'marketing'] as const;
 
 export const CONTENT_DATE_LOCALE = 'en-CA';
@@ -135,16 +136,17 @@ export const CONTENT_DATE_LOCALE = 'en-CA';
 export const CONTENT_STATUS_PUBLISHED = 'published';
 export const CONTENT_STATUS_DRAFT = 'draft';
 export const CONTENT_TEMPLATE_EMPTY = '—';
-export const CONTENT_MORE_MENU_MIN_WIDTH = 200;
-
-export const CONTENT_NEW_PAGE_MENU_MIN_WIDTH = 220;
 export const SAVED_TEMPLATES_DIVIDER_KEY = 'saved-templates-divider';
 export const CONTENT_ROW_ID_ACCESSOR = 'id';
 export const CONTENT_STATUS_CLASS = {
   [CONTENT_STATUS_PUBLISHED]: 'bifrost-cms-status bifrost-cms-status--published',
   [CONTENT_STATUS_DRAFT]: 'bifrost-cms-status bifrost-cms-status--draft',
 } as const;
-export const CONTENT_STATUS_CLASS_FALLBACK = 'bifrost-cms-status';
-export const CONTENT_ERROR_CLASS = 'bifrost-cms-dashboard__error mb-0';
-export const CONTENT_EMPTY_CLASS = 'bifrost-cms__muted mb-0';
-export const CONTENT_TABLE_WRAP_CLASS = 'bifrost-cms-card bifrost-cms-pages-wrap';
+
+export const CONTENT_TABLE_PAGE_SIZE = NUMBER_FIFTY;
+export const CONTENT_TABLE_PAGE_SIZE_OPTIONS = [
+  NUMBER_TEN,
+  NUMBER_TWENTY_FIVE,
+  NUMBER_FIFTY,
+  NUMBER_ONE_HUNDRED,
+] as const;

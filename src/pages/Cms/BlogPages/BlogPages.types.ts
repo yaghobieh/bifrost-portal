@@ -1,8 +1,9 @@
 export type BlogTableRow = {
   id: string;
   title: string;
-  slug: string;
+  author: string;
+  category: string;
   status: string;
-  updated: string;
+  published: string;
   [key: string]: unknown;
 };

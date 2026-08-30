@@ -50,6 +50,7 @@ const routes = [
   { path: ROUTES.CMS, name: 'cms', component: withCmsGate(Dashboard) },
   { path: ROUTES.CMS_CONTENT, name: 'cms-content', component: withCmsGate(ContentPages) },
   { path: ROUTES.CMS_BLOG, name: 'cms-blog', component: withCmsGate(BlogPages) },
+  { path: ROUTES.CMS_BLOG_EDIT, name: 'cms-blog-edit', component: withCmsGate(ContentEdit) },
   { path: ROUTES.CMS_EDIT, name: 'cms-edit', component: withCmsGate(ContentEdit) },
   { path: ROUTES.CMS_MEDIA, name: 'cms-media', component: withCmsGate(MediaPages) },
   { path: ROUTES.CMS_EDITORS, name: 'cms-editors', component: withCmsGate(EditorsPages) },

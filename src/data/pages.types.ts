@@ -51,15 +51,19 @@ export type SitePageCopy = {
 };
 
 export type CmsPageItem = {
+  id?: string;
   slug: string;
   title: string;
   payload: Record<string, unknown>;
+  status?: string;
 };
 
 export type CmsItemResponse = {
   item?: {
+    id?: string;
     slug: string;
     title: string;
+    status?: string;
     payload?: Record<string, unknown> | null;
   };
 };

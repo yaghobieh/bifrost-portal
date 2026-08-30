@@ -12,6 +12,16 @@ export {
 export { communityLabel } from './onboarding.utils';
 export { lookLabel } from './look.utils';
 export { isNumberValue, isPlainObject, isStringValue } from './value.utils';
+export {
+  HREF_KIND,
+  isExternalHref,
+  isHashHref,
+  isInternalHref,
+  resolveHrefKind,
+} from './href.utils';
+export type { HrefKind } from './href.types';
+export { joinTags, splitTags, tagSelectOptions } from './tag.utils';
+export { titleFromSlug } from './slug.utils';
 export { buildPostmanCollection, downloadPostmanCollection } from './postman.utils';
 export { answerFromNav } from './askAi.utils';
 export {
