@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { Button, Card, Flex, Typography } from '@forgedevstack/bear';
+import { PAGE_START_CTA_VARIANT } from './PageStart.const';
 import type { PageStartProps } from './PageStart.types';
 
 export const PageStart: FC<PageStartProps> = (props) => {
@@ -13,12 +14,12 @@ export const PageStart: FC<PageStartProps> = (props) => {
         }
         return (
           <Card key={card.id} padding="md" className={cardClass}>
-            <Flex direction="column" gap={3}>
-              {card.recommended && card.tag ? (
+            <Flex direction="column" gap={3} className="bifrost-cms-page-start__inner">
+              {card.recommended && card.tag && (
                 <Typography variant="caption" className="bifrost-cms-page-start__tag mb-0">
                   {card.tag}
                 </Typography>
-              ) : null}
+              )}
               <Typography variant="h4" className="mb-0">
                 {card.title}
               </Typography>
@@ -27,7 +28,8 @@ export const PageStart: FC<PageStartProps> = (props) => {
               </Typography>
               <Button
                 size="sm"
-                variant={card.recommended ? 'primary' : 'outline'}
+                variant={PAGE_START_CTA_VARIANT}
+                className="bifrost-cms-page-start__cta"
                 onClick={() => onStart(card.id)}
               >
                 {card.cta}

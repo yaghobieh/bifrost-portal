@@ -562,9 +562,16 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms__bottom-nav {
-  left: var(--bifrost-cms-sidebar-w, 288px) !important;
-  background: var(--bifrost-cms-surface) !important;
-  border-top: 1px solid var(--bifrost-cms-border);
+  display: none;
+}
+
+.bifrost-cms__menu,
+.bifrost-cms__mobile-bar {
+  display: none;
+}
+
+.bifrost-cms__nav-overlay {
+  display: none;
 }
 
 .bifrost-cms__agent-bar {
@@ -1441,9 +1448,132 @@ html.bifrost-cms-host #root {
 
 .bifrost-cms-edit__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
-  gap: 1rem;
+  grid-template-columns: 220px minmax(0, 1fr) 260px;
+  gap: 0;
+  align-items: stretch;
+  border: 1px solid var(--bifrost-cms-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bifrost-cms-surface);
+  min-height: 37.5rem;
+}
+
+.bifrost-cms-edit__settings {
+  border-right: 1px solid var(--bifrost-cms-border);
+  padding: 1rem 0.875rem;
+  background: var(--bifrost-cms-surface);
+}
+
+.bifrost-cms-edit__set-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  display: block;
+}
+
+.bifrost-cms-edit__route {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--bifrost-cms-border);
+  border-radius: 0.4375rem;
+  overflow: hidden;
+}
+
+.bifrost-cms-edit__route-prefix {
+  background: var(--bifrost-cms-bg);
+  padding: 0.5rem;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.65625rem;
+  color: var(--bifrost-cms-muted);
+  border-right: 1px solid var(--bifrost-cms-border);
+  white-space: nowrap;
+}
+
+.bifrost-cms-edit__route .Bear-Input,
+.bifrost-cms-edit__route input {
+  border: 0;
+  box-shadow: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.bifrost-cms-edit__main {
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.bifrost-cms-field-stage__slot {
+  min-height: 2.5rem;
+}
+
+.bifrost-cms-field-stage__item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  border: 1.5px dashed var(--bifrost-cms-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.875rem;
+  background: var(--bifrost-cms-surface);
+}
+
+.bifrost-cms-field-stage__handle {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--bifrost-cms-muted);
+  cursor: grab;
+  font-size: 0;
+}
+
+.bifrost-cms-field-stage__handle::before {
+  content: '⋮⋮';
+  font-size: 0.75rem;
+  letter-spacing: -0.12em;
+}
+
+.bifrost-cms-field-stage__tail {
+  min-height: 3rem;
+  border: 1.5px dashed var(--bifrost-cms-border);
+  border-radius: 0.5rem;
+}
+
+.bifrost-cms-ink-block {
+  position: relative;
+  border: 1.5px solid var(--bifrost-cms-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  padding-top: 0.5rem;
+}
+
+.bifrost-cms-ink-block__tag {
+  display: inline-block;
+  margin: 0 0.75rem 0.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.1875rem;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.5625rem;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: #14161c;
+}
+
+.bifrost-cms-blog-edit__grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 1.5rem;
   align-items: start;
+}
+
+.bifrost-cms-page-header {
+  width: 100%;
+}
+
+.bifrost-cms-page-header > * {
+  width: 100%;
 }
 
 .bifrost-cms-select {
@@ -2736,6 +2866,24 @@ html.bifrost-cms-host #root {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
+  align-items: stretch;
+}
+
+.bifrost-cms-template-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bifrost-cms-template-card__inner {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.bifrost-cms-template-card__cta {
+  margin-top: auto;
+  width: 100%;
 }
 
 @media (max-width: 1100px) {
@@ -2789,6 +2937,15 @@ html.bifrost-cms-host #root {
     grid-template-columns: 1fr !important;
   }
 
+  .bifrost-cms-edit__settings {
+    border-right: 0;
+    border-bottom: 1px solid var(--bifrost-cms-border);
+  }
+
+  .bifrost-cms-blog-edit__grid {
+    grid-template-columns: 1fr;
+  }
+
   .bifrost-cms-cast {
     grid-template-columns: 1fr;
   }
@@ -2814,15 +2971,57 @@ html.bifrost-cms-host #root {
 
 @media (max-width: 768px) {
   .bifrost-cms {
-    flex-direction: column;
+    flex-direction: row;
   }
 
-  .bifrost-cms__sidebar {
-    width: 100% !important;
+  .bifrost-cms__rail {
+    position: fixed;
+    z-index: 60;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 0.75rem 0 1.5rem rgb(15 23 42 / 0.18);
   }
 
-  .bifrost-cms-dashboard__kpis {
-    grid-template-columns: 1fr;
+  .bifrost-cms.is-nav-open .bifrost-cms__rail {
+    transform: translateX(0);
+  }
+
+  .bifrost-cms__resize {
+    display: none;
+  }
+
+  .bifrost-cms__nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: rgb(15 23 42 / 0.45);
+  }
+
+  .bifrost-cms__menu,
+  .bifrost-cms__mobile-bar {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .bifrost-cms__mobile-bar {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--bifrost-cms-surface);
+    border-bottom: 1px solid var(--bifrost-cms-border);
+  }
+
+  .bifrost-cms__appbar-left {
+    width: 100%;
+    min-width: 0;
   }
 
   .bifrost-cms__search-wrap {
@@ -2837,6 +3036,66 @@ html.bifrost-cms-host #root {
 
   .bifrost-cms__appbar-user {
     display: none;
+  }
+
+  .bifrost-cms__content {
+    padding: 1rem 0.875rem 5.5rem;
+  }
+
+  .bifrost-cms-page-header__title {
+    font-size: 1.125rem;
+  }
+
+  .bifrost-cms-dashboard__kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .bifrost-cms-pages-wrap,
+  .bifrost-cms-card {
+    overflow-x: auto;
+  }
+
+  .bifrost-cms__bottom-nav {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    background: var(--bifrost-cms-surface);
+    border-top: 1px solid var(--bifrost-cms-border);
+    justify-content: space-around;
+    padding: 0.35rem 0.25rem calc(0.35rem + env(safe-area-inset-bottom));
+  }
+
+  .bifrost-cms__bottom-nav-item {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--bifrost-cms-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.35rem 0.2rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+  }
+
+  .bifrost-cms__bottom-nav-item span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bifrost-cms__bottom-nav-item.is-active {
+    color: var(--bifrost-cms-accent);
+  }
+
+  .bifrost-cms__agent-dock {
+    bottom: 4.5rem;
   }
 }
 
@@ -3015,6 +3274,10 @@ html.bifrost-cms-host #root {
 
 .bifrost-cms-page-header {
   padding-bottom: 8px;
+}
+
+.bifrost-cms-page-header__action {
+  width: 100%;
 }
 
 .bifrost-cms-card__title {
@@ -3976,11 +4239,11 @@ html.bifrost-cms-host #root {
   position: absolute;
   right: 0;
   bottom: calc(100% + 0.75rem);
-  z-index: 50;
+  z-index: 40;
   display: flex;
   flex-direction: column;
   width: min(36rem, calc(100vw - 2rem));
-  height: min(28rem, calc(100vh - 7rem));
+  height: min(28rem, calc(100vh - 10rem));
   overflow: hidden;
   box-shadow: 0 12px 32px color-mix(in srgb, var(--bear-neutral-900) 16%, transparent);
 }
@@ -4377,6 +4640,24 @@ html.bifrost-cms-host #root {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.75rem;
+  align-items: stretch;
+}
+
+.bifrost-cms-page-start__card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bifrost-cms-page-start__inner {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.bifrost-cms-page-start__cta {
+  margin-top: auto;
+  width: 100%;
 }
 
 .bifrost-cms-page-start__card--rec {
@@ -4387,6 +4668,32 @@ html.bifrost-cms-host #root {
   color: var(--bear-primary-600);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.bifrost-cms-template-cubes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.bifrost-cms-template-cubes__hit {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+}
+
+.bifrost-cms-template-cubes__card {
+  height: 100%;
+  cursor: pointer;
+}
+
+.bifrost-cms-template-cubes__count {
+  letter-spacing: -0.03em;
 }
 
 .bifrost-cms-field-attach {

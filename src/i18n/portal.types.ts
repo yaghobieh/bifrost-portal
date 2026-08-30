@@ -6,6 +6,24 @@ export interface DocCopy {
   crumb: string;
 }
 
+export interface BlogPostCopy {
+  title: string;
+  excerpt: string;
+}
+
+export interface BlogArticleCopy extends BlogPostCopy {
+  p1: string;
+  hWhy: string;
+  pWhy: string;
+  calloutLead: string;
+  calloutBody: string;
+  hWire: string;
+  pWireBefore: string;
+  reuseVia: string;
+  pWireAfter: string;
+  pClose: string;
+}
+
 export interface Messages {
   brand: string;
   tagline: string;
@@ -64,6 +82,7 @@ export interface Messages {
     github: string;
     signIn: string;
     status: string;
+    blog: string;
   };
   status: {
     title: string;
@@ -75,9 +94,44 @@ export interface Messages {
     dbDown: string;
     service: string;
     serviceHint: string;
+    product: string;
     version: string;
     updateAvailable: string;
     updateCurrent: string;
+    updateBadge: string;
+    uptimeTitle: string;
+    uptimeAgo: string;
+    uptimeToday: string;
+    uptimeHoursMins: string;
+    uptimeLive: string;
+    services: string;
+    svcApi: string;
+    svcMedia: string;
+    svcDatabase: string;
+    svcAuth: string;
+    svcWebhooks: string;
+    svcNotConfigured: string;
+    svcDegraded: string;
+    incidents: string;
+    incResolved: string;
+    incOpen: string;
+    incEmpty: string;
+    incMedia: string;
+    incAuth: string;
+    incidentDuration: string;
+    subscribeTitle: string;
+    subscribeLead: string;
+    subscribePlaceholder: string;
+    subscribeAction: string;
+    subscribed: string;
+  };
+  demo: {
+    title: string;
+    lead: string;
+    note: string;
+    tabIndex: string;
+    tabArticle: string;
+    tabStatus: string;
   };
   landing: {
     navProduct: string;
@@ -173,11 +227,6 @@ export interface Messages {
     stub: string;
     callout: string;
   };
-  demo: {
-    title: string;
-    lead: string;
-    note: string;
-  };
   changelog: {
     title: string;
     lead: string;
@@ -204,5 +253,30 @@ export interface Messages {
     translating: string;
     translateSuccess: string;
     translateError: string;
+  };
+  blog: {
+    title: string;
+    lead: string;
+    eyebrow: string;
+    newest: string;
+    mostViewed: string;
+    share: string;
+    shareCopied: string;
+    empty: string;
+    views: string;
+    readTime: string;
+    chipAll: string;
+    catProduct: string;
+    catEngineering: string;
+    catChangelog: string;
+    previous: string;
+    next: string;
+    posts: {
+      marketing: BlogArticleCopy;
+      ink: BlogPostCopy;
+      changelog: BlogPostCopy;
+      visibility: BlogPostCopy;
+      install: BlogPostCopy;
+    };
   };
 }

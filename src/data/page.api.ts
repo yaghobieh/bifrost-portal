@@ -1,7 +1,7 @@
-import { ABORT_ERROR_NAME, PUBLIC_PAGES_PATH } from '@const/strings.const';
+import { ABORT_ERROR_NAME, PUBLIC_DOCS_PATH, PUBLIC_PAGES_PATH } from '@const/strings.const';
 import { requestWithError } from '@sdk/http';
 import { mapCmsDoc } from './docs.mapper';
-import type { DocPageModel } from './docs.types';
+import type { CmsDocItem, CmsDocsListResponse, DocPageModel } from './docs.types';
 import type { CmsItemResponse, CmsPageItem } from './pages.types';
 
 const inflightPages = new Map<string, Promise<CmsPageItem>>();
@@ -21,9 +21,11 @@ const fetchPublicPageRequest = async (slug: string): Promise<CmsPageItem> => {
     throw new Error(slug);
   }
   return {
+    id: item.id,
     slug: item.slug,
     title: item.title,
     payload: item.payload ?? {},
+    status: item.status,
   };
 };
 
@@ -76,4 +78,19 @@ export const fetchPublicDoc = async (
     title: item.title,
     payload: item.payload,
   });
+};
+
+export const fetchPublicDocsList = async (): Promise<CmsDocItem[]> => {
+  const response = await requestWithError(PUBLIC_DOCS_PATH, undefined, {
+    silent: true,
+    code: 'pages',
+  });
+  if (!response.ok) {
+    return [];
+  }
+  const data = (await response.json()) as CmsDocsListResponse;
+  if (!data.items || !Array.isArray(data.items)) {
+    return [];
+  }
+  return data.items;
 };

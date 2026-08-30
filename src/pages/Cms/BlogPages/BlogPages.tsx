@@ -6,23 +6,35 @@ import { GridTable } from '@forgedevstack/grid-table';
 import type { ColumnDefinition } from '@forgedevstack/grid-table';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
-import { cmsEditPath, EMPTY_STRING } from '@const/index';
+import { cmsBlogEditPath, EMPTY_STRING } from '@const/index';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   DOCUMENT_DEFAULT_LOCALE,
   DOCUMENT_STARTER_STATUS,
+  CONTENT_TEMPLATE_EMPTY,
+  CONTENT_TABLE_PAGE_SIZE,
+  CONTENT_TABLE_PAGE_SIZE_OPTIONS,
 } from '../ContentPages/ContentPages.const';
-import { formatContentUpdated } from '../ContentPages/ContentPages.utils';
-import { PAYLOAD_KEY_CAST_FIELDS, PAYLOAD_KEY_CAST_VALUES } from '../ContentEdit/ContentEdit.const';
+import { formatContentUpdated, payloadActor } from '../ContentPages/ContentPages.utils';
+import {
+  PAYLOAD_KEY_AUTHOR,
+  PAYLOAD_KEY_CATEGORIES,
+  PAYLOAD_KEY_CAST_FIELDS,
+  PAYLOAD_KEY_CAST_VALUES,
+  PAYLOAD_KEY_CREATED_BY,
+  PAYLOAD_KEY_SCHEDULE,
+  PAYLOAD_KEY_UPDATED_BY,
+} from '../ContentEdit/ContentEdit.const';
+import { payloadString } from '../ContentEdit/ContentEdit.utils';
+import { loadCmsProfile } from '../SettingsPages';
 import {
   BLOG_COLLECTION,
   BLOG_COLUMN,
   BLOG_DATE_LOCALE,
   BLOG_ROW_ID,
   BLOG_SLUG_PREFIX,
-  BLOG_TABLE_WRAP_CLASS,
 } from './BlogPages.const';
 import type { BlogTableRow } from './BlogPages.types';
 import { blogCastFields } from './BlogPages.utils';
@@ -34,6 +46,7 @@ export const BlogPages: FC = () => {
   const { token } = useNucleus(authNucleus);
   const { items, loading, error, saving, fetchContent } = useNucleus(contentNucleus);
   const activeToken = token || providerToken;
+  const actorName = loadCmsProfile().displayName || loadCmsProfile().username;
 
   useEffect(() => {
     if (!activeToken) return;
@@ -45,9 +58,15 @@ export const BlogPages: FC = () => {
     .map((item) => ({
       id: item.id,
       title: item.title || item.slug,
-      slug: item.slug,
+      author:
+        payloadString(item.payload, PAYLOAD_KEY_AUTHOR) ||
+        payloadActor(item.payload, PAYLOAD_KEY_CREATED_BY),
+      category: payloadString(item.payload, PAYLOAD_KEY_CATEGORIES),
       status: item.status,
-      updated: formatContentUpdated(item.updatedAt, BLOG_DATE_LOCALE),
+      published: formatContentUpdated(
+        payloadString(item.payload, PAYLOAD_KEY_SCHEDULE) || item.updatedAt,
+        BLOG_DATE_LOCALE,
+      ),
     }));
 
   const onNewPost = async () => {
@@ -64,13 +83,16 @@ export const BlogPages: FC = () => {
       payload: {
         [PAYLOAD_KEY_CAST_FIELDS]: fields,
         [PAYLOAD_KEY_CAST_VALUES]: {},
+        [PAYLOAD_KEY_AUTHOR]: actorName,
+        [PAYLOAD_KEY_CREATED_BY]: actorName,
+        [PAYLOAD_KEY_UPDATED_BY]: actorName,
       },
     });
     if (!item) {
       return;
     }
     await fetchContent(activeToken);
-    navigate(cmsEditPath(item.id));
+    navigate(cmsBlogEditPath(item.id));
   };
 
   return (
@@ -79,8 +101,15 @@ export const BlogPages: FC = () => {
         <CmsPageHeader
           title={t.dashboard.blogTitle}
           subtitle={t.dashboard.blogSubtitle}
+          actionTitle={t.dashboard.blogNewPost}
+          actionBody={t.dashboard.blogSubtitle}
           extra={
-            <Button size="sm" variant="primary" disabled={saving || !activeToken} onClick={() => void onNewPost()}>
+            <Button
+              size="sm"
+              variant="primary"
+              disabled={saving || !activeToken}
+              onClick={() => void onNewPost()}
+            >
               {t.dashboard.blogNewPost}
             </Button>
           }
@@ -90,19 +119,23 @@ export const BlogPages: FC = () => {
             {t.dashboard.contentLoadError}
           </Typography>
         )}
-        <div className={BLOG_TABLE_WRAP_CLASS}>
+        <div className="bifrost-cms-card bifrost-cms-pages-wrap">
           <GridTable
             data={rows}
             loading={loading}
             stickyHeader
-            showPagination={false}
+            showPagination
+            paginationConfig={{
+              initialPageSize: CONTENT_TABLE_PAGE_SIZE,
+              pageSizeOptions: CONTENT_TABLE_PAGE_SIZE_OPTIONS,
+            }}
             showFilter={false}
             emptyContent={
               <Typography variant="body2" className="bifrost-cms__muted mb-0">
                 {t.dashboard.listEmpty}
               </Typography>
             }
-            onRowClick={(row) => navigate(cmsEditPath(String(row.id)))}
+            onRowClick={(row) => navigate(cmsBlogEditPath(String(row.id)))}
             columns={
               [
                 {
@@ -113,10 +146,16 @@ export const BlogPages: FC = () => {
                   render: (value) => <b>{String(value ?? EMPTY_STRING)}</b>,
                 },
                 {
-                  id: BLOG_COLUMN.SLUG,
-                  accessor: BLOG_COLUMN.SLUG,
-                  header: t.dashboard.contentColSlug,
-                  sortable: true,
+                  id: BLOG_COLUMN.AUTHOR,
+                  accessor: BLOG_COLUMN.AUTHOR,
+                  header: t.dashboard.blogColAuthor,
+                  render: (value) => String(value || CONTENT_TEMPLATE_EMPTY),
+                },
+                {
+                  id: BLOG_COLUMN.CATEGORY,
+                  accessor: BLOG_COLUMN.CATEGORY,
+                  header: t.dashboard.blogColCategory,
+                  render: (value) => String(value || CONTENT_TEMPLATE_EMPTY),
                 },
                 {
                   id: BLOG_COLUMN.STATUS,
@@ -124,9 +163,10 @@ export const BlogPages: FC = () => {
                   header: t.dashboard.contentColStatus,
                 },
                 {
-                  id: BLOG_COLUMN.UPDATED,
-                  accessor: BLOG_COLUMN.UPDATED,
-                  header: t.dashboard.contentColUpdated,
+                  id: BLOG_COLUMN.PUBLISHED,
+                  accessor: BLOG_COLUMN.PUBLISHED,
+                  header: t.dashboard.blogColPublished,
+                  render: (value) => String(value || CONTENT_TEMPLATE_EMPTY),
                 },
                 {
                   id: BLOG_COLUMN.ACTIONS,
@@ -139,10 +179,10 @@ export const BlogPages: FC = () => {
                       className="bifrost-cms-link"
                       onClick={(event) => {
                         event.stopPropagation();
-                        navigate(cmsEditPath(String(row.id)));
+                        navigate(cmsBlogEditPath(String(row.id)));
                       }}
                     >
-                      {t.dashboard.contentOpen}
+                      {t.dashboard.contentEdit}
                     </button>
                   ),
                 },

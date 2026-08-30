@@ -1,5 +1,5 @@
 ---
-description: Git branches from Jira for the Bifrost public docs portal
+description: Git branches from Jira — ticket into release/X_temp, then release/X, then main
 alwaysApply: true
 ---
 
@@ -9,8 +9,8 @@ alwaysApply: true
 
 1. Open the CMS Jira board (key `CMS`).
 2. Move the issue to **In Progress**.
-3. Branch from the **portal sprint release branch**, not from `main`.
-4. CMS admin sprint is **1.1.12** → `release/1.1.12`. Product version stays **1.0.0**.
+3. Branch from **`release/{version}_temp`**, not from `main` and not from the real release until temp is checked.
+4. CMS admin sprint is **1.1.14** → temp `release/1.1.14_temp`, then real `release/1.1.14`. Product version stays **1.0.0**.
 5. Ticket branch: `{feature|bug}/{PROJECT}-{n}`.
 
 ## Prefix
@@ -24,13 +24,22 @@ alwaysApply: true
 
 Label portal work `bifrost-portal` and `portal`. CMS admin work uses `library` / `portal` on the admin repos.
 
+## Merge path
+
+1. Ticket branch `{feature|bug}/{PROJECT}-{n}` from `release/1.1.14_temp`.
+2. PR the ticket **into** `release/1.1.14_temp`.
+3. When the sprint tickets are in temp, **review and check** `release/1.1.14_temp`.
+4. Merge temp → **`release/1.1.14`** and recheck that branch.
+5. After approval, merge `release/1.1.14` → **`main`**.
+
+Do not merge portal WIP into `main` mid-sprint. Do not PR tickets straight into `release/1.1.14` while temp is the integration branch.
+
 ## Stories and subtasks
 
-- Story in progress: branch `feature/CMS-128` from `release/1.1.12`.
+- Story in progress: branch `feature/CMS-128` from `release/1.1.14_temp`.
 - Subtasks open PRs **into the story branch**.
-- After checks: merge the story into `release/1.1.12` (Jira → In Review).
-- Do not merge portal WIP into `main` mid-sprint.
+- After checks: merge the story into `release/1.1.14_temp` (Jira → In Review).
 
 ## Sprint end
 
-Merge `release/1.1.12` → `main`, then deploy the public docs site and `/cms`.
+Merge `release/1.1.14` → `main`, then deploy the public docs site and `/cms`.
