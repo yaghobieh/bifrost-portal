@@ -19,7 +19,7 @@ export const FieldAttachMenu: FC<FieldAttachMenuProps> = (props) => {
   return (
     <div className="bifrost-cms-field-attach" onContextMenu={onContextMenu}>
       {children}
-      {open ? (
+      {open && (
         <div
           className="bifrost-cms-field-attach__menu"
           style={{ left, top }}
@@ -49,7 +49,7 @@ export const FieldAttachMenu: FC<FieldAttachMenuProps> = (props) => {
             </button>
           ))}
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

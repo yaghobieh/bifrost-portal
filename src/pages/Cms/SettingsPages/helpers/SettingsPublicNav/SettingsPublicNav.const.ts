@@ -1,0 +1,3 @@
+export const SETTINGS_PUBLIC_NAV_BUTTON_TYPE = 'button';
+export const SETTINGS_PUBLIC_NAV_DELTA_UP = -1;
+export const SETTINGS_PUBLIC_NAV_DELTA_DOWN = 1;

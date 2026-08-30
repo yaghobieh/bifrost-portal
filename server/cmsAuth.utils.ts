@@ -58,9 +58,12 @@ const bytesToBinary = (bytes: Uint8Array): string => {
 const toBase64Url = (bytes: Uint8Array): string => {
   const encoded = btoa(bytesToBinary(bytes));
   return encoded
-    .replaceAll(BASE64_PLUS, BASE64_URL_PLUS)
-    .replaceAll(BASE64_SLASH, BASE64_URL_SLASH)
-    .replaceAll(BASE64_PAD, EMPTY_STRING);
+    .split(BASE64_PLUS)
+    .join(BASE64_URL_PLUS)
+    .split(BASE64_SLASH)
+    .join(BASE64_URL_SLASH)
+    .split(BASE64_PAD)
+    .join(EMPTY_STRING);
 };
 
 const utf8ToBase64Url = (value: string): string =>
@@ -68,8 +71,10 @@ const utf8ToBase64Url = (value: string): string =>
 
 const base64UrlToBytes = (value: string): Uint8Array => {
   const padded = value
-    .replaceAll(BASE64_URL_PLUS, BASE64_PLUS)
-    .replaceAll(BASE64_URL_SLASH, BASE64_SLASH);
+    .split(BASE64_URL_PLUS)
+    .join(BASE64_PLUS)
+    .split(BASE64_URL_SLASH)
+    .join(BASE64_SLASH);
   const binary = atob(padded);
   const bytes = new Uint8Array(binary.length);
   for (let index = 0; index < binary.length; index += 1) {

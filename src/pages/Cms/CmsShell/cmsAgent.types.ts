@@ -6,6 +6,7 @@ export type CmsAgentApplyDetail = {
 
 export type CmsAgentBarProps = {
   onApply: (templateId: string) => void;
+  chipsClassName: string;
 };
 
 export type CmsAgentDockProps = {

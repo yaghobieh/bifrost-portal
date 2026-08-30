@@ -215,6 +215,22 @@ html.bifrost-cms-host #root {
   flex: 1 1 auto;
 }
 
+.bifrost-cms__brand-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+}
+
+.bifrost-cms__brand-link:hover .bifrost-cms__brand {
+  color: #fff;
+}
+
 .bifrost-cms__sidebar .Bear-Sidebar__toggle {
   color: #e8eaef !important;
   background: transparent !important;
@@ -1041,6 +1057,22 @@ html.bifrost-cms-host #root {
 .bifrost-cms-settings__nav {
   display: grid;
   gap: 0.65rem;
+}
+
+.bifrost-cms-public-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.bifrost-cms-public-nav__row {
+  padding: 0.75rem;
+  border: 1px solid var(--bifrost-cms-border);
+  border-radius: 0.65rem;
+}
+
+.bifrost-cms-public-nav__tools {
+  flex-wrap: wrap;
 }
 
 .bifrost-cms-template-preview {

@@ -9,12 +9,14 @@ import { useI18n } from '@i18n/index';
 import { cmsBuilderPath, cmsEditPath, EMPTY_STRING, SLASH } from '@const/index';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
-import { loadCmsSite, persistCmsSiteRemote } from '../SettingsPages';
+import { loadCmsProfile, loadCmsSite, persistCmsSiteRemote } from '../SettingsPages';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   CONTENT_COLLECTION_PAGES,
   CONTENT_COLUMN_IDS,
   CONTENT_DATE_LOCALE,
+  CONTENT_KIND_FILTER_OPERATOR,
+  CONTENT_KIND_FILTER_TYPE,
   CONTENT_EMPTY_CLASS,
   CONTENT_ERROR_CLASS,
   CONTENT_KIND_ITEM,
@@ -31,21 +33,29 @@ import {
 } from './ContentPages.const';
 import type { ContentTableRow } from './ContentPages.types';
 import {
+  contentKindFilterOptions,
   contentStatusClass,
   contentStatusLabel,
   formatContentUpdated,
   isDocsLayout,
+  labelTemplateKind,
+  matchesContentKindFilter,
+  payloadActor,
   templateFromPayload,
+  templateKindFromPayload,
 } from './ContentPages.utils';
 import { ContentRowActions } from './helpers/ContentRowActions';
 import { PAGE_START_IDS, PAGE_START_LAYOUT, PageStart } from './helpers/PageStart';
 import type { PageStartId } from './helpers/PageStart';
 import { cloneCanvasTree, canvasFromPayload } from '../BuilderPages/BuilderPages.utils';
 import {
+  PAYLOAD_KEY_AUTHOR,
   PAYLOAD_KEY_CAST_FIELDS,
   PAYLOAD_KEY_CAST_VALUES,
+  PAYLOAD_KEY_CREATED_BY,
   PAYLOAD_KEY_LAYOUT,
   PAYLOAD_KEY_TEMPLATE,
+  PAYLOAD_KIND_KEY,
 } from '../ContentEdit/ContentEdit.const';
 import {
   CAST_VALUE_SUMMARY_JOIN,
@@ -72,6 +82,8 @@ export const ContentPages: FC = () => {
   const { items, loading, error, saving, fetchContent, deleteContent } =
     useNucleus(contentNucleus);
   const activeToken = token || providerToken;
+  const actorName = loadCmsProfile().displayName || loadCmsProfile().username;
+  const kindFilterOptions = contentKindFilterOptions(t.dashboard);
 
   useEffect(() => {
     if (!activeToken) return;
@@ -84,26 +96,33 @@ export const ContentPages: FC = () => {
         item.collection as (typeof CONTENT_LIST_COLLECTIONS)[number],
       ),
     )
-    .map((item) => ({
-      id: item.id,
-      kind: CONTENT_KIND_ITEM as typeof CONTENT_KIND_ITEM,
-      title: item.title || item.slug,
-      slug: item.slug,
-      collection: item.collection,
-      template: templateFromPayload(item.payload),
-      fields: summarizeCastValues(
-        mergeCastFields(
-          castFieldsFromPayload(findLinkedTemplate(items, item.payload, item.id)?.payload),
-          castFieldsFromPayload(item.payload),
+    .map((item) => {
+      const templateKind = templateKindFromPayload(item.payload, item.collection);
+      return {
+        id: item.id,
+        kind: CONTENT_KIND_ITEM as typeof CONTENT_KIND_ITEM,
+        title: item.title || item.slug,
+        slug: item.slug,
+        collection: item.collection,
+        template: templateFromPayload(item.payload),
+        templateKind,
+        fields: summarizeCastValues(
+          mergeCastFields(
+            castFieldsFromPayload(findLinkedTemplate(items, item.payload, item.id)?.payload),
+            castFieldsFromPayload(item.payload),
+          ),
+          castValuesFromPayload(item.payload),
+          CAST_VALUE_SUMMARY_JOIN,
+          CAST_VALUE_SUMMARY_SEP,
         ),
-        castValuesFromPayload(item.payload),
-        CAST_VALUE_SUMMARY_JOIN,
-        CAST_VALUE_SUMMARY_SEP,
-      ),
-      status: item.status,
-      updatedAt: item.updatedAt,
-      updated: formatContentUpdated(item.updatedAt, CONTENT_DATE_LOCALE),
-    }));
+        status: item.status,
+        createdBy:
+          payloadActor(item.payload, PAYLOAD_KEY_CREATED_BY) ||
+          payloadActor(item.payload, PAYLOAD_KEY_AUTHOR),
+        updatedAt: item.updatedAt,
+        updated: formatContentUpdated(item.updatedAt, CONTENT_DATE_LOCALE),
+      };
+    });
 
   const onNewPage = async (layoutId: string) => {
     if (!activeToken) return;
@@ -127,8 +146,16 @@ export const ContentPages: FC = () => {
         canvas,
         [PAYLOAD_KEY_LAYOUT]: layout?.id || layoutId,
         [PAYLOAD_KEY_TEMPLATE]: saved?.id,
+        [PAYLOAD_KIND_KEY]: templateKindFromPayload(
+          {
+            [PAYLOAD_KEY_LAYOUT]: layout?.id || layoutId,
+            [PAYLOAD_KEY_TEMPLATE]: saved?.id,
+          },
+          CONTENT_COLLECTION_PAGES,
+        ),
         [PAYLOAD_KEY_CAST_FIELDS]: layout?.castFields || castFieldsFromPayload(saved?.payload),
         [PAYLOAD_KEY_CAST_VALUES]: layout?.castValues || castValuesFromPayload(saved?.payload),
+        [PAYLOAD_KEY_CREATED_BY]: actorName,
       },
     });
     if (!item) return;
@@ -182,7 +209,10 @@ export const ContentPages: FC = () => {
       locale: DOCUMENT_DEFAULT_LOCALE,
       title: source.title,
       status: CONTENT_STATUS_DRAFT,
-      payload: source.payload,
+      payload: {
+        ...source.payload,
+        [PAYLOAD_KEY_CREATED_BY]: actorName,
+      },
     });
     if (!item) {
       return;
@@ -327,7 +357,8 @@ export const ContentPages: FC = () => {
             loading={loading}
             stickyHeader
             showPagination={false}
-            showFilter={false}
+            showFilter
+            showFilterChips
             emptyContent={
               <Typography variant="body2" className={CONTENT_EMPTY_CLASS}>
                 {t.dashboard.listEmpty}
@@ -341,6 +372,7 @@ export const ContentPages: FC = () => {
                   accessor: CONTENT_COLUMN_IDS.TITLE,
                   header: t.dashboard.contentColTitle,
                   sortable: true,
+                  filterable: false,
                   render: (value) => <b>{String(value ?? EMPTY_STRING)}</b>,
                 },
                 {
@@ -348,23 +380,46 @@ export const ContentPages: FC = () => {
                   accessor: CONTENT_COLUMN_IDS.SLUG,
                   header: t.dashboard.contentColSlug,
                   sortable: true,
+                  filterable: false,
+                },
+                {
+                  id: CONTENT_COLUMN_IDS.KIND,
+                  accessor: CONTENT_COLUMN_IDS.KIND,
+                  header: t.dashboard.contentColKind,
+                  filterable: true,
+                  filterType: CONTENT_KIND_FILTER_TYPE,
+                  filterOptions: kindFilterOptions,
+                  defaultFilterOperator: CONTENT_KIND_FILTER_OPERATOR,
+                  filterFn: matchesContentKindFilter,
+                  render: (_value, row) =>
+                    labelTemplateKind(String(row.templateKind), t.dashboard),
                 },
                 {
                   id: CONTENT_COLUMN_IDS.TEMPLATE,
                   accessor: CONTENT_COLUMN_IDS.TEMPLATE,
                   header: t.dashboard.contentColTemplate,
+                  filterable: false,
+                  render: (value) => String(value || CONTENT_TEMPLATE_EMPTY),
+                },
+                {
+                  id: CONTENT_COLUMN_IDS.CREATED_BY,
+                  accessor: CONTENT_COLUMN_IDS.CREATED_BY,
+                  header: t.dashboard.contentColCreatedBy,
+                  filterable: false,
                   render: (value) => String(value || CONTENT_TEMPLATE_EMPTY),
                 },
                 {
                   id: CONTENT_COLUMN_IDS.FIELDS,
                   accessor: CONTENT_COLUMN_IDS.FIELDS,
                   header: t.dashboard.contentColFields,
+                  filterable: false,
                   render: (value) => String(value || CONTENT_TEMPLATE_EMPTY),
                 },
                 {
                   id: CONTENT_COLUMN_IDS.STATUS,
                   accessor: CONTENT_COLUMN_IDS.STATUS,
                   header: t.dashboard.contentColStatus,
+                  filterable: false,
                   render: (_value, row) => (
                     <span className={contentStatusClass(String(row.status))}>
                       {contentStatusLabel(String(row.status), t.dashboard)}
@@ -376,12 +431,14 @@ export const ContentPages: FC = () => {
                   accessor: CONTENT_COLUMN_IDS.UPDATED,
                   header: t.dashboard.contentColUpdated,
                   sortable: true,
+                  filterable: false,
                 },
                 {
                   id: CONTENT_COLUMN_IDS.ACTIONS,
                   accessor: CONTENT_ROW_ID_ACCESSOR,
                   header: EMPTY_STRING,
                   sortable: false,
+                  filterable: false,
                   render: (_value, row) => (
                     <ContentRowActions
                       id={String(row.id)}

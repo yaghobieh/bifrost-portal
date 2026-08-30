@@ -373,6 +373,7 @@ export interface Messages {
   };
   cmsShell: {
     brand: string;
+    backToPortal: string;
     search: string;
     searchShortcut: string;
     searchEmpty: string;
@@ -705,6 +706,14 @@ export interface Messages {
     contentColStatus: string;
     contentColUpdated: string;
     contentColTemplate: string;
+    contentColKind: string;
+    contentColCreatedBy: string;
+    contentKindFilterAll: string;
+    contentTemplateDoc: string;
+    contentTemplateArticle: string;
+    contentTemplateLanding: string;
+    contentTemplateBlank: string;
+    contentTemplatePage: string;
     contentColFields: string;
     contentOpenHint: string;
     contentColActions: string;
@@ -1342,6 +1351,15 @@ export interface Messages {
     chatRight: string;
     navVisibility: string;
     navHint: string;
+    publicNavVisibility: string;
+    publicNavHint: string;
+    publicNavLabel: string;
+    publicNavHref: string;
+    publicNavAdd: string;
+    publicNavRemove: string;
+    publicNavMoveUp: string;
+    publicNavMoveDown: string;
+    publicNavVisible: string;
     locale: string;
     localeEn: string;
     localeEs: string;
