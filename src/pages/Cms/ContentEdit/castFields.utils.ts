@@ -1,4 +1,5 @@
 import { EMPTY_STRING } from '@const/index';
+import { NUMBER_ONE, NUMBER_ZERO } from '@const/numbers.const';
 import { isPlainObject, isStringValue } from '@utils';
 import type { ContentItem } from '@sdk/modules/content';
 import { CONTENT_COLLECTION_TEMPLATES } from '../ContentPages/ContentPages.const';
@@ -43,6 +44,61 @@ export const mergeCastFields = (templateFields: CastField[], pageFields: CastFie
     seen.add(key);
     next.push(field);
   });
+  return next;
+};
+
+export const fieldOrderKey = (field: CastField): string => field.name || field.id;
+
+export const fieldOrderKeys = (fields: CastField[]): string[] => fields.map(fieldOrderKey);
+
+export const orderCastFields = (fields: CastField[], order: string[]): CastField[] => {
+  if (!order.length) {
+    return fields;
+  }
+  const remaining = new Map(fields.map((field) => [fieldOrderKey(field), field]));
+  const next: CastField[] = [];
+  order.forEach((key) => {
+    const field = remaining.get(key);
+    if (!field) {
+      return;
+    }
+    next.push(field);
+    remaining.delete(key);
+  });
+  remaining.forEach((field) => {
+    next.push(field);
+  });
+  return next;
+};
+
+export const moveCastFields = (fields: CastField[], from: number, to: number): CastField[] => {
+  const invalid =
+    from === to ||
+    from < NUMBER_ZERO ||
+    to < NUMBER_ZERO ||
+    from >= fields.length ||
+    to > fields.length;
+  if (invalid) {
+    return fields;
+  }
+  const next = [...fields];
+  const [item] = next.splice(from, NUMBER_ONE);
+  if (!item) {
+    return fields;
+  }
+  const insertAt = from < to ? to - NUMBER_ONE : to;
+  next.splice(insertAt, NUMBER_ZERO, item);
+  return next;
+};
+
+export const insertCastFieldAt = (
+  fields: CastField[],
+  index: number,
+  field: CastField,
+): CastField[] => {
+  const next = [...fields];
+  const at = index < NUMBER_ZERO ? NUMBER_ZERO : Math.min(index, next.length);
+  next.splice(at, NUMBER_ZERO, field);
   return next;
 };
 

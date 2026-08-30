@@ -48,7 +48,9 @@ export const ROUTES = {
   CMS_CAST: '/cms/cast',
   CMS_TASKS: '/cms/tasks',
   CMS_BLOG: '/cms/blog',
+  CMS_BLOG_EDIT: '/cms/blog/:id',
   BLOG: '/blog',
+  BLOG_POST: '/blog/:slug',
   SENSORS: '/sensors',
   PAGES: '/pages',
   NOT_FOUND: '/404',
@@ -57,6 +59,9 @@ export const ROUTES = {
 
 export const cmsEditPath = (id: string): string =>
   `/cms/edit/${encodeURIComponent(id)}`;
+
+export const cmsBlogEditPath = (id: string): string =>
+  `/cms/blog/${encodeURIComponent(id)}`;
 
 export const BUILDER_QUERY_DOC = 'doc';
 export const BUILDER_QUERY_LAYOUT = 'layout';

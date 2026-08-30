@@ -12,6 +12,7 @@ export interface ApiEndpoint {
 export const API_ENDPOINTS: ApiEndpoint[] = [
   { id: 'version', method: 'GET', path: '/api/v1/version', collection: 'Runtime', summary: 'Runtime version payload bound to window.version' },
   { id: 'health', method: 'GET', path: '/api/health', collection: 'Runtime', summary: 'Process health check' },
+  { id: 'status', method: 'GET', path: '/api/status', collection: 'Runtime', summary: 'Live service probes and incidents' },
   { id: 'content-list', method: 'GET', path: '/api/cms/content', collection: 'Content', summary: 'List content entries for a collection' },
   { id: 'content-get', method: 'GET', path: '/api/cms/content/:id', collection: 'Content', summary: 'Get one content entry' },
   { id: 'content-create', method: 'POST', path: '/api/cms/content', collection: 'Content', summary: 'Create a content entry' },

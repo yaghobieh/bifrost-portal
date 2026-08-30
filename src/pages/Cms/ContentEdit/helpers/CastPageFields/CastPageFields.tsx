@@ -3,11 +3,10 @@ import { Button, Card, Flex, Typography } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
 import { CMS_CARD_PADDING } from '@pages/Cms/CmsShell';
 import { EMPTY_STRING } from '@const/index';
-import { NUMBER_ZERO } from '@const/numbers.const';
 import type { CastPageFieldsProps } from './CastPageFields.types';
 import { castTypeOptions } from './CastPageFields.utils';
-import { CastFieldChrome } from '../CastFieldChrome';
-import { CastValueInput } from '../CastValueInput';
+import { CastFieldChrome } from './helpers/CastFieldChrome';
+import { CastValueInput } from './helpers/CastValueInput';
 
 export const CastPageFields: FC<CastPageFieldsProps> = (props) => {
   const {
@@ -25,16 +24,16 @@ export const CastPageFields: FC<CastPageFieldsProps> = (props) => {
   return (
     <Card className="mb-3" padding={CMS_CARD_PADDING}>
       <Flex direction="column" gap={3}>
-        <Flex direction="column" gap={1}>
-          <Typography variant="h4">
+        <div>
+          <Typography variant="h4" className="mb-1">
             {t.contentEdit.castFieldsTitle}
           </Typography>
-          <Typography variant="caption" color="muted">
+          <Typography variant="caption" color="muted" className="mb-0">
             {t.contentEdit.castFieldsHint}
           </Typography>
-        </Flex>
-        {fields.length === NUMBER_ZERO && (
-          <Typography variant="caption" color="muted">
+        </div>
+        {fields.length === 0 && (
+          <Typography variant="caption" color="muted" className="mb-0">
             {t.contentEdit.castEmpty}
           </Typography>
         )}

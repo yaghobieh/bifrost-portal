@@ -5,18 +5,13 @@ import {
   HERO_IMG_SRC,
 } from '@const/strings.const';
 import {
-  NUMBER_FOUR_HUNDRED_TWENTY,
-  NUMBER_THREE_HUNDRED_EIGHTY,
-  NUMBER_THREE_HUNDRED_TWENTY,
   NUMBER_TWELVE,
+  NUMBER_TWO_HUNDRED_TWENTY,
 } from '@const/numbers.const';
 import { bearWidgetHtml } from './bearWidget.utils';
 import type { BearWidgetDef } from './ContentEdit.types';
 
 export const BEAR_WIDGET_ID_TRANSLATION = 'translation';
-export const CONTENT_EDIT_EDITOR_MIN_HEIGHT_PX = NUMBER_FOUR_HUNDRED_TWENTY;
-export const CONTENT_EDIT_DRAWER_WIDTH_PX = NUMBER_THREE_HUNDRED_EIGHTY;
-export const CONTENT_EDIT_PREVIEW_MIN_HEIGHT_PX = NUMBER_THREE_HUNDRED_TWENTY;
 
 export const BEAR_WIDGET_COMPONENT = {
   TYPOGRAPHY: 'Typography',
@@ -332,6 +327,16 @@ export const PAYLOAD_TITLE_KEY = 'title';
 export const PAYLOAD_ITEMS_KEY = 'items';
 export const PAYLOAD_ORDERED_KEY = 'ordered';
 export const PAYLOAD_BODY_KEY = 'body';
+export const PAYLOAD_HEADING_KEY = 'heading';
+export const PAYLOAD_PARAGRAPHS_KEY = 'paragraphs';
+export const PAYLOAD_CALLOUT_KEY = 'callout';
+export const PAYLOAD_KIND_KEY = 'kind';
+export const PAYLOAD_CODE_LANG_KEY = 'lang';
+export const PAYLOAD_CODE_SOURCE_KEY = 'source';
+export const PAYLOAD_TABLE_KEY = 'table';
+export const PAYLOAD_TABLE_HEADERS_KEY = 'headers';
+export const PAYLOAD_TABLE_ROWS_KEY = 'rows';
+export const PAYLOAD_LEAD_KEY = 'lead';
 
 export const PAYLOAD_HTML_LIST_KEYS = [PAYLOAD_SECTIONS_KEY, PAYLOAD_BLOCKS_KEY] as const;
 
@@ -350,17 +355,21 @@ export const PAYLOAD_KEY_OG_IMAGE = 'ogImage';
 export const PAYLOAD_KEY_TAGS = 'tags';
 export const PAYLOAD_KEY_CATEGORIES = 'categories';
 export const PAYLOAD_KEY_AUTHOR = 'author';
-export const PAYLOAD_KEY_CREATED_BY = 'createdBy';
-export const PAYLOAD_KIND_KEY = 'kind';
 export const PAYLOAD_KEY_SCHEDULE = 'scheduleAt';
 export const PAYLOAD_KEY_FEATURED = 'featuredImage';
 export const PAYLOAD_KEY_CAST_FIELDS = 'castFields';
 export const PAYLOAD_KEY_CAST_VALUES = 'castValues';
 export const PAYLOAD_KEY_TEMPLATE = 'template';
 export const PAYLOAD_KEY_LAYOUT = 'layoutId';
+export const PAYLOAD_KEY_FIELD_ORDER = 'castFieldOrder';
+export const PAYLOAD_KEY_CREATED_BY = 'createdBy';
+export const PAYLOAD_KEY_UPDATED_BY = 'updatedBy';
+export const PAYLOAD_KEY_VIEWS = 'views';
+export const CONTENT_EDIT_SETTINGS_WIDTH_PX = NUMBER_TWO_HUNDRED_TWENTY;
 export const CONTENT_EDIT_TITLE_ID = 'cms-edit-title';
 export const CONTENT_EDIT_SUBTITLE_ID = 'cms-edit-subtitle';
 export const CONTENT_EDIT_SLUG_ID = 'cms-edit-slug';
+export const CONTENT_EDIT_SETTINGS_SLUG_ID = 'cms-edit-settings-slug';
 export const CONTENT_EDIT_AUTHOR_ID = 'cms-edit-author';
 export const CONTENT_EDIT_TAGS_ID = 'cms-edit-tags';
 export const CONTENT_EDIT_CATEGORIES_ID = 'cms-edit-categories';

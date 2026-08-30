@@ -2,6 +2,7 @@ import {
   EMPTY_STRING,
   HTML_NEWLINE,
   HTML_TAG_H,
+  HTML_TAG_H2,
   HTML_TAG_H3,
   HTML_TAG_IMG,
   HTML_TAG_LI,
@@ -14,36 +15,48 @@ import {
   PAD_CHAR_ZERO,
 } from '@const/index';
 import { NUMBER_FIVE, NUMBER_FOUR, NUMBER_ONE, NUMBER_TWO, NUMBER_ZERO } from '@const/numbers.const';
+import { fetchPublicDocsList, fetchPublicPage } from '@data/index';
 import { isNumberValue, isPlainObject, isStringValue } from '@utils';
 import type { ContentItem, CmsPageItem } from '@sdk/modules/content';
 import {
   CONTENT_COLLECTION_PAGE_META,
   CONTENT_COLLECTION_PAGES,
+  CONTENT_STATUS_PUBLISHED,
+  DOCUMENT_DEFAULT_LOCALE,
 } from '@pages/Cms/ContentPages/ContentPages.const';
-import { docsHtmlFromValues, isDocsLayout } from '@pages/Cms/ContentPages/ContentPages.utils';
+import {
+  docsHtmlFromValues,
+  isCatalogDocId,
+  isDocsCatalogCollection,
+  isDocsLayout,
+  slugFromCatalogId,
+} from '@pages/Cms/ContentPages/ContentPages.utils';
 import {
   CONTENT_EDIT_KIND,
   PAYLOAD_ALT_KEY,
   PAYLOAD_BODY_KEY,
+  PAYLOAD_CALLOUT_KEY,
   PAYLOAD_CODE_KEY,
+  PAYLOAD_CODE_SOURCE_KEY,
+  PAYLOAD_HEADING_KEY,
   PAYLOAD_HTML_FALLBACK,
   PAYLOAD_HTML_KEY,
   PAYLOAD_HTML_LIST_KEYS,
   PAYLOAD_ITEMS_KEY,
   PAYLOAD_LEVEL_KEY,
   PAYLOAD_ORDERED_KEY,
+  PAYLOAD_PARAGRAPHS_KEY,
   PAYLOAD_SRC_KEY,
+  PAYLOAD_TABLE_KEY,
+  PAYLOAD_TABLE_HEADERS_KEY,
+  PAYLOAD_TABLE_ROWS_KEY,
   PAYLOAD_TEXT_KEY,
   PAYLOAD_TITLE_KEY,
   PAYLOAD_TYPE_KEY,
   SCHEDULE_DEFAULT_TIME,
   SECTION_TYPE,
 } from './ContentEdit.const';
-import { POINTER_EVENT_MOVE, POINTER_EVENT_UP } from '@pages/Cms/CmsShell/CmsShell.const';
-import type { ContentEditTarget, PreviewResizeParams } from './ContentEdit.types';
-
-const HEADER_DEFAULT_LEVEL = NUMBER_TWO;
-const HEADER_MAX_LEVEL = NUMBER_FOUR;
+import type { ContentEditTarget } from './ContentEdit.types';
 
 const escapeHtml = (value: string): string =>
   value
@@ -67,9 +80,9 @@ const headerHtml = (entry: Record<string, unknown>): string => {
   if (!text) return EMPTY_STRING;
   const raw = entry[PAYLOAD_LEVEL_KEY];
   const level =
-    isNumberValue(raw) && raw >= NUMBER_ONE && raw <= HEADER_MAX_LEVEL
+    isNumberValue(raw) && raw >= NUMBER_ONE && raw <= NUMBER_FOUR
       ? raw
-      : HEADER_DEFAULT_LEVEL;
+      : NUMBER_TWO;
   return wrapTag(`${HTML_TAG_H}${level}`, escapeHtml(text));
 };
 
@@ -131,6 +144,57 @@ const SECTION_HTML: Record<string, (entry: Record<string, unknown>) => string> =
   [SECTION_TYPE.LIST]: listHtml,
 };
 
+const docsSectionHtml = (entry: Record<string, unknown>): string => {
+  const heading = stringField(entry, PAYLOAD_HEADING_KEY) || stringField(entry, PAYLOAD_TITLE_KEY);
+  const parts: string[] = [];
+  if (heading) {
+    parts.push(wrapTag(HTML_TAG_H2, escapeHtml(heading)));
+  }
+  const paragraphs = entry[PAYLOAD_PARAGRAPHS_KEY];
+  if (Array.isArray(paragraphs)) {
+    for (const paragraph of paragraphs) {
+      if (!isStringValue(paragraph) || !paragraph) {
+        continue;
+      }
+      parts.push(wrapTag(HTML_TAG_P, paragraph));
+    }
+  }
+  const callout = stringField(entry, PAYLOAD_CALLOUT_KEY);
+  if (callout) {
+    parts.push(wrapTag(HTML_TAG_P, escapeHtml(callout)));
+  }
+  const code = asRecord(entry[PAYLOAD_CODE_KEY]);
+  if (code) {
+    const source = stringField(code, PAYLOAD_CODE_SOURCE_KEY);
+    if (source) {
+      parts.push(wrapTag(HTML_TAG_PRE, escapeHtml(source)));
+    }
+  }
+  const table = asRecord(entry[PAYLOAD_TABLE_KEY]);
+  if (table) {
+    const headers = table[PAYLOAD_TABLE_HEADERS_KEY];
+    const rows = table[PAYLOAD_TABLE_ROWS_KEY];
+    if (Array.isArray(headers) && Array.isArray(rows)) {
+      const head = headers
+        .map((cell) => (isStringValue(cell) ? `<th>${escapeHtml(cell)}</th>` : EMPTY_STRING))
+        .join(EMPTY_STRING);
+      const body = rows
+        .map((row) => {
+          if (!Array.isArray(row)) {
+            return EMPTY_STRING;
+          }
+          const cells = row
+            .map((cell) => (isStringValue(cell) ? `<td>${escapeHtml(cell)}</td>` : EMPTY_STRING))
+            .join(EMPTY_STRING);
+          return `<tr>${cells}</tr>`;
+        })
+        .join(EMPTY_STRING);
+      parts.push(`<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`);
+    }
+  }
+  return parts.join(HTML_NEWLINE);
+};
+
 const sectionToHtml = (section: unknown): string => {
   if (isStringValue(section)) {
     return wrapTag(HTML_TAG_P, escapeHtml(section));
@@ -139,6 +203,9 @@ const sectionToHtml = (section: unknown): string => {
   if (!entry) return EMPTY_STRING;
   const html = stringField(entry, PAYLOAD_HTML_KEY);
   if (html) return html;
+  if (stringField(entry, PAYLOAD_HEADING_KEY) || Array.isArray(entry[PAYLOAD_PARAGRAPHS_KEY])) {
+    return docsSectionHtml(entry);
+  }
   const type = stringField(entry, PAYLOAD_TYPE_KEY);
   const handler = SECTION_HTML[type] ?? paragraphHtml;
   return handler(entry);
@@ -164,6 +231,16 @@ export const appendWidgetHtml = (bodyHtml: string, widgetHtml: string): string =
   return `${bodyHtml}${HTML_NEWLINE}${widgetHtml}`;
 };
 
+export const insertWidgetHtmlAt = (bodyHtml: string, widgetHtml: string, atStart: boolean): string => {
+  if (!bodyHtml) {
+    return widgetHtml;
+  }
+  if (atStart) {
+    return `${widgetHtml}${HTML_NEWLINE}${bodyHtml}`;
+  }
+  return appendWidgetHtml(bodyHtml, widgetHtml);
+};
+
 export { loadSeoCollapsed, saveSeoCollapsed } from '@utils';
 
 export const resolveEditTarget = (
@@ -171,7 +248,8 @@ export const resolveEditTarget = (
   pages: CmsPageItem[],
   items: ContentItem[],
 ): ContentEditTarget | null => {
-  const page = pages.find((entry) => entry.id === id);
+  const slug = isCatalogDocId(id) ? slugFromCatalogId(id) : id;
+  const page = pages.find((entry) => entry.id === id || entry.slug === slug);
   if (page) {
     const meta = items.find(
       (entry) => entry.collection === CONTENT_COLLECTION_PAGE_META && entry.slug === page.id,
@@ -179,7 +257,7 @@ export const resolveEditTarget = (
     const contentPage = items.find(
       (entry) =>
         entry.collection === CONTENT_COLLECTION_PAGES &&
-        (entry.id === page.id || entry.slug === page.slug),
+        (entry.id === page.id || entry.slug === page.slug || entry.slug === slug),
     );
     return {
       kind: CONTENT_EDIT_KIND.PAGE,
@@ -197,7 +275,12 @@ export const resolveEditTarget = (
       },
     };
   }
-  const item = items.find((entry) => entry.id === id);
+  const item =
+    items.find((entry) => entry.id === id) ||
+    items.find(
+      (entry) => entry.slug === slug && isDocsCatalogCollection(entry.collection),
+    ) ||
+    items.find((entry) => entry.slug === slug);
   if (item) {
     return {
       kind: CONTENT_EDIT_KIND.ITEM,
@@ -214,12 +297,105 @@ export const resolveEditTarget = (
   return null;
 };
 
+export const targetFromPublicPage = (params: {
+  id?: string;
+  slug: string;
+  title: string;
+  payload: Record<string, unknown>;
+  status?: string;
+}): ContentEditTarget => {
+  const { slug, title, payload, status } = params;
+  const id = params.id || slug;
+  return {
+    kind: CONTENT_EDIT_KIND.ITEM,
+    id,
+    title,
+    slug,
+    status: status || CONTENT_STATUS_PUBLISHED,
+    bodyHtml: htmlFromPayload(payload),
+    collection: CONTENT_COLLECTION_PAGES,
+    locale: DOCUMENT_DEFAULT_LOCALE,
+    payload,
+  };
+};
+
+export const loadPublicEditTarget = async (id: string): Promise<ContentEditTarget | null> => {
+  const slug = isCatalogDocId(id) ? slugFromCatalogId(id) : id;
+  try {
+    const page = await fetchPublicPage(slug);
+    return targetFromPublicPage({
+      id: page.id,
+      slug: page.slug,
+      title: page.title,
+      payload: page.payload ?? {},
+      status: page.status,
+    });
+  } catch {
+    const list = await fetchPublicDocsList();
+    const match = list.find((item) => item.id === id || item.slug === slug);
+    if (!match) {
+      return null;
+    }
+    if (match.payload) {
+      return targetFromPublicPage({
+        id: match.id,
+        slug: match.slug,
+        title: match.title,
+        payload: match.payload,
+        status: match.status,
+      });
+    }
+    try {
+      const page = await fetchPublicPage(match.slug);
+      return targetFromPublicPage({
+        id: page.id,
+        slug: page.slug,
+        title: page.title,
+        payload: page.payload ?? {},
+        status: page.status,
+      });
+    } catch {
+      return null;
+    }
+  }
+};
+
+const payloadValueText = (value: unknown): string => {
+  if (isStringValue(value) && value) {
+    return value;
+  }
+  if (Array.isArray(value) && value.length > NUMBER_ZERO) {
+    return payloadValueText(value[NUMBER_ZERO]);
+  }
+  return EMPTY_STRING;
+};
+
+/**
+ * Reads the first non-empty string from `payload` for the given keys.
+ * Arrays use the first item. Pass several keys to fall through.
+ */
 export const payloadString = (
   payload: Record<string, unknown> | undefined,
-  key: string,
+  ...keys: string[]
 ): string => {
-  const value = payload?.[key];
-  return isStringValue(value) ? value : EMPTY_STRING;
+  for (const key of keys) {
+    const text = payloadValueText(payload?.[key]);
+    if (text) {
+      return text;
+    }
+  }
+  return EMPTY_STRING;
+};
+
+/**
+ * Same as {@link payloadString}, and accepts a Promise payload.
+ */
+export const payloadStringPromise = async (
+  payload: Record<string, unknown> | undefined | Promise<Record<string, unknown> | undefined>,
+  ...keys: string[]
+): Promise<string> => {
+  const resolved = await payload;
+  return payloadString(resolved, ...keys);
 };
 
 const pad = (value: number): string => String(value).padStart(NUMBER_TWO, PAD_CHAR_ZERO);
@@ -273,17 +449,4 @@ export const resolveEditBodyHtml = (params: {
     return htmlFromCastValues(values);
   }
   return fallback;
-};
-
-export const startPreviewResize = (params: PreviewResizeParams): void => {
-  const { startX, startWidth, minWidth, onWidth } = params;
-  const onMove = (moveEvent: globalThis.MouseEvent) => {
-    onWidth(Math.max(minWidth, startWidth + moveEvent.clientX - startX));
-  };
-  const onUp = () => {
-    window.removeEventListener(POINTER_EVENT_MOVE, onMove);
-    window.removeEventListener(POINTER_EVENT_UP, onUp);
-  };
-  window.addEventListener(POINTER_EVENT_MOVE, onMove);
-  window.addEventListener(POINTER_EVENT_UP, onUp);
 };
