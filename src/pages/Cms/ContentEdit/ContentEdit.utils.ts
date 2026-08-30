@@ -39,7 +39,8 @@ import {
   SCHEDULE_DEFAULT_TIME,
   SECTION_TYPE,
 } from './ContentEdit.const';
-import type { ContentEditTarget } from './ContentEdit.types';
+import { POINTER_EVENT_MOVE, POINTER_EVENT_UP } from '@pages/Cms/CmsShell/CmsShell.const';
+import type { ContentEditTarget, PreviewResizeParams } from './ContentEdit.types';
 
 const HEADER_DEFAULT_LEVEL = NUMBER_TWO;
 const HEADER_MAX_LEVEL = NUMBER_FOUR;
@@ -272,4 +273,17 @@ export const resolveEditBodyHtml = (params: {
     return htmlFromCastValues(values);
   }
   return fallback;
+};
+
+export const startPreviewResize = (params: PreviewResizeParams): void => {
+  const { startX, startWidth, minWidth, onWidth } = params;
+  const onMove = (moveEvent: globalThis.MouseEvent) => {
+    onWidth(Math.max(minWidth, startWidth + moveEvent.clientX - startX));
+  };
+  const onUp = () => {
+    window.removeEventListener(POINTER_EVENT_MOVE, onMove);
+    window.removeEventListener(POINTER_EVENT_UP, onUp);
+  };
+  window.addEventListener(POINTER_EVENT_MOVE, onMove);
+  window.addEventListener(POINTER_EVENT_UP, onUp);
 };

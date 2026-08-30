@@ -719,7 +719,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               </div>
             }
             centerContent={
-              showAgentBar ? <CmsAgentBar onApply={onAgentApply} /> : undefined
+              showAgentBar && <CmsAgentBar onApply={onAgentApply} chipsClassName="flex-wrap" />
             }
             rightContent={
               <Flex align="center" gap={3}>

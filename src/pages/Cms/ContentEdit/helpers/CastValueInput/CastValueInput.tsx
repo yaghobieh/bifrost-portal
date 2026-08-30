@@ -6,8 +6,8 @@ import {
   CAST_PAGE_VALUE_PREFIX,
   CAST_TEXTAREA_ROWS,
   CAST_VALUE_INPUT_TYPE,
-} from '../../CastPageFields.const';
-import { parseCastSelectOptions, isCastLongText } from '../../CastPageFields.utils';
+} from '../CastPageFields/CastPageFields.const';
+import { parseCastSelectOptions, isCastLongText } from '../CastPageFields/CastPageFields.utils';
 import type { CastValueInputProps } from './CastValueInput.types';
 
 export const CastValueInput: FC<CastValueInputProps> = (props) => {

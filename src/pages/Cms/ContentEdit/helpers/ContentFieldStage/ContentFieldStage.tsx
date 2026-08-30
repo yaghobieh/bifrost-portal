@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Flex } from '@forgedevstack/bear';
 import { EMPTY_STRING } from '@const/index';
-import { CastValueInput } from '../CastPageFields/helpers/CastValueInput';
+import { CastValueInput } from '../CastValueInput';
 import { FieldAttachMenu } from '../FieldAttachMenu';
 import type { ContentFieldStageProps } from './ContentFieldStage.types';
 
