@@ -41,6 +41,34 @@
       "destination": "/api/c/pages?rest=nav"
     },
     {
+      "source": "/api/cms/users",
+      "destination": "/api/c/users"
+    },
+    {
+      "source": "/api/cms/roles",
+      "destination": "/api/c/roles"
+    },
+    {
+      "source": "/api/cms/create-user",
+      "destination": "/api/c/users?rest=create"
+    },
+    {
+      "source": "/api/cms/update-user-role/:id",
+      "destination": "/api/c/users?rest=role&id=:id"
+    },
+    {
+      "source": "/api/cms/create-role",
+      "destination": "/api/c/roles?rest=create"
+    },
+    {
+      "source": "/api/cms/update-role/:id",
+      "destination": "/api/c/roles?rest=update&id=:id"
+    },
+    {
+      "source": "/api/cms/delete-role/:id",
+      "destination": "/api/c/roles?rest=delete&id=:id"
+    },
+    {
       "source": "/api/cms/:path*",
       "destination": "/api/c/:path*"
     },
