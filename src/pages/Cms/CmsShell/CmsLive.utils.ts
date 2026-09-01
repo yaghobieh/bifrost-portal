@@ -1,7 +1,12 @@
+import { CONTENT_TYPE_JSON } from '@const/strings.const';
+import { HTTP_METHOD_GET, HTTP_METHOD_POST } from '@const/http.const';
+import { AUTH_BEARER_PREFIX, AUTH_HEADER_AUTHORIZATION } from '@hooks/auth.const';
 import { EMPTY_STRING, INK_API_URL } from '@const/index';
 import {
   CMS_HEALTH_PATH,
   CMS_LIVE_DOWN,
+  CMS_LIVE_EVENTS_KEY,
+  CMS_LIVE_HEADER_CONTENT_TYPE,
   CMS_LIVE_HTTP_PROTOCOL,
   CMS_LIVE_LOCAL_MSG_PREFIX,
   CMS_LIVE_LOCAL_ROOM_PREFIX,
@@ -294,6 +299,43 @@ export const parseLiveSocketPayload = (raw: string): CmsLiveParsedPayload | null
       rooms: parsed.rooms,
       room: parsed.room,
     };
+  } catch {
+    return null;
+  }
+};
+
+export const liveEventsFromBody = (value: unknown): unknown[] => {
+  if (!isRecord(value)) {
+    return [];
+  }
+  const events = value[CMS_LIVE_EVENTS_KEY];
+  if (!Array.isArray(events)) {
+    return [];
+  }
+  return events;
+};
+
+export const requestCmsLiveHttp = async (params: {
+  token: string;
+  body?: string;
+}): Promise<unknown> => {
+  const { token, body } = params;
+  const headers: Record<string, string> = {
+    [AUTH_HEADER_AUTHORIZATION]: `${AUTH_BEARER_PREFIX}${token}`,
+  };
+  if (body) {
+    headers[CMS_LIVE_HEADER_CONTENT_TYPE] = CONTENT_TYPE_JSON;
+  }
+  try {
+    const response = await fetch(`${cmsApiOrigin()}${CMS_LIVE_PATH}`, {
+      method: body ? HTTP_METHOD_POST : HTTP_METHOD_GET,
+      headers,
+      body,
+    });
+    if (!response.ok) {
+      return null;
+    }
+    return response.json();
   } catch {
     return null;
   }
