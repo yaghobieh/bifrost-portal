@@ -23,6 +23,8 @@ import {
   CMS_LIVE_TYPE_TASKS_UPDATE,
   CMS_LIVE_LOCAL_ROOM_PREFIX,
   CMS_LIVE_LOCAL_MSG_PREFIX,
+  CMS_LIVE_TRANSPORT_HTTP,
+  CMS_LIVE_TRANSPORT_WS,
 } from './CmsLive.const';
 import type {
   CmsChatRoom,
@@ -32,10 +34,12 @@ import type {
   CmsPresenceUser,
 } from './CmsLive.types';
 import {
+  liveEventsFromBody,
   mergeChatRooms,
   loadStoredAvailability,
   parseLiveSocketPayload,
   presencePingBody,
+  requestCmsLiveHttp,
   resolveChatRoom,
   resolveChatRooms,
   resolvePresenceUsers,
@@ -94,6 +98,8 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
   availabilityRef.current = availability;
   const roomsRef = useRef<CmsChatRoom[]>([]);
   roomsRef.current = rooms;
+  const transportRef = useRef<string | null>(null);
+  const applyLiveRawRef = useRef<(raw: string) => void>(() => undefined);
 
   useEffect(() => {
     if (!token) {
@@ -107,6 +113,8 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
     let pingTimer: number | null = null;
     let retryTimer: number | null = null;
     let delay = CMS_LIVE_RECONNECT_MS;
+    let socketOpened = false;
+    transportRef.current = null;
 
     const pingName = user?.name || user?.username || EMPTY_STRING;
     const pingBody = () =>
@@ -188,9 +196,51 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
         setRooms((current) => mergeChatRooms(current, [room]));
       }
     };
+    applyLiveRawRef.current = (raw) => {
+      applyMessage({ data: raw } as MessageEvent<string>);
+    };
+
+    const applyHttpBody = (data: unknown) => {
+      const events = liveEventsFromBody(data);
+      if (events.length === 0) {
+        setHealth({ status: CMS_LIVE_DOWN, db: false });
+        return;
+      }
+      events.forEach((event) => {
+        applyMessage({ data: JSON.stringify(event) } as MessageEvent<string>);
+      });
+    };
+
+    const runHttp = async (body?: string) => {
+      if (stopped) {
+        return;
+      }
+      const data = await requestCmsLiveHttp({ token, body });
+      if (stopped) {
+        return;
+      }
+      if (!data) {
+        setHealth({ status: CMS_LIVE_DOWN, db: false });
+        return;
+      }
+      applyHttpBody(data);
+    };
+
+    const startHttp = () => {
+      if (stopped || transportRef.current === CMS_LIVE_TRANSPORT_HTTP) {
+        return;
+      }
+      transportRef.current = CMS_LIVE_TRANSPORT_HTTP;
+      socketRef.current = null;
+      clearPing();
+      void runHttp(pingBody());
+      pingTimer = window.setInterval(() => {
+        void runHttp(pingBody());
+      }, CMS_LIVE_PING_MS);
+    };
 
     const connect = () => {
-      if (stopped) {
+      if (stopped || transportRef.current === CMS_LIVE_TRANSPORT_HTTP) {
         return;
       }
       setHealth({ status: CMS_LIVE_CONNECTING, db: false });
@@ -199,6 +249,8 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
       socketRef.current = next;
       next.onmessage = applyMessage;
       next.onopen = () => {
+        socketOpened = true;
+        transportRef.current = CMS_LIVE_TRANSPORT_WS;
         delay = CMS_LIVE_RECONNECT_MS;
         clearPing();
         if (next.readyState === WebSocket.OPEN) {
@@ -217,6 +269,13 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
           socketRef.current = null;
         }
         if (stopped) {
+          return;
+        }
+        if (!socketOpened) {
+          startHttp();
+          return;
+        }
+        if (transportRef.current === CMS_LIVE_TRANSPORT_HTTP) {
           return;
         }
         setHealth({ status: CMS_LIVE_CONNECTING, db: false });
@@ -241,6 +300,16 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
   }, [token, user?.name, user?.username]);
 
   const sendJson = (payload: unknown) => {
+    if (transportRef.current === CMS_LIVE_TRANSPORT_HTTP) {
+      void requestCmsLiveHttp({ token: token || EMPTY_STRING, body: JSON.stringify(payload) }).then(
+        (data) => {
+          liveEventsFromBody(data).forEach((event) => {
+            applyLiveRawRef.current(JSON.stringify(event));
+          });
+        },
+      );
+      return;
+    }
     const socket = socketRef.current;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       return;
@@ -343,17 +412,12 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
     saveStoredAvailability(status);
     availabilityRef.current = status;
     setAvailabilityState(status);
-    const socket = socketRef.current;
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      return;
-    }
-    socket.send(
-      presencePingBody({
-        name: user?.name || user?.username || EMPTY_STRING,
-        avatar: loadCmsProfile().avatarDataUrl || EMPTY_STRING,
-        availability: status,
-      }),
-    );
+    const raw = presencePingBody({
+      name: user?.name || user?.username || EMPTY_STRING,
+      avatar: loadCmsProfile().avatarDataUrl || EMPTY_STRING,
+      availability: status,
+    });
+    sendJson(JSON.parse(raw) as Record<string, unknown>);
   };
 
   return (

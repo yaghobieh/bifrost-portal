@@ -41,6 +41,10 @@
       "destination": "/api/c/pages?rest=nav"
     },
     {
+      "source": "/api/cms/live",
+      "destination": "/api/c/live"
+    },
+    {
       "source": "/api/cms/users",
       "destination": "/api/c/users"
     },
