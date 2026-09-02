@@ -131,7 +131,7 @@ export const ContentEdit: FC = () => {
   const params = useParams<{ id?: string }>();
   const { navigate } = useNavigate();
   const { token: providerToken } = useAuth();
-  const { onlineUsers, selfId } = useCmsLive();
+  const { onlineUsers, selfId, selfSessionId } = useCmsLive();
   const { token } = useNucleus(authNucleus);
   const {
     items,
@@ -571,6 +571,7 @@ export const ContentEdit: FC = () => {
               <LiveEditors
                 users={onlineUsers}
                 currentUserId={selfId}
+                currentSessionId={selfSessionId}
                 location={currentLiveLocation().location}
               />
               {target && (

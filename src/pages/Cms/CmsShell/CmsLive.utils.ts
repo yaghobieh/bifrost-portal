@@ -13,6 +13,7 @@ import {
   CMS_LIVE_OK,
   CMS_LIVE_PATH,
   CMS_LIVE_PATH_SEP,
+  CMS_LIVE_SESSION_KEY,
   CMS_LIVE_TOKEN_QUERY,
   CMS_LIVE_TYPE_PRESENCE_PING,
   CMS_LIVE_WS_PROTOCOL,
@@ -139,15 +140,31 @@ export const currentLiveLocation = (): { location: string; locationLabel: string
   return { location, locationLabel: parts[parts.length - 1] };
 };
 
+export const loadLiveSessionId = (): string => {
+  try {
+    const stored = window.localStorage.getItem(CMS_LIVE_SESSION_KEY);
+    if (stored) {
+      return stored;
+    }
+    const next = window.crypto.randomUUID();
+    window.localStorage.setItem(CMS_LIVE_SESSION_KEY, next);
+    return next;
+  } catch {
+    return `${Date.now()}`;
+  }
+};
+
 export const presencePingBody = (params: {
   name: string;
   avatar: string;
   availability: CmsPresenceStatus;
+  sessionId: string;
 }): string => {
-  const { name, avatar, availability } = params;
+  const { name, avatar, availability, sessionId } = params;
   const { location, locationLabel } = currentLiveLocation();
   return JSON.stringify({
     type: CMS_LIVE_TYPE_PRESENCE_PING,
+    sessionId,
     location,
     locationLabel,
     name,
@@ -198,6 +215,7 @@ export const resolvePresenceUsers = (value: unknown): CmsPresenceUser[] => {
     }
     users.push({
       id,
+      sessionId: readString(row.sessionId) || id,
       name: readString(row.name),
       avatar: readString(row.avatar),
       location: readString(row.location),
@@ -269,6 +287,7 @@ export type CmsLiveParsedPayload = {
   item: unknown;
   users: unknown;
   selfId: string;
+  selfSessionId: string;
   tasks: unknown;
   board: unknown;
   rooms: unknown;
@@ -294,6 +313,7 @@ export const parseLiveSocketPayload = (raw: string): CmsLiveParsedPayload | null
       item: parsed.item,
       users: parsed.users,
       selfId: readString(parsed.selfId),
+      selfSessionId: readString(parsed.selfSessionId),
       tasks: parsed.tasks,
       board: parsed.board,
       rooms: parsed.rooms,

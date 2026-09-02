@@ -2,6 +2,7 @@ export type LiveAvailability = 'online' | 'away' | 'busy' | 'not_there';
 
 export type LivePresenceUser = {
   id: string;
+  sessionId: string;
   name: string;
   avatar: string;
   location: string;
@@ -26,6 +27,7 @@ export type LiveChatRoom = {
 
 export type LiveIncoming = {
   type: string;
+  sessionId?: string;
   location?: string;
   locationLabel?: string;
   avatar?: string;
@@ -40,6 +42,7 @@ export type LiveIncoming = {
 };
 
 export type LivePresenceRow = {
+  session_id: string;
   user_id: string;
   name: string;
   avatar: string;
