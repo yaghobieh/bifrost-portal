@@ -25,6 +25,7 @@ export type CmsCrewChatProps = {
   onSend: (roomId: string, body: string) => void;
   onOpenUser: (id: string) => void;
   onOpenRoom: (id: string) => void;
+  onLeaveRoom: () => void;
   onEnsureChannel: (tag: string, extraIds?: string[]) => string;
   side: 'left' | 'right';
   color: string;
@@ -94,6 +95,8 @@ export type CrewChatPaneProps = {
   pickLabel: string;
   addPeopleLabel: string;
   invitePeople: CrewMentionPerson[];
+  backLabel: string;
+  onBack: () => void;
   onInvitePerson: (id: string) => void;
   onToggleRoomSound: () => void;
   children: ReactNode;

@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, type FC } from 'react';
 import { Avatar, BearIcons, Button, Flex, Typography } from '@forgedevstack/bear';
 import { EMPTY_STRING } from '@const/index';
 import { CMS_AVATAR_INITIALS_LENGTH, CMS_ICON_SIZE, NUMBER_ZERO } from '@const/numbers.const';
-import { CREW_SCROLL_STICK_PX } from '../../CmsCrewChat.const';
+import { CREW_BACK_CLASS, CREW_SCROLL_STICK_PX } from '../../CmsCrewChat.const';
 import type { CrewChatPaneProps } from '../../CmsCrewChat.types';
 import { formatChatTime, initialsFromName } from '../../CmsCrewChat.utils';
 import { isThreadStuck, lastMessageId, threadDistanceFromBottom } from './CrewChatPane.utils';
@@ -26,6 +26,8 @@ export const CrewChatPane: FC<CrewChatPaneProps> = (props) => {
     pickLabel,
     addPeopleLabel,
     invitePeople,
+    backLabel,
+    onBack,
     onInvitePerson,
     onToggleRoomSound,
     children,
@@ -84,13 +86,25 @@ export const CrewChatPane: FC<CrewChatPaneProps> = (props) => {
   return (
     <Flex direction="column" className="bifrost-cms-crew__pane">
       <Flex align="center" justify="between" gap={2} className="bifrost-cms-crew__pane-head">
-        <Flex direction="column" gap={1}>
-          <Typography variant="h4" className="mb-0">
-            {title}
-          </Typography>
-          <Typography variant="caption" className="bifrost-cms__muted mb-0">
-            {online ? onlineLabel : offlineLabel}
-          </Typography>
+        <Flex align="center" gap={1}>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className={CREW_BACK_CLASS}
+            onClick={onBack}
+            aria-label={backLabel}
+          >
+            {backLabel}
+          </Button>
+          <Flex direction="column" gap={1}>
+            <Typography variant="h4" className="mb-0">
+              {title}
+            </Typography>
+            <Typography variant="caption" className="bifrost-cms__muted mb-0">
+              {online ? onlineLabel : offlineLabel}
+            </Typography>
+          </Flex>
         </Flex>
         <Flex align="center" gap={1}>
           <Button size="sm" variant="ghost" aria-label={searchLabel}>

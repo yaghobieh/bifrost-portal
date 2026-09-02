@@ -917,6 +917,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             onSend={sendChat}
             onOpenUser={openCrewWithUser}
             onOpenRoom={(id) => setCrewRoomId(id)}
+            onLeaveRoom={() => setCrewRoomId(CMS_CREW_DRAWER_OPEN)}
             onEnsureChannel={(tag, extraIds) =>
               createRoom([currentUserId, ...(extraIds ?? [])], tag)
             }
