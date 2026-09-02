@@ -9,6 +9,7 @@ import {
   CMS_LIVE_CONNECTING,
   CMS_LIVE_DOWN,
   CMS_LIVE_OK,
+  CMS_LIVE_HTTP_POLL_MS,
   CMS_LIVE_PING_MS,
   CMS_LIVE_RECONNECT_MAX_MS,
   CMS_LIVE_RECONNECT_MS,
@@ -254,7 +255,7 @@ export const CmsLiveProvider: FC<{ children: ReactNode }> = (props) => {
         }
         pingTimer = window.setInterval(() => {
           void runHttp(pingBody());
-        }, CMS_LIVE_PING_MS);
+        }, CMS_LIVE_HTTP_POLL_MS);
       });
     };
 

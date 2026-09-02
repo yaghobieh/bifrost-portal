@@ -13,6 +13,7 @@ import {
   CREW_BLOB_LEFT_CLASS,
   CREW_NAME_TOKEN,
   CREW_PANEL_CLASS,
+  CREW_PANEL_ROOM_CLASS,
 } from './CmsCrewChat.const';
 import {
   collectMentionPeople,
@@ -44,6 +45,7 @@ export const CmsCrewChat: FC<CmsCrewChatProps> = (props) => {
     onSend,
     onOpenUser,
     onOpenRoom,
+    onLeaveRoom,
     onEnsureChannel,
     side,
     color,
@@ -110,7 +112,7 @@ export const CmsCrewChat: FC<CmsCrewChatProps> = (props) => {
       </Button>
       <Flex
         direction="row"
-        className={CREW_PANEL_CLASS}
+        className={room ? CREW_PANEL_ROOM_CLASS : CREW_PANEL_CLASS}
         style={{ ['--bifrost-cms-chat-color' as string]: color }}
       >
         <CrewChatSidebar
@@ -177,6 +179,8 @@ export const CmsCrewChat: FC<CmsCrewChatProps> = (props) => {
           pickLabel={t.cmsShell.noConversation}
           addPeopleLabel={t.cmsShell.addToRoom}
           invitePeople={peopleNotInRoom(people, room)}
+          backLabel={t.cmsShell.crewBack}
+          onBack={onLeaveRoom}
           onInvitePerson={(id) => {
             if (!room?.tag) return;
             onEnsureChannel(room.tag, [id]);

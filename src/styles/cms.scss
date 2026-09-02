@@ -4742,6 +4742,10 @@ html.bifrost-cms-host #root {
   border-color: var(--bear-success-600) !important;
 }
 
+.bifrost-cms-crew__back {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .bifrost-cms-login__brand {
     display: none;
@@ -4758,9 +4762,14 @@ html.bifrost-cms-host #root {
   }
 
   .bifrost-cms-crew-blob {
-    width: calc(100vw - 1.5rem);
-    height: min(32rem, calc(100vh - 6rem));
-    right: 0.25rem;
+    position: fixed;
+    left: 0.5rem;
+    right: 0.5rem;
+    top: 3.75rem;
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    width: auto;
+    height: auto;
+    z-index: 44;
   }
 
   .bifrost-cms-crew {
@@ -4769,10 +4778,26 @@ html.bifrost-cms-host #root {
 
   .bifrost-cms-crew__nav {
     width: 100%;
-    flex: 0 0 auto;
-    max-height: 40%;
+    flex: 1;
+    max-height: none;
     border-right: 0;
-    border-bottom: 1px solid var(--bear-border-default);
+    border-bottom: 0;
+  }
+
+  .bifrost-cms-crew:not(.bifrost-cms-crew--room) .bifrost-cms-crew__pane {
+    display: none;
+  }
+
+  .bifrost-cms-crew--room .bifrost-cms-crew__nav {
+    display: none;
+  }
+
+  .bifrost-cms-crew__back {
+    display: inline-flex;
+  }
+
+  .bifrost-cms-crew__empty {
+    min-height: 0;
   }
 
   .bifrost-cms__agent-bubble,

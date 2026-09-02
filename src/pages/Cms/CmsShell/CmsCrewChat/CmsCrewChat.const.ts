@@ -22,3 +22,5 @@ export const CREW_BLOB_CLASS = 'bifrost-cms-crew-blob';
 export const CREW_BLOB_LEFT_CLASS = 'bifrost-cms-crew-blob bifrost-cms-crew-blob--left';
 export const CREW_BLOB_CLOSE_CLASS = 'bifrost-cms-crew-blob__close';
 export const CREW_PANEL_CLASS = 'bifrost-cms-crew';
+export const CREW_PANEL_ROOM_CLASS = 'bifrost-cms-crew bifrost-cms-crew--room';
+export const CREW_BACK_CLASS = 'bifrost-cms-crew__back';
