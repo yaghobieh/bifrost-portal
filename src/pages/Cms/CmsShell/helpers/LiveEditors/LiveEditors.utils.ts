@@ -15,14 +15,18 @@ const matchesLocation = (person: CmsPresenceUser, location: string): boolean => 
 export const usersAtLocation = (params: {
   users: CmsPresenceUser[];
   currentUserId: string;
+  currentSessionId: string;
   location: string;
 }): CmsPresenceUser[] => {
-  const { users, currentUserId, location } = params;
+  const { users, currentUserId, currentSessionId, location } = params;
   if (!location) {
     return [];
   }
   return users.filter((person) => {
-    if (person.id === currentUserId) {
+    if (currentSessionId && person.sessionId === currentSessionId) {
+      return false;
+    }
+    if (!currentSessionId && person.id === currentUserId) {
       return false;
     }
     if (person.availability === CMS_PRESENCE_NOT_THERE) {

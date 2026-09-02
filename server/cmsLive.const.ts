@@ -1,4 +1,4 @@
-export const LIVE_PRESENCE_TTL_SEC = 15;
+export const LIVE_PRESENCE_TTL_SEC = 45;
 export const LIVE_MESSAGE_LIMIT = 100;
 export const LIVE_TASKS_ROW_ID = 'default';
 export const LIVE_EVENTS_KEY = 'events';

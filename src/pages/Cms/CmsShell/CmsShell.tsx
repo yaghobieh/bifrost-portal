@@ -128,7 +128,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [crewRoomId, setCrewRoomId] = useState<string | null>(null);
   const [flyoutId, setFlyoutId] = useState<string | null>(null);
-  const { onlineUsers, rooms, createRoom, sendChat, selfId, tasks, availability, setAvailability } = useCmsLive();
+  const { onlineUsers, rooms, createRoom, sendChat, selfId, selfSessionId, tasks, availability, setAvailability } = useCmsLive();
   const [site, setSite] = useState(() => loadCmsSite());
   const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
   const [navOpen, setNavOpen] = useState(false);
@@ -782,6 +782,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
                 <CmsOnlineStatus
                   users={onlineUsers}
                   currentUserId={currentUserId}
+                  currentSessionId={selfSessionId}
                   onOpenUser={openCrewWithUser}
                 />
                 <Button

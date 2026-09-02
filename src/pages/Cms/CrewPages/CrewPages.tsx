@@ -44,7 +44,7 @@ import {
 export const CrewPages: FC = () => {
   const { t } = useI18n();
   const { token } = useNucleus(authNucleus);
-  const { onlineUsers, selfId } = useCmsLive();
+  const { onlineUsers, selfId, selfSessionId } = useCmsLive();
   const [users, setUsers] = useState<CrewUser[]>([]);
   const [roles, setRoles] = useState<CrewRole[]>(DEFAULT_CREW_ROLES);
   const [name, setName] = useState(EMPTY_STRING);
@@ -209,6 +209,7 @@ export const CrewPages: FC = () => {
             <LiveEditors
               users={onlineUsers}
               currentUserId={selfId}
+              currentSessionId={selfSessionId}
               location={currentLiveLocation().location}
             />
           }

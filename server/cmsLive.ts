@@ -63,8 +63,9 @@ const withQueryToken = (request: Request): Request => {
 
 const ensureLiveTables = async (sql: SqlClient): Promise<void> => {
   await sql`
-    CREATE TABLE IF NOT EXISTS cms_presence (
-      user_id TEXT PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS cms_live_sessions (
+      session_id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
       name TEXT NOT NULL DEFAULT '',
       avatar TEXT NOT NULL DEFAULT '',
       location TEXT NOT NULL DEFAULT '',
@@ -102,6 +103,7 @@ const ensureLiveTables = async (sql: SqlClient): Promise<void> => {
 
 const upsertPresence = async (params: {
   sql: SqlClient;
+  sessionId: string;
   userId: string;
   name: string;
   avatar: string;
@@ -109,11 +111,16 @@ const upsertPresence = async (params: {
   locationLabel: string;
   availability: string;
 }): Promise<void> => {
-  const { sql, userId, name, avatar, location, locationLabel, availability } = params;
+  const { sql, sessionId, userId, name, avatar, location, locationLabel, availability } = params;
   await sql`
-    INSERT INTO cms_presence (user_id, name, avatar, location, location_label, availability, seen_at)
-    VALUES (${userId}, ${name}, ${avatar}, ${location}, ${locationLabel}, ${availability}, NOW())
-    ON CONFLICT (user_id) DO UPDATE SET
+    INSERT INTO cms_live_sessions (
+      session_id, user_id, name, avatar, location, location_label, availability, seen_at
+    )
+    VALUES (
+      ${sessionId}, ${userId}, ${name}, ${avatar}, ${location}, ${locationLabel}, ${availability}, NOW()
+    )
+    ON CONFLICT (session_id) DO UPDATE SET
+      user_id = EXCLUDED.user_id,
       name = EXCLUDED.name,
       avatar = EXCLUDED.avatar,
       location = EXCLUDED.location,
@@ -126,8 +133,8 @@ const upsertPresence = async (params: {
 const listPresence = async (sql: SqlClient): Promise<LivePresenceUser[]> => {
   const ttl = LIVE_PRESENCE_TTL_SEC;
   const rows = (await sql`
-    SELECT user_id, name, avatar, location, location_label, availability
-    FROM cms_presence
+    SELECT session_id, user_id, name, avatar, location, location_label, availability
+    FROM cms_live_sessions
     WHERE seen_at > NOW() - (${ttl}::int * INTERVAL '1 second')
   `) as LivePresenceRow[];
   return rows.map(mapPresenceUser);
@@ -242,15 +249,16 @@ const saveTasks = async (params: {
 const snapshot = async (params: {
   sql: SqlClient;
   userId: string;
+  sessionId: string;
 }): Promise<Record<string, unknown>> => {
-  const { sql, userId } = params;
+  const { sql, userId, sessionId } = params;
   const users = await listPresence(sql);
   const rooms = await listRoomsForUser({ sql, userId });
   const tasks = await loadTasks(sql);
   return {
     [LIVE_EVENTS_KEY]: [
       { type: LIVE_TYPE_HEALTH, status: LIVE_HEALTH_OK, db: true },
-      { type: LIVE_TYPE_PRESENCE, users, selfId: userId },
+      { type: LIVE_TYPE_PRESENCE, users, selfId: userId, selfSessionId: sessionId },
       { type: LIVE_TYPE_CHAT_ROOMS, rooms },
       { type: LIVE_TYPE_TASKS, tasks: tasks.tasks, board: tasks.board },
     ],
@@ -262,12 +270,14 @@ const handleIncoming = async (params: {
   userId: string;
   fallbackName: string;
   incoming: LiveIncoming;
-}): Promise<void> => {
+}): Promise<string> => {
   const { sql, userId, fallbackName, incoming } = params;
+  const sessionId = incoming.sessionId || userId;
   const isPing = incoming.type === LIVE_TYPE_PRESENCE_PING || incoming.type === EMPTY_STRING;
   if (isPing || incoming.location !== undefined || incoming.availability) {
     await upsertPresence({
       sql,
+      sessionId,
       userId,
       name: incoming.name || fallbackName,
       avatar: incoming.avatar ?? EMPTY_STRING,
@@ -294,6 +304,7 @@ const handleIncoming = async (params: {
   if (incoming.type === LIVE_TYPE_TASKS || incoming.type === LIVE_TYPE_TASKS_UPDATE) {
     await saveTasks({ sql, tasks: incoming.tasks, board: incoming.board });
   }
+  return sessionId;
 };
 
 export const handleCmsLive = async (params: {
@@ -313,26 +324,17 @@ export const handleCmsLive = async (params: {
   }
   const fallbackName = str(loaded.user.name) || str(loaded.user.username) || loaded.user.email;
   try {
+    let sessionId = loaded.user.id;
     if (request.method === METHOD_POST) {
       const incoming = parseIncoming(await readUnknownObject(request));
-      await handleIncoming({
+      sessionId = await handleIncoming({
         sql,
         userId: loaded.user.id,
         fallbackName,
         incoming,
       });
-    } else {
-      await upsertPresence({
-        sql,
-        userId: loaded.user.id,
-        name: fallbackName,
-        avatar: EMPTY_STRING,
-        location: EMPTY_STRING,
-        locationLabel: EMPTY_STRING,
-        availability: LIVE_AVAILABILITY_ONLINE,
-      });
     }
-    const body = await snapshot({ sql, userId: loaded.user.id });
+    const body = await snapshot({ sql, userId: loaded.user.id, sessionId });
     return { status: HTTP_STATUS_OK, body };
   } catch {
     return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };

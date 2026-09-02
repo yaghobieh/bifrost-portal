@@ -9,16 +9,16 @@ import { editorInitials, usersAtLocation } from './LiveEditors.utils';
 import type { LiveEditorsProps } from './LiveEditors.types';
 
 export const LiveEditors: FC<LiveEditorsProps> = (props) => {
-  const { users, currentUserId, location } = props;
+  const { users, currentUserId, currentSessionId, location } = props;
   const { cloudName } = useNucleus(mediaNucleus);
-  const others = usersAtLocation({ users, currentUserId, location });
+  const others = usersAtLocation({ users, currentUserId, currentSessionId, location });
   if (others.length === 0) {
     return null;
   }
   return (
     <Flex align="center" gap={1} className="bifrost-cms-live-editors">
       {others.map((person) => (
-        <Tooltip key={person.id} content={person.name} placement="bottom">
+        <Tooltip key={person.sessionId || person.id} content={person.name} placement="bottom">
           <span className="bifrost-cms-live-editors__item">
             <Avatar
               src={toCloudinarySrc(person.avatar || EMPTY_STRING, cloudName) || undefined}

@@ -14,13 +14,18 @@ const initialsFromName = (name: string): string =>
   name.trim().slice(NUMBER_ZERO, CMS_AVATAR_INITIALS_LENGTH).toUpperCase();
 
 export const CmsOnlineStatus: FC<CmsOnlineStatusProps> = (props) => {
-  const { users, currentUserId, onOpenUser } = props;
+  const { users, currentUserId, currentSessionId, onOpenUser } = props;
   const { t } = useI18n();
   const { cloudName } = useNucleus(mediaNucleus);
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(CMS_ONLINE_PAGE_SIZE);
-  const others = users.filter((person) => person.id !== currentUserId);
+  const others = users.filter((person) => {
+    if (currentSessionId && person.sessionId) {
+      return person.sessionId !== currentSessionId;
+    }
+    return person.id !== currentUserId;
+  });
   const visible = others.slice(NUMBER_ZERO, visibleCount);
   const remaining = others.length - visible.length;
 
@@ -71,7 +76,7 @@ export const CmsOnlineStatus: FC<CmsOnlineStatusProps> = (props) => {
             <Flex direction="column" gap={1}>
               {visible.map((person) => (
                 <button
-                  key={person.id}
+                  key={person.sessionId || person.id}
                   type="button"
                   className="bifrost-cms__online-user"
                   onClick={() => {

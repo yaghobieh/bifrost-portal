@@ -39,6 +39,7 @@ export const readAvailability = (value: unknown): LiveAvailability => {
 
 export const mapPresenceUser = (row: LivePresenceRow): LivePresenceUser => ({
   id: row.user_id,
+  sessionId: row.session_id,
   name: row.name,
   avatar: row.avatar,
   location: row.location,
@@ -107,6 +108,7 @@ export const findMatchingRoom = (params: {
 
 export const parseIncoming = (body: Record<string, unknown>): LiveIncoming => ({
   type: str(body.type),
+  sessionId: body.sessionId === undefined ? undefined : str(body.sessionId),
   location: body.location === undefined ? undefined : str(body.location),
   locationLabel: body.locationLabel === undefined ? undefined : str(body.locationLabel),
   avatar: body.avatar === undefined ? undefined : str(body.avatar),
