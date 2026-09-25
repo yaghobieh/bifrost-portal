@@ -2,6 +2,7 @@ import { useState, type FC } from 'react';
 import { Button, Flex, Select, Typography } from '@forgedevstack/bear';
 import { GridTable } from '@forgedevstack/grid-table';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
+import { EMPTY_STRING } from '@const/index';
 import {
   CONTENT_CUBE_KIND_ORDER,
   CONTENT_TABLE_PAGE_SIZE,
@@ -18,15 +19,15 @@ export const ContentPages: FC = () => {
   const { t, saving, activeToken, error, loading, rows, columns, onNewPage, onOpenRow } =
     useContentPages();
   const [templateFilter, setTemplateFilter] = useState(CONTENT_TEMPLATE_FILTER_ALL);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
 
   const filteredByTemplate = filterRowsByTemplate(rows, templateFilter);
   const visibleRows = filteredByTemplate.filter((row) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
-    const titleMatch = String(row.title || '').toLowerCase().includes(q);
-    const slugMatch = String(row.slug || '').toLowerCase().includes(q);
-    const idMatch = String(row.id || '').toLowerCase().includes(q);
+    const titleMatch = String(row.title || EMPTY_STRING).toLowerCase().includes(q);
+    const slugMatch = String(row.slug || EMPTY_STRING).toLowerCase().includes(q);
+    const idMatch = String(row.id || EMPTY_STRING).toLowerCase().includes(q);
     return titleMatch || slugMatch || idMatch;
   });
 
@@ -76,7 +77,7 @@ export const ContentPages: FC = () => {
         )}
 
         <div className="bifrost-cms-card bifrost-cms-pages-wrap">
-          <Flex gap={3} items="center" className="p-4 border-b border-gray-200 bg-gray-50 flex-wrap">
+          <Flex gap={3} align="center" className="p-4 border-b border-gray-200 bg-gray-50 flex-wrap">
             <div style={{ minWidth: 240, flex: 1 }}>
               <input
                 type="text"
