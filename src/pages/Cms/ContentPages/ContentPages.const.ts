@@ -150,3 +150,5 @@ export const CONTENT_TABLE_PAGE_SIZE_OPTIONS = [
   NUMBER_FIFTY,
   NUMBER_ONE_HUNDRED,
 ] as const;
+
+export const COUNT_TOKEN = '{count}';

@@ -10,7 +10,7 @@ import {
   CONTENT_TEMPLATE_FILTER_ALL,
   TEMPLATE_KIND,
 } from './ContentPages.const';
-import { labelTemplateKind } from './ContentPages.utils';
+import { formatEntriesFound, labelTemplateKind } from './ContentPages.utils';
 import { isStringValue } from '@utils';
 import { filterRowsByTemplate } from './helpers/ContentTemplateCubes';
 import { useContentPages } from './hooks';
@@ -55,7 +55,7 @@ export const ContentPages: FC = () => {
               {t.cmsShell.contentManager}
             </Typography>
             <Typography variant="body2" className="text-sm text-gray-500">
-              {visibleRows.length} entries found
+              {formatEntriesFound(t.dashboard.entriesFound, visibleRows.length)}
             </Typography>
           </div>
           <Button
@@ -66,7 +66,7 @@ export const ContentPages: FC = () => {
               void onNewPage();
             }}
           >
-            + Create new entry
+            {t.dashboard.createEntry}
           </Button>
         </div>
 
@@ -81,7 +81,7 @@ export const ContentPages: FC = () => {
             <div style={{ minWidth: 240, flex: 1 }}>
               <input
                 type="text"
-                placeholder="Search entries..."
+                placeholder={t.dashboard.searchEntries}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
