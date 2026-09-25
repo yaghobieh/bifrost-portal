@@ -1,8 +1,8 @@
 {
   "name": "bifrost-portal",
   "version": "1.0.0",
-  "sprint": "1.1.13",
-  "sprintVersion": "1.1.13",
+  "sprint": "1.1.16",
+  "sprintVersion": "1.1.16",
   "private": true,
   "type": "module",
   "scripts": {

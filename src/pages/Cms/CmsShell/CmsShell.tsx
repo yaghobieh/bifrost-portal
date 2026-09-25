@@ -63,8 +63,6 @@ import { CmsGlowLoader } from '../CmsGlowLoader';
 import { CmsHealthDot } from './CmsHealthDot';
 import { dispatchAgentApply } from './cmsAgent.utils';
 import { USER_MENU_MIN_WIDTH } from './cmsAgent.const';
-import { CmsBottomNav } from './helpers/CmsBottomNav';
-import { CmsNavOverlay } from './helpers/CmsNavOverlay';
 import {
   CMS_AVATAR_INITIALS_LENGTH,
   CMS_ICON_SIZE,
@@ -94,6 +92,8 @@ import {
 import { ErrorHost } from './ErrorHost';
 import { CmsBrandLink } from './helpers/CmsBrandLink';
 import { CmsUpdateBanner } from './helpers/CmsUpdateBanner';
+import { CmsBottomNav } from './helpers/CmsBottomNav';
+import { CmsNavOverlay } from './helpers/CmsNavOverlay';
 import { useCmsLive } from './CmsLiveProvider';
 import { CMS_LIVE_LOCAL_ROOM_PREFIX } from './CmsLive.const';
 import { findDirectRoom, findServerMatch } from './CmsLive.utils';
@@ -128,7 +128,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [crewRoomId, setCrewRoomId] = useState<string | null>(null);
   const [flyoutId, setFlyoutId] = useState<string | null>(null);
-  const { onlineUsers, rooms, createRoom, sendChat, selfId, selfSessionId, tasks, availability, setAvailability } = useCmsLive();
+  const { onlineUsers, rooms, createRoom, sendChat, selfId, tasks, availability, setAvailability } = useCmsLive();
   const [site, setSite] = useState(() => loadCmsSite());
   const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
   const [navOpen, setNavOpen] = useState(false);
@@ -378,7 +378,14 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       onClick: () => setChatOpen(true),
     },
   ].filter(visibleLeaf);
-  const designChildren: CmsSidebarNavItem[] = [
+
+  const contentChildren: CmsSidebarNavItem[] = [
+    {
+      id: CMS_NAV_IDS.PAGES,
+      label: t.cmsShell.contentManager,
+      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.PAGES],
+    },
     {
       id: CMS_NAV_IDS.BUILDER,
       label: t.cmsShell.contentTypeBuilder,
@@ -386,36 +393,49 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.BUILDER],
     },
     {
-      id: CMS_NAV_IDS.TRANSLATIONS,
-      label: t.cmsShell.translations,
-      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.TRANSLATIONS],
-    },
-    {
-      id: CMS_NAV_IDS.CAST,
-      label: t.cmsShell.cast,
-      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.CAST],
-    },
-    {
       id: CMS_NAV_IDS.MEDIA,
       label: t.cmsShell.mediaLibrary,
       icon: <BearIcons.ImageIcon size={CMS_ICON_SIZE} />,
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.MEDIA],
     },
+  ].filter(visibleLeaf);
+
+  const collectionsChildren: CmsSidebarNavItem[] = [
     {
-      id: CMS_NAV_IDS.TEMPLATES,
-      label: t.cmsShell.templates,
-      icon: <BearIcons.LayersIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.TEMPLATES],
+      id: CMS_NAV_IDS.BLOG,
+      label: t.cmsShell.blog,
+      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.BLOG],
     },
     {
-      id: CMS_NAV_IDS.LIVE_EDIT,
-      label: t.cmsShell.liveEdit,
-      icon: <BearIcons.EditIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.LIVE_EDIT],
+      id: CMS_NAV_IDS.CAST,
+      label: t.cmsShell.cast,
+      icon: <BearIcons.LayersIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.CAST],
     },
   ].filter(visibleLeaf);
+
+  const pluginsChildren: CmsSidebarNavItem[] = [
+    {
+      id: CMS_NAV_IDS.EXTENSIONS,
+      label: t.cmsShell.marketplace,
+      icon: <BearIcons.ShoppingCartIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.EXTENSIONS],
+    },
+    {
+      id: CMS_NAV_IDS.ANALYTICS,
+      label: t.cmsShell.analytics,
+      icon: <BearIcons.BarChartIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.DASHBOARD],
+    },
+    {
+      id: CMS_NAV_IDS.TRANSLATIONS,
+      label: t.cmsShell.translations,
+      icon: <BearIcons.GlobeIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.TRANSLATIONS],
+    },
+  ].filter(visibleLeaf);
+
   const generalChildren: CmsSidebarNavItem[] = [
     {
       id: CMS_NAV_IDS.SETTINGS,
@@ -442,18 +462,25 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.HELP],
     },
   ].filter(visibleLeaf);
+
   const sidebarGroups: CmsSidebarNavItem[] = [
     {
-      id: CMS_NAV_SECTIONS.OVERVIEW,
-      label: t.cmsShell.allContent,
-      icon: <BearIcons.DashboardIcon size={CMS_ICON_SIZE} />,
-      children: overviewChildren,
+      id: CMS_NAV_SECTIONS.CONTENT,
+      label: t.cmsShell.content,
+      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+      children: contentChildren,
     },
     {
-      id: CMS_NAV_SECTIONS.DESIGN,
-      label: t.cmsShell.designContent,
-      icon: <BearIcons.GridIcon size={CMS_ICON_SIZE} />,
-      children: designChildren,
+      id: CMS_NAV_SECTIONS.COLLECTIONS,
+      label: t.cmsShell.collectionTypes,
+      icon: <BearIcons.LayersIcon size={CMS_ICON_SIZE} />,
+      children: collectionsChildren,
+    },
+    {
+      id: CMS_NAV_SECTIONS.PLUGINS,
+      label: t.cmsShell.marketplace,
+      icon: <BearIcons.PackageIcon size={CMS_ICON_SIZE} />,
+      children: pluginsChildren,
     },
     {
       id: CMS_NAV_SECTIONS.GENERAL,
@@ -625,12 +652,12 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       className={`bifrost-cms bifrost-cms--${resolvedMode}${navOpen ? ' is-nav-open' : ''}`}
       data-color-mode={resolvedMode}
     >
-      {navOpen ? (
+      {navOpen && (
         <CmsNavOverlay
           label={t.cmsShell.closeNav}
           onClose={() => setNavOpen(false)}
         />
-      ) : null}
+      )}
       <div className="bifrost-cms__rail">
       <div className="bifrost-cms__rail-stack">
       <Sidebar
@@ -666,7 +693,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               <span className="bifrost-cms__avatar-swatch">
                 <Avatar src={avatarSrc} initials={avatarInitials} size="sm" />
               </span>
-              {collapsed ? null : (
+              {!collapsed && (
                 <Typography variant="caption" className="bifrost-cms__footer-name mb-0">
                   {displayName}
                 </Typography>
@@ -685,7 +712,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
           </Flex>
       </div>
       </div>
-      {collapsed ? null : (
+      {!collapsed && (
         <button
           type="button"
           className="bifrost-cms__resize"
@@ -693,7 +720,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
           onMouseDown={onResizeStart}
         />
       )}
-      {collapsed && flyoutGroup ? (
+      {collapsed && flyoutGroup && (
         <div className="bifrost-cms__nav-flyout" role="menu">
           <Typography variant="caption" className="bifrost-cms__nav-flyout-title mb-0">
             {flyoutGroup.label}
@@ -710,7 +737,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             </button>
           ))}
         </div>
-      ) : null}
+      )}
       </div>
       <div className="bifrost-cms__main">
         {site.showTopNav ? (
@@ -767,7 +794,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               </Flex>
             }
             centerContent={
-              showAgentBar && <CmsAgentBar onApply={onAgentApply} chipsClassName="flex-wrap" />
+              showAgentBar ? <CmsAgentBar onApply={onAgentApply} /> : undefined
             }
             rightContent={
               <Flex align="center" gap={3}>
@@ -782,7 +809,6 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
                 <CmsOnlineStatus
                   users={onlineUsers}
                   currentUserId={currentUserId}
-                  currentSessionId={selfSessionId}
                   onOpenUser={openCrewWithUser}
                 />
                 <Button
@@ -917,7 +943,6 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             onSend={sendChat}
             onOpenUser={openCrewWithUser}
             onOpenRoom={(id) => setCrewRoomId(id)}
-            onLeaveRoom={() => setCrewRoomId(CMS_CREW_DRAWER_OPEN)}
             onEnsureChannel={(tag, extraIds) =>
               createRoom([currentUserId, ...(extraIds ?? [])], tag)
             }

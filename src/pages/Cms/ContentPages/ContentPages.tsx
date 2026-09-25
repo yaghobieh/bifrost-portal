@@ -18,7 +18,18 @@ export const ContentPages: FC = () => {
   const { t, saving, activeToken, error, loading, rows, columns, onNewPage, onOpenRow } =
     useContentPages();
   const [templateFilter, setTemplateFilter] = useState(CONTENT_TEMPLATE_FILTER_ALL);
-  const visibleRows = filterRowsByTemplate(rows, templateFilter);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredByTemplate = filterRowsByTemplate(rows, templateFilter);
+  const visibleRows = filteredByTemplate.filter((row) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    const titleMatch = String(row.title || '').toLowerCase().includes(q);
+    const slugMatch = String(row.slug || '').toLowerCase().includes(q);
+    const idMatch = String(row.id || '').toLowerCase().includes(q);
+    return titleMatch || slugMatch || idMatch;
+  });
+
   const kindOptions = [
     {
       value: CONTENT_TEMPLATE_FILTER_ALL,
@@ -37,24 +48,26 @@ export const ContentPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.PAGES}>
       <Flex direction="column" gap={6} className="bifrost-cms-page">
-        <CmsPageHeader
-          title={t.dashboard.contentTitle}
-          subtitle={t.dashboard.contentSubtitle}
-          actionTitle={t.dashboard.templatesTitle}
-          actionBody={t.dashboard.templatesSubtitle}
-          extra={
-            <Button
-              size="sm"
-              variant="primary"
-              disabled={saving || !activeToken}
-              onClick={() => {
-                void onNewPage();
-              }}
-            >
-              {t.dashboard.newPage}
-            </Button>
-          }
-        />
+        <div className="bifrost-cms-header-row flex justify-between items-center">
+          <div>
+            <Typography variant="h2" className="text-2xl font-bold text-gray-900 mb-1">
+              {t.cmsShell.contentManager}
+            </Typography>
+            <Typography variant="body2" className="text-sm text-gray-500">
+              {visibleRows.length} entries found
+            </Typography>
+          </div>
+          <Button
+            size="sm"
+            variant="primary"
+            disabled={saving || !activeToken}
+            onClick={() => {
+              void onNewPage();
+            }}
+          >
+            + Create new entry
+          </Button>
+        </div>
 
         {Boolean(error) && (
           <Typography variant="body2" className="bifrost-cms-dashboard__error mb-0">
@@ -63,19 +76,31 @@ export const ContentPages: FC = () => {
         )}
 
         <div className="bifrost-cms-card bifrost-cms-pages-wrap">
-          <Select
-            label={t.dashboard.contentColKind}
-            value={templateFilter}
-            options={kindOptions}
-            onChange={(next) => {
-              if (isStringValue(next)) {
-                setTemplateFilter(next);
-              }
-            }}
-            fullWidth
-          />
+          <Flex gap={3} items="center" className="p-4 border-b border-gray-200 bg-gray-50 flex-wrap">
+            <div style={{ minWidth: 240, flex: 1 }}>
+              <input
+                type="text"
+                placeholder="Search entries..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+              />
+            </div>
+            <div style={{ minWidth: 200 }}>
+              <Select
+                value={templateFilter}
+                options={kindOptions}
+                onChange={(next) => {
+                  if (isStringValue(next)) {
+                    setTemplateFilter(next);
+                  }
+                }}
+                fullWidth
+              />
+            </div>
+          </Flex>
           <GridTable
-            key={templateFilter}
+            key={`${templateFilter}-${searchQuery}`}
             data={visibleRows}
             loading={loading}
             stickyHeader
@@ -86,7 +111,7 @@ export const ContentPages: FC = () => {
             }}
             showFilter={false}
             emptyContent={
-              <Typography variant="body2" className="bifrost-cms__muted mb-0">
+              <Typography variant="body2" className="bifrost-cms__muted mb-0 py-8 text-center">
                 {t.dashboard.listEmpty}
               </Typography>
             }
