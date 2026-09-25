@@ -45,9 +45,13 @@ export const CMS_NAV_IDS = {
   TASKS: 'tasks',
   CHAT: 'chat',
   NOTIFICATIONS: 'notifications',
+  MARKETPLACE: 'marketplace',
 } as const;
 
 export const CMS_NAV_SECTIONS = {
+  CONTENT: 'sec-content',
+  COLLECTIONS: 'sec-collections',
+  PLUGINS: 'sec-plugins',
   OVERVIEW: 'sec-overview',
   DESIGN: 'sec-design',
   GENERAL: 'sec-general',
@@ -63,6 +67,7 @@ export const CMS_NAV_ROUTES: Record<string, string> = {
   [CMS_NAV_IDS.CREW]: ROUTES.CMS_CREW,
   [CMS_NAV_IDS.LIVE_EDIT]: ROUTES.CMS_LIVE_EDIT,
   [CMS_NAV_IDS.EXTENSIONS]: ROUTES.CMS_EXTENSIONS,
+  [CMS_NAV_IDS.MARKETPLACE]: ROUTES.CMS_EXTENSIONS,
   [CMS_NAV_IDS.BUNDLES]: ROUTES.CMS_EXTENSIONS,
   [CMS_NAV_IDS.PLANS]: ROUTES.CMS_PLANS,
   [CMS_NAV_IDS.AI_USAGE]: ROUTES.CMS_PLANS,

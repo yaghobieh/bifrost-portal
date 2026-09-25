@@ -417,6 +417,10 @@ export interface Messages {
     builder: string;
     analytics: string;
     settings: string;
+    marketplace: string;
+    collectionTypes: string;
+    singleTypes: string;
+    components: string;
     team: string;
     planFallback: string;
     accountFallback: string;
