@@ -23,6 +23,7 @@ import {
   CONTENT_STATUS_DRAFT,
   CONTENT_STATUS_PUBLISHED,
   CONTENT_TEMPLATE_EMPTY,
+  COUNT_TOKEN,
   DOC_CATALOG_ID_PREFIX,
   DOCS_FIELD_DEFAULTS,
   DOCS_FIELD_NAME,
@@ -316,3 +317,7 @@ export const docsHtmlFromValues = (values: Record<string, string>): string => {
   const bash = values[DOCS_FIELD_NAME.BASH] || EMPTY_STRING;
   return `${sections.join('')}<pre><code>${bash}</code></pre>`;
 };
+
+export const formatEntriesFound = (template: string, count: number): string =>
+  template.replace(COUNT_TOKEN, String(count));
+

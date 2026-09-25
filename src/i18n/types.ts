@@ -796,6 +796,9 @@ export interface Messages {
     plansCurrent: string;
     plansSwitch: string;
     plansFreeCore: string;
+    createEntry: string;
+    entriesFound: string;
+    searchEntries: string;
     listEmpty: string;
     weekdays: {
       mon: string;

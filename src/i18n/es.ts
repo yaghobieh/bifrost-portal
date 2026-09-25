@@ -848,6 +848,9 @@ export const es: Messages = {
     plansCurrent: 'Pack actual',
     plansSwitch: 'Cambiar a este pack',
     plansFreeCore: 'Editor core MIT',
+    createEntry: '+ Crear nueva entrada',
+    entriesFound: '{count} entradas encontradas',
+    searchEntries: 'Buscar entradas…',
     listEmpty: 'Aún no hay elementos.',
     weekdays: {
       mon: 'Lun',
