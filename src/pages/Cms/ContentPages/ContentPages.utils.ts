@@ -142,9 +142,15 @@ type TemplateKindParams = {
 };
 
 const TEMPLATE_KIND_RESOLVERS: Array<(params: TemplateKindParams) => string | null> = [
-  ({ kindValue }) => {
-    if (kindValue === PAGE_KIND_ARTICLE) {
+  ({ kindValue, collection }) => {
+    if (kindValue === PAGE_KIND_ARTICLE || collection === 'articles' || collection === 'article') {
       return TEMPLATE_KIND.ARTICLE;
+    }
+    return null;
+  },
+  ({ collection }) => {
+    if (collection === 'blog') {
+      return 'blog';
     }
     return null;
   },
@@ -163,6 +169,12 @@ const TEMPLATE_KIND_RESOLVERS: Array<(params: TemplateKindParams) => string | nu
   ({ layoutId }) => {
     if (layoutId === PAGE_START_LAYOUT.BLANK) {
       return TEMPLATE_KIND.BLANK;
+    }
+    return null;
+  },
+  ({ collection }) => {
+    if (collection && collection !== CONTENT_COLLECTION_PAGES) {
+      return collection;
     }
     return null;
   },
@@ -191,8 +203,11 @@ export const labelTemplateKind = (kind: string, copy: Messages['dashboard']): st
   if (kind === TEMPLATE_KIND.DOC) {
     return copy.contentTemplateDoc;
   }
-  if (kind === TEMPLATE_KIND.ARTICLE) {
+  if (kind === TEMPLATE_KIND.ARTICLE || kind === 'articles') {
     return copy.contentTemplateArticle;
+  }
+  if (kind === 'blog') {
+    return 'Blog';
   }
   if (kind === TEMPLATE_KIND.LANDING || kind === TEMPLATE_KIND.MARKETING) {
     return copy.contentTemplateLanding;
@@ -200,7 +215,14 @@ export const labelTemplateKind = (kind: string, copy: Messages['dashboard']): st
   if (kind === TEMPLATE_KIND.BLANK) {
     return copy.contentTemplateBlank;
   }
-  return copy.contentTemplatePage;
+  if (kind === TEMPLATE_KIND.PAGE) {
+    return copy.contentTemplatePage;
+  }
+  // Humanize custom page type identifiers (e.g. "case-studies" -> "Case Studies")
+  return kind
+    .split(/[-_]/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 };
 
 export const rowsFromPublicDocs = (params: {

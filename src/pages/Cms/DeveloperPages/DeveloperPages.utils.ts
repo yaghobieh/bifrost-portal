@@ -127,7 +127,36 @@ export const generatePostmanCollection = (): object => ({
       name: 'Articles',
       item: [
         {
-          name: 'List Articles',
+          name: 'List Articles (Dedicated)',
+          request: {
+            method: 'GET',
+            header: [{ key: 'Authorization', value: 'Bearer {{token}}' }],
+            url: {
+              raw: '{{baseUrl}}/api/articles?locale=en&status=published',
+              host: ['{{baseUrl}}'],
+              path: ['api', 'articles'],
+              query: [
+                { key: 'locale', value: 'en' },
+                { key: 'status', value: 'published' },
+              ],
+            },
+          },
+        },
+        {
+          name: 'Get Article by Slug (Dedicated)',
+          request: {
+            method: 'GET',
+            header: [{ key: 'Authorization', value: 'Bearer {{token}}' }],
+            url: {
+              raw: '{{baseUrl}}/api/articles/:slug',
+              host: ['{{baseUrl}}'],
+              path: ['api', 'articles', ':slug'],
+              variable: [{ key: 'slug', value: 'getting-started-graphql' }],
+            },
+          },
+        },
+        {
+          name: 'List Articles (CMS Generic)',
           request: {
             method: 'GET',
             header: [{ key: 'Authorization', value: 'Bearer {{token}}' }],

@@ -13,11 +13,15 @@ export type ContentKind = typeof CONTENT_KIND_PAGE | typeof CONTENT_KIND_ITEM;
 
 export const CONTENT_COLLECTION_DOCS = 'docs';
 export const CONTENT_COLLECTION_PAGES = 'pages';
+export const CONTENT_COLLECTION_ARTICLES = 'articles';
+export const CONTENT_COLLECTION_BLOG = 'blog';
 export const CONTENT_COLLECTION_TEMPLATES = 'templates';
 export const CONTENT_COLLECTION_PAGE_META = 'page-meta';
 export const CONTENT_LIST_COLLECTIONS = [
   CONTENT_COLLECTION_DOCS,
   CONTENT_COLLECTION_PAGES,
+  CONTENT_COLLECTION_ARTICLES,
+  CONTENT_COLLECTION_BLOG,
 ] as const;
 
 export const DOCUMENT_TEMPLATE_ID = 'document';

@@ -13,6 +13,9 @@ import { formatEntriesFound, labelTemplateKind } from './ContentPages.utils';
 import { filterRowsByTemplate } from './helpers/ContentTemplateCubes';
 import { useContentPages } from './hooks';
 import type { ContentTableRow } from './ContentPages.types';
+import { CreatePageTypeModal } from './helpers/CreatePageTypeModal';
+import { loadAllPageTypes, PAGE_TYPES_UPDATED_EVENT } from './pageTypes.utils';
+import type { PageTypeDefinition } from './pageTypes.types';
 
 export const ContentPages: FC = () => {
   const {
@@ -30,6 +33,9 @@ export const ContentPages: FC = () => {
     onDuplicatePage,
   } = useContentPages();
 
+  const [pageTypes, setPageTypes] = useState<PageTypeDefinition[]>(() => loadAllPageTypes());
+  const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
+
   const [templateFilter, setTemplateFilter] = useState(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
@@ -38,6 +44,14 @@ export const ContentPages: FC = () => {
       return CONTENT_TEMPLATE_FILTER_ALL;
     }
   });
+
+  useEffect(() => {
+    const handleTypesUpdate = () => {
+      setPageTypes(loadAllPageTypes());
+    };
+    window.addEventListener(PAGE_TYPES_UPDATED_EVENT, handleTypesUpdate);
+    return () => window.removeEventListener(PAGE_TYPES_UPDATED_EVENT, handleTypesUpdate);
+  }, []);
 
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft' | 'review'>('all');
   const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
@@ -90,35 +104,32 @@ export const ContentPages: FC = () => {
   const collectionTabs = [
     { id: CONTENT_TEMPLATE_FILTER_ALL, label: t.dashboard.contentTemplateFilterAll, count: totalCount },
     {
-      id: TEMPLATE_KIND.ARTICLE,
+      id: 'articles',
       label: labelTemplateKind(TEMPLATE_KIND.ARTICLE, t.dashboard),
-      count: rows.filter((r) => r.template === TEMPLATE_KIND.ARTICLE).length,
+      count: rows.filter((r) => r.template === TEMPLATE_KIND.ARTICLE || r.collection === 'articles' || r.templateKind === 'article').length,
     },
     {
-      id: TEMPLATE_KIND.PAGE,
+      id: 'pages',
       label: labelTemplateKind(TEMPLATE_KIND.PAGE, t.dashboard),
-      count: rows.filter((r) => r.template === TEMPLATE_KIND.PAGE).length,
+      count: rows.filter((r) => r.template === TEMPLATE_KIND.PAGE || r.collection === 'pages' || r.templateKind === 'page').length,
+    },
+    {
+      id: 'blog',
+      label: 'Blog',
+      count: rows.filter((r) => r.collection === 'blog' || r.templateKind === 'blog').length,
     },
     {
       id: TEMPLATE_KIND.DOC,
       label: labelTemplateKind(TEMPLATE_KIND.DOC, t.dashboard),
-      count: rows.filter((r) => r.template === TEMPLATE_KIND.DOC).length,
+      count: rows.filter((r) => r.template === TEMPLATE_KIND.DOC || r.collection === 'docs').length,
     },
-    {
-      id: TEMPLATE_KIND.MARKETING,
-      label: labelTemplateKind(TEMPLATE_KIND.MARKETING, t.dashboard),
-      count: rows.filter((r) => r.template === TEMPLATE_KIND.MARKETING || r.template === TEMPLATE_KIND.LANDING).length,
-    },
-    {
-      id: 'category',
-      label: 'Categories',
-      count: rows.filter((r) => r.template === 'category' || r.collection === 'category').length,
-    },
-    {
-      id: 'author',
-      label: 'Authors',
-      count: rows.filter((r) => r.template === 'author' || r.collection === 'author').length,
-    },
+    ...pageTypes
+      .filter((pt) => !['articles', 'pages', 'blog', 'docs'].includes(pt.id))
+      .map((pt) => ({
+        id: pt.id,
+        label: pt.name,
+        count: rows.filter((r) => r.collection === pt.id || r.templateKind === pt.id).length,
+      })),
   ];
 
   const handleBulkPublish = async () => {
@@ -188,12 +199,20 @@ export const ContentPages: FC = () => {
           <Flex gap={2} align="center">
             <Button
               size="sm"
+              variant="outline"
+              onClick={() => setShowCreateTypeModal(true)}
+              className="border-pink-600 text-pink-600 hover:bg-pink-50 font-semibold shadow-2xs"
+            >
+              ＋ New Page Type
+            </Button>
+            <Button
+              size="sm"
               variant="primary"
               disabled={saving || !activeToken}
               onClick={() => {
-                void onNewPage();
+                void onNewPage(templateFilter);
               }}
-              className="bg-pink-600 hover:bg-pink-700 text-white font-semibold"
+              className="bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow-sm"
             >
               ＋ {t.dashboard.createEntry}
             </Button>
@@ -206,7 +225,7 @@ export const ContentPages: FC = () => {
             variant="outlined"
             padding="sm"
             className={`cursor-pointer transition-all bg-white border rounded-lg shadow-sm hover:border-gray-300 ${
-              statusFilter === 'all' ? 'ring-2 ring-blue-500' : 'border-gray-100'
+              statusFilter === 'all' ? 'ring-2 ring-pink-500' : 'border-gray-100'
             }`}
             onClick={() => setStatusFilter('all')}
           >
@@ -305,7 +324,7 @@ export const ContentPages: FC = () => {
                 variant="outline"
                 disabled={bulkLoading}
                 onClick={handleBulkDuplicate}
-                className="text-blue-700 border-blue-300 hover:bg-blue-50"
+                className="text-pink-700 border-pink-300 hover:bg-pink-50"
               >
                 Duplicate
               </Button>
@@ -333,7 +352,7 @@ export const ContentPages: FC = () => {
         <div className="bifrost-cms-card bifrost-cms-pages-wrap">
           {/* Collection tabs & search toolbar */}
           <div className="p-4 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between gap-3 items-stretch md:items-center">
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
               {collectionTabs.map((tab) => {
                 const isActive = templateFilter === tab.id;
                 return (
@@ -343,7 +362,7 @@ export const ContentPages: FC = () => {
                     onClick={() => setTemplateFilter(tab.id)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border ${
                       isActive
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                        ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
                         : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
@@ -351,6 +370,14 @@ export const ContentPages: FC = () => {
                   </button>
                 );
               })}
+              <button
+                type="button"
+                onClick={() => setShowCreateTypeModal(true)}
+                className="px-2.5 py-1 rounded-full text-xs font-semibold text-pink-600 border border-dashed border-pink-300 hover:border-pink-500 hover:bg-pink-50 cursor-pointer whitespace-nowrap transition-all ml-1 shadow-2xs"
+                title="Create a new collection / page type"
+              >
+                ＋ New Type
+              </button>
             </div>
 
             <div className="flex items-center gap-2">
@@ -381,7 +408,7 @@ export const ContentPages: FC = () => {
                         setShowFilterPopover(false);
                       }}
                       className={`w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-100 flex justify-between ${
-                        statusFilter === 'all' ? 'font-bold text-blue-600' : 'text-gray-700'
+                        statusFilter === 'all' ? 'font-bold text-pink-600' : 'text-gray-700'
                       }`}
                     >
                       All statuses <span>{totalCount}</span>
@@ -433,7 +460,7 @@ export const ContentPages: FC = () => {
                   placeholder={t.dashboard.searchEntries}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-3 pr-8 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full pl-3 pr-8 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 bg-white"
                 />
                 {Boolean(searchQuery) && (
                   <button
@@ -477,6 +504,15 @@ export const ContentPages: FC = () => {
           />
         </div>
       </Flex>
+
+      <CreatePageTypeModal
+        isOpen={showCreateTypeModal}
+        onClose={() => setShowCreateTypeModal(false)}
+        onCreated={(newType) => {
+          setPageTypes(loadAllPageTypes());
+          setTemplateFilter(newType.id);
+        }}
+      />
     </CmsShell>
   );
 };
