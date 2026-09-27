@@ -355,5 +355,8 @@ export const useContentPages = (): UseContentPagesResult => {
     columns,
     onNewPage,
     onOpenRow,
+    onSetStatus,
+    onDeletePage,
+    onDuplicatePage,
   };
 };

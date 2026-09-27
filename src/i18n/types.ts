@@ -1159,6 +1159,9 @@ export interface Messages {
     typeFile: string;
     typeBackground: string;
     typeSelect: string;
+    typeDate: string;
+    typeBoolean: string;
+    typeRelation: string;
     fieldOptions: string;
     fieldRequired: string;
     emailFormat: string;
