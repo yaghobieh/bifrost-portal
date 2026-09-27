@@ -3,19 +3,7 @@ import { Badge, BearIcons, Button, Flex, Switch, Typography } from '@forgedevsta
 import { useI18n } from '@i18n/index';
 import { downloadPostmanCollection } from '../../DeveloperPages.utils';
 import { loadAllPageTypes } from '../../../ContentPages/pageTypes.utils';
-
-type EndpointDef = {
-  id: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  path: string;
-  category: string;
-  description: string;
-  headers: Record<string, string | undefined>;
-  requestBody?: Record<string, unknown> | null;
-  responseStatus: number;
-  responseHeaders: Record<string, string>;
-  responseBody: Record<string, unknown>;
-};
+import type { EndpointDef } from './ApiEndpointsView.types';
 
 const ALL_ENDPOINTS: EndpointDef[] = [
   // Articles

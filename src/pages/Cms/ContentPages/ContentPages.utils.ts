@@ -29,7 +29,11 @@ import {
   DOCS_FIELD_NAME,
   DOCS_LAYOUT_IDS,
   MARKETING_LAYOUT_IDS,
+  STATUS_FILTER,
+  STATUS_REVIEW_VARIANTS,
+  CONTENT_STATUS_REVIEW,
   TEMPLATE_KIND,
+  type StatusFilter,
 } from './ContentPages.const';
 import { PAGE_START_LAYOUT } from './helpers/PageStart';
 
@@ -223,6 +227,46 @@ export const labelTemplateKind = (kind: string, copy: Messages['dashboard']): st
     .split(/[-_]/)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
+};
+
+export const isReviewStatus = (status: unknown): boolean => {
+  const normalized = String(status || EMPTY_STRING).toLowerCase();
+  return (STATUS_REVIEW_VARIANTS as readonly string[]).includes(normalized);
+};
+
+export const matchesStatusFilter = (status: unknown, filter: StatusFilter): boolean => {
+  if (filter === STATUS_FILTER.ALL) {
+    return true;
+  }
+  const normalized = String(status || EMPTY_STRING).toLowerCase();
+  if (filter === STATUS_FILTER.PUBLISHED) {
+    return normalized === CONTENT_STATUS_PUBLISHED;
+  }
+  if (filter === STATUS_FILTER.DRAFT) {
+    return normalized === CONTENT_STATUS_DRAFT;
+  }
+  if (filter === STATUS_FILTER.REVIEW) {
+    return isReviewStatus(normalized);
+  }
+  return true;
+};
+
+export const runBulkAction = async <T,>(
+  items: T[],
+  action: (item: T) => Promise<void> | void,
+  onError?: (error: unknown) => void,
+): Promise<boolean> => {
+  try {
+    for (const item of items) {
+      await action(item);
+    }
+    return true;
+  } catch (error) {
+    if (onError) {
+      onError(error);
+    }
+    return false;
+  }
 };
 
 export const rowsFromPublicDocs = (params: {

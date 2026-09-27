@@ -1,15 +1,28 @@
 import { useEffect, useState, type FC } from 'react';
-import { Badge, Button, Card, Flex, Typography } from '@forgedevstack/bear';
+import { Badge, BearIcons, Button, Card, Flex, Typography } from '@forgedevstack/bear';
 import { GridTable } from '@forgedevstack/grid-table';
 import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
 import { EMPTY_STRING } from '@const/index';
+import { NUMBER_ZERO } from '@const/numbers.const';
 import {
+  COLLECTION_TAB_ID,
+  CONTENT_COLLECTION_DOCS,
+  CONTENT_STATUS_DRAFT,
+  CONTENT_STATUS_PUBLISHED,
   CONTENT_TABLE_PAGE_SIZE,
   CONTENT_TABLE_PAGE_SIZE_OPTIONS,
-  CONTENT_TEMPLATE_FILTER_ALL,
+  COUNT_TOKEN,
+  STATUS_FILTER,
   TEMPLATE_KIND,
+  type StatusFilter,
 } from './ContentPages.const';
-import { formatEntriesFound, labelTemplateKind } from './ContentPages.utils';
+import {
+  formatEntriesFound,
+  isReviewStatus,
+  labelTemplateKind,
+  matchesStatusFilter,
+  runBulkAction,
+} from './ContentPages.utils';
 import { filterRowsByTemplate } from './helpers/ContentTemplateCubes';
 import { useContentPages } from './hooks';
 import type { ContentTableRow } from './ContentPages.types';
@@ -39,9 +52,9 @@ export const ContentPages: FC = () => {
   const [templateFilter, setTemplateFilter] = useState(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
-      return sp.get('kind') || sp.get('collection') || CONTENT_TEMPLATE_FILTER_ALL;
+      return sp.get('kind') || sp.get('collection') || COLLECTION_TAB_ID.ALL;
     } catch {
-      return CONTENT_TEMPLATE_FILTER_ALL;
+      return COLLECTION_TAB_ID.ALL;
     }
   });
 
@@ -53,11 +66,16 @@ export const ContentPages: FC = () => {
     return () => window.removeEventListener(PAGE_TYPES_UPDATED_EVENT, handleTypesUpdate);
   }, []);
 
-  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft' | 'review'>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(STATUS_FILTER.ALL);
   const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
   const [selectedRows, setSelectedRows] = useState<ContentTableRow[]>([]);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [showFilterPopover, setShowFilterPopover] = useState(false);
+
+  const handleSelectStatusFilter = (filter: StatusFilter) => {
+    setStatusFilter(filter);
+    setShowFilterPopover(false);
+  };
 
   useEffect(() => {
     const onLocationChange = () => {
@@ -75,15 +93,10 @@ export const ContentPages: FC = () => {
 
   const filteredByTemplate = filterRowsByTemplate(rows, templateFilter);
   const visibleRows = filteredByTemplate.filter((row) => {
-    // Status filter
-    if (statusFilter !== 'all') {
-      const s = String(row.status || EMPTY_STRING).toLowerCase();
-      if (statusFilter === 'published' && s !== 'published') return false;
-      if (statusFilter === 'draft' && s !== 'draft') return false;
-      if (statusFilter === 'review' && s !== 'review' && s !== 'in review') return false;
+    if (!matchesStatusFilter(row.status, statusFilter)) {
+      return false;
     }
 
-    // Search query filter
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     const titleMatch = String(row.title || EMPTY_STRING).toLowerCase().includes(q);
@@ -94,49 +107,84 @@ export const ContentPages: FC = () => {
   });
 
   const totalCount = rows.length;
-  const publishedCount = rows.filter((r) => String(r.status).toLowerCase() === 'published').length;
-  const draftCount = rows.filter((r) => String(r.status).toLowerCase() === 'draft').length;
-  const reviewCount = rows.filter((r) => {
-    const s = String(r.status).toLowerCase();
-    return s === 'review' || s === 'in review';
-  }).length;
+  const publishedCount = rows.filter(
+    (row) => String(row.status).toLowerCase() === CONTENT_STATUS_PUBLISHED,
+  ).length;
+  const draftCount = rows.filter(
+    (row) => String(row.status).toLowerCase() === CONTENT_STATUS_DRAFT,
+  ).length;
+  const reviewCount = rows.filter((row) => isReviewStatus(row.status)).length;
 
   const collectionTabs = [
-    { id: CONTENT_TEMPLATE_FILTER_ALL, label: t.dashboard.contentTemplateFilterAll, count: totalCount },
     {
-      id: 'articles',
+      id: COLLECTION_TAB_ID.ALL,
+      label: t.dashboard.contentTemplateFilterAll,
+      count: totalCount,
+    },
+    {
+      id: COLLECTION_TAB_ID.ARTICLES,
       label: labelTemplateKind(TEMPLATE_KIND.ARTICLE, t.dashboard),
-      count: rows.filter((r) => r.template === TEMPLATE_KIND.ARTICLE || r.collection === 'articles' || r.templateKind === 'article').length,
+      count: rows.filter(
+        (row) =>
+          row.template === TEMPLATE_KIND.ARTICLE ||
+          row.collection === COLLECTION_TAB_ID.ARTICLES ||
+          row.templateKind === TEMPLATE_KIND.ARTICLE,
+      ).length,
     },
     {
-      id: 'pages',
+      id: COLLECTION_TAB_ID.PAGES,
       label: labelTemplateKind(TEMPLATE_KIND.PAGE, t.dashboard),
-      count: rows.filter((r) => r.template === TEMPLATE_KIND.PAGE || r.collection === 'pages' || r.templateKind === 'page').length,
+      count: rows.filter(
+        (row) =>
+          row.template === TEMPLATE_KIND.PAGE ||
+          row.collection === COLLECTION_TAB_ID.PAGES ||
+          row.templateKind === TEMPLATE_KIND.PAGE,
+      ).length,
     },
     {
-      id: 'blog',
+      id: COLLECTION_TAB_ID.BLOG,
       label: 'Blog',
-      count: rows.filter((r) => r.collection === 'blog' || r.templateKind === 'blog').length,
+      count: rows.filter(
+        (row) =>
+          row.collection === COLLECTION_TAB_ID.BLOG ||
+          row.templateKind === COLLECTION_TAB_ID.BLOG,
+      ).length,
     },
     {
-      id: TEMPLATE_KIND.DOC,
+      id: COLLECTION_TAB_ID.DOC,
       label: labelTemplateKind(TEMPLATE_KIND.DOC, t.dashboard),
-      count: rows.filter((r) => r.template === TEMPLATE_KIND.DOC || r.collection === 'docs').length,
+      count: rows.filter(
+        (row) =>
+          row.template === TEMPLATE_KIND.DOC ||
+          row.collection === CONTENT_COLLECTION_DOCS,
+      ).length,
     },
     ...pageTypes
-      .filter((pt) => !['articles', 'pages', 'blog', 'docs'].includes(pt.id))
-      .map((pt) => ({
-        id: pt.id,
-        label: pt.name,
-        count: rows.filter((r) => r.collection === pt.id || r.templateKind === pt.id).length,
+      .filter(
+        (pageType) =>
+          ![
+            COLLECTION_TAB_ID.ARTICLES,
+            COLLECTION_TAB_ID.PAGES,
+            COLLECTION_TAB_ID.BLOG,
+            CONTENT_COLLECTION_DOCS,
+          ].includes(pageType.id),
+      )
+      .map((pageType) => ({
+        id: pageType.id,
+        label: pageType.name,
+        count: rows.filter(
+          (row) => row.collection === pageType.id || row.templateKind === pageType.id,
+        ).length,
       })),
   ];
 
   const handleBulkPublish = async () => {
-    if (!selectedRows.length) return;
+    if (selectedRows.length === NUMBER_ZERO) return;
     setBulkLoading(true);
     try {
-      await Promise.all(selectedRows.map((row) => onSetStatus(String(row.id), 'published')));
+      await runBulkAction(selectedRows, (row) =>
+        onSetStatus(String(row.id), CONTENT_STATUS_PUBLISHED),
+      );
       setSelectedRows([]);
     } finally {
       setBulkLoading(false);
@@ -144,10 +192,12 @@ export const ContentPages: FC = () => {
   };
 
   const handleBulkDraft = async () => {
-    if (!selectedRows.length) return;
+    if (selectedRows.length === NUMBER_ZERO) return;
     setBulkLoading(true);
     try {
-      await Promise.all(selectedRows.map((row) => onSetStatus(String(row.id), 'draft')));
+      await runBulkAction(selectedRows, (row) =>
+        onSetStatus(String(row.id), CONTENT_STATUS_DRAFT),
+      );
       setSelectedRows([]);
     } finally {
       setBulkLoading(false);
@@ -155,10 +205,12 @@ export const ContentPages: FC = () => {
   };
 
   const handleBulkDuplicate = async () => {
-    if (!selectedRows.length) return;
+    if (selectedRows.length === NUMBER_ZERO) return;
     setBulkLoading(true);
     try {
-      await Promise.all(selectedRows.map((row) => onDuplicatePage(String(row.id))));
+      await runBulkAction(selectedRows, (row) =>
+        onDuplicatePage(String(row.id)),
+      );
       setSelectedRows([]);
     } finally {
       setBulkLoading(false);
@@ -166,13 +218,17 @@ export const ContentPages: FC = () => {
   };
 
   const handleBulkDelete = async () => {
-    if (!selectedRows.length) return;
-    if (!window.confirm(`Delete ${selectedRows.length} selected entries?`)) return;
+    if (selectedRows.length === NUMBER_ZERO) return;
+    const confirmMessage = t.dashboard.deleteConfirm.replace(
+      COUNT_TOKEN,
+      String(selectedRows.length),
+    );
+    if (!window.confirm(confirmMessage)) return;
     setBulkLoading(true);
     try {
-      for (const row of selectedRows) {
-        onDeletePage(String(row.id));
-      }
+      await runBulkAction(selectedRows, (row) =>
+        onDeletePage(String(row.id)),
+      );
       setSelectedRows([]);
     } finally {
       setBulkLoading(false);
