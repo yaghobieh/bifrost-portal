@@ -7,7 +7,6 @@ import {
   EMPTY_STRING,
   ERROR_INTERNAL,
   HTTP_STATUS_OK,
-  PATH_SEGMENT_POSTS,
   PAYLOAD_BODY_KEY,
   PAYLOAD_LEAD_KEY,
   QUERY_SLUG,
@@ -20,6 +19,8 @@ import {
   CMS_DOCS_LOCALE,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
 } from './cmsDocs.const';
+
+export { listPublishedBlog, publishedBlogBySlug } from './cmsBlogFeed';
 
 const toIso = (value: string | Date): string =>
   value instanceof Date ? value.toISOString() : value;
@@ -103,51 +104,6 @@ export const pageBySlugQuery = async (params: {
         ],
       },
     };
-  } catch {
-    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
-  }
-};
-
-export const listPublishedBlog = async (params: {
-  databaseUrl: string;
-  request: Request;
-}): Promise<CmsAuthResult> => {
-  const { databaseUrl } = params;
-  try {
-    const sql = neon(databaseUrl);
-    const rows = (await sql`
-      SELECT id, collection, slug, locale, title, payload, status, created_at, updated_at
-      FROM cms_content
-      WHERE collection = ${COLLECTION_BLOG}
-        AND status = ${CMS_CONTENT_STATUS_PUBLISHED}
-        AND locale = ${CMS_DOCS_LOCALE}
-      ORDER BY updated_at DESC
-    `) as CmsAdminContentRow[];
-    return { status: HTTP_STATUS_OK, body: { items: rows.map(mapItem) } };
-  } catch {
-    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
-  }
-};
-
-export const publishedBlogBySlug = async (params: {
-  databaseUrl: string;
-  request: Request;
-}): Promise<CmsAuthResult> => {
-  const { databaseUrl, request } = params;
-  const url = new URL(request.url);
-  const fromQuery = (url.searchParams.get(QUERY_SLUG) ?? EMPTY_STRING).trim();
-  const parts = url.pathname.split('/').filter(Boolean);
-  const last = parts[parts.length - 1] ?? EMPTY_STRING;
-  const slug = fromQuery || last;
-  if (!slug || slug === PATH_SEGMENT_POSTS) {
-    return { status: HTTP_STATUS_OK, body: { item: null } };
-  }
-  try {
-    const item = await publishedBySlug({ databaseUrl, slug });
-    if (!item || item.collection !== COLLECTION_BLOG) {
-      return { status: HTTP_STATUS_OK, body: { item: null } };
-    }
-    return { status: HTTP_STATUS_OK, body: { item } };
   } catch {
     return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
   }

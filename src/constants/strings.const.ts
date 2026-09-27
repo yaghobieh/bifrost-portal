@@ -87,6 +87,8 @@ export const IMAGE_ATTR_EQ = '="';
 export const ATTR_DATA_I18N = 'data-i18n-key';
 export const LOGO_SRC = '/ink-logo.png';
 export const BIFROST_ICON_SRC = '/bifrost-icon.png';
+export const BIFROST_MARK_SVG = '/bifrost-mark.svg';
+export const BIFROST_FAVICON_SVG = '/favicon.svg';
 export const HERO_IMG_SRC = '/ink-hero.png';
 export const LANDING_BG_SRC = '/ink-landing.png';
 export const ICON_SRC = '/ink-icon.svg';

@@ -58,8 +58,22 @@ export const ROUTES = {
   LAB: '/lab',
 } as const;
 
+export const cmsEditPath = (id: string): string =>
+  `/cms/edit/${encodeURIComponent(id)}`;
+
+export const cmsBlogEditPath = (id: string): string =>
+  `/cms/blog/${encodeURIComponent(id)}`;
+
 export const BUILDER_QUERY_DOC = 'doc';
 export const BUILDER_QUERY_LAYOUT = 'layout';
+
+export const cmsBuilderPath = (query?: { doc?: string; layout?: string }): string => {
+  const params = new URLSearchParams();
+  if (query?.doc) params.set(BUILDER_QUERY_DOC, query.doc);
+  if (query?.layout) params.set(BUILDER_QUERY_LAYOUT, query.layout);
+  const search = params.toString();
+  return search ? `${ROUTES.CMS_BUILDER}?${search}` : ROUTES.CMS_BUILDER;
+};
 
 export const PUBLIC_NAV_IDS = {
   PRODUCT: 'product',
@@ -83,5 +97,9 @@ export const NAV_LINKS_BASE = [
   { id: 'plugins' as const, href: `${ROUTES.DOCS}/plugins` },
 ];
 
+export const NAV_LINKS = NAV_LINKS_BASE;
+
 export const DEFAULT_DOC_SLUG = 'overview';
 export const DOC_INSTALLATION_SLUG = 'installation';
+
+export const DOC_PATH = (slug: string): string => `${ROUTES.DOCS}/${slug}`;

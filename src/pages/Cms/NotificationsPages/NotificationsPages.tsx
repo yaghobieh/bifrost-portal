@@ -5,7 +5,7 @@ import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { fetchNotifications, type CmsNotification } from '@sdk/modules/cms';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { useCmsLive } from '../CmsShell/CmsLiveProvider';
 import {
   NOTIFICATIONS_DAYS,
@@ -70,14 +70,27 @@ export const NotificationsPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.NOTIFICATIONS}>
       <Flex direction="column" gap={4}>
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.cmsNotifications.title}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {seeAll ? t.cmsNotifications.seeAllHint : t.cmsNotifications.subtitle}
-          </Typography>
-        </div>
+        <CmsPageHeader
+          title={t.cmsNotifications.title}
+          subtitle={seeAll ? t.cmsNotifications.seeAllHint : t.cmsNotifications.subtitle}
+          actionTitle={t.cmsNotifications.markAllRead}
+          actionBody={t.cmsNotifications.subtitle}
+          extra={
+            <Button
+              size="sm"
+              variant="primary"
+              disabled={unreadCount === 0}
+              onClick={() => {
+                markAllRead();
+                setItems((current) =>
+                  current.map((row) => ({ ...row, readAt: row.readAt || new Date().toISOString() })),
+                );
+              }}
+            >
+              {t.cmsNotifications.markAllRead}
+            </Button>
+          }
+        />
         <Flex justify="between" align="center" className="gap-3 flex-wrap">
           <Flex gap={1} className="flex-wrap">
             <Button
@@ -111,19 +124,6 @@ export const NotificationsPages: FC = () => {
               onClick={() => setSeeAll((value) => !value)}
             >
               {t.cmsNotifications.seeAll}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={unreadCount === 0}
-              onClick={() => {
-                markAllRead();
-                setItems((current) =>
-                  current.map((row) => ({ ...row, readAt: row.readAt || new Date().toISOString() })),
-                );
-              }}
-            >
-              {t.cmsNotifications.markAllRead}
             </Button>
           </Flex>
         </Flex>

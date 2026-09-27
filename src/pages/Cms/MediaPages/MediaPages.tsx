@@ -46,12 +46,24 @@ export const MediaPages: FC = () => {
         <CmsPageHeader
           title={t.dashboard.mediaTitle}
           subtitle={t.dashboard.mediaSubtitle}
+          actionTitle={t.dashboard.mediaDropTitle}
+          actionBody={t.dashboard.mediaDropBody}
+          extra={
+            <Button
+              size="sm"
+              variant="primary"
+              disabled={uploading || !activeToken}
+              onClick={() => inputRef.current?.click()}
+            >
+              {uploading ? t.dashboard.mediaUploading : t.dashboard.mediaBrowse}
+            </Button>
+          }
           actions={
-            source ? (
+            source && (
               <Badge variant="info" className="text-xs">
                 {source}
               </Badge>
-            ) : null
+            )
           }
         />
 

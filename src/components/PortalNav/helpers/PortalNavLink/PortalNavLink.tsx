@@ -6,9 +6,10 @@ import {
   PORTAL_NAV_HASH_PREFIX,
   PORTAL_NAV_HTTP,
   PORTAL_NAV_HTTPS,
+  PORTAL_NAV_LINK_CLASS,
   PORTAL_NAV_REL,
   PORTAL_NAV_SLASH,
-} from '../../PortalNav.const';
+} from '@components/PortalNav/PortalNav.const';
 import type { PortalNavLinkProps } from './PortalNavLink.types';
 
 const isInternalHref = (href: string): boolean =>
@@ -20,33 +21,34 @@ const isExternalHref = (href: string): boolean =>
 const isHashHref = (href: string): boolean => href.startsWith(PORTAL_NAV_HASH_PREFIX);
 
 export const PortalNavLink: FC<PortalNavLinkProps> = (props) => {
-  const { href, label } = props;
+  const { href, label, className } = props;
   if (!href || !label) {
     return null;
   }
+  const cls = className || PORTAL_NAV_LINK_CLASS;
   if (isInternalHref(href)) {
     return (
-      <Link className="Bl-nav__link" to={href}>
+      <Link className={cls} to={href}>
         {label}
       </Link>
     );
   }
   if (isExternalHref(href)) {
     return (
-      <a className="Bl-nav__link" href={href} target={PORTAL_NAV_BLANK} rel={PORTAL_NAV_REL}>
+      <a className={cls} href={href} target={PORTAL_NAV_BLANK} rel={PORTAL_NAV_REL}>
         {label}
       </a>
     );
   }
   if (isHashHref(href)) {
     return (
-      <a className="Bl-nav__link" href={href}>
+      <a className={PORTAL_NAV_LINK_CLASS} href={href}>
         {label}
       </a>
     );
   }
   return (
-    <Link className="Bl-nav__link" to={href}>
+    <Link className={PORTAL_NAV_LINK_CLASS} to={href}>
       {label}
     </Link>
   );

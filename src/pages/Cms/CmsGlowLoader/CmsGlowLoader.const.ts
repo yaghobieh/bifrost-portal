@@ -1,4 +1,4 @@
-import { BIFROST_ICON_SRC } from '@const/strings.const';
+import { BIFROST_MARK_SVG } from '@const/strings.const';
 
-export const BIFROST_GLOW_SRC = BIFROST_ICON_SRC;
-export const BIFROST_GLOW_SIZE_PX = 56;
+export const BIFROST_GLOW_SRC = BIFROST_MARK_SVG;
+export const BIFROST_GLOW_SIZE_PX = 64;

@@ -1,7 +1,12 @@
 import type { FC } from 'react';
-import { Input, Select } from '@forgedevstack/bear';
+import { Input, Select, Typography } from '@forgedevstack/bear';
 import { isStringValue } from '@utils';
 import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
+import {
+  WidgetGridTable,
+  isGridTableField,
+  serializeGridTableHtml,
+} from '@components/WidgetGridTable';
 import {
   CAST_PAGE_VALUE_PREFIX,
   CAST_TEXTAREA_ROWS,
@@ -14,6 +19,22 @@ export const CastValueInput: FC<CastValueInputProps> = (props) => {
   const { field, value, label, onValueChange } = props;
   const fieldId = `${CAST_PAGE_VALUE_PREFIX}${field.id}`;
   const isLongText = isCastLongText(field.type);
+
+  if (isGridTableField(field, value)) {
+    return (
+      <div>
+        <Typography variant="caption" className="bifrost-cms__muted mb-1 block">
+          {label}
+        </Typography>
+        <WidgetGridTable
+          html={value}
+          editable
+          className="bifrost-cms-grid"
+          onTableChange={(table) => onValueChange(field.name, serializeGridTableHtml(table))}
+        />
+      </div>
+    );
+  }
 
   if (field.type === CAST_FIELD_TYPE.SELECT) {
     return (

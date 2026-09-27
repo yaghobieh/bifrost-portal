@@ -4,8 +4,10 @@ export {
   CMS_VERSION_PATH,
   CMS_UPDATE_PATH,
   TARGET_CMS_VERSION,
+  TARGET_CMS_SPRINT,
   CONSOLE_VERSION_LABEL,
 } from './version.const';
+export { isOnTargetCms } from './version.utils';
 export { bindWindowVersion } from './version.window';
 export { requestUpdateCms } from './update.api';
 export type {
@@ -14,4 +16,5 @@ export type {
   VersionInfo,
   CmsUpdateResult,
   WhatsNewCopy,
+  OnTargetCmsParams,
 } from './version.types';

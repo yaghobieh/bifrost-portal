@@ -28,6 +28,7 @@ import {
   METHOD_GET,
   METHOD_PUT,
   NUMBER_ZERO,
+  NUMBER_ONE,
   PACKAGE_VERSION,
   PLAN_FREE,
   PRODUCT_BIFROST,
@@ -38,6 +39,9 @@ import {
   SERVICE_NAME,
   SETTINGS_BODY_VALUE,
   SETTINGS_KV_KEYS,
+  SETTINGS_KV_SITE,
+  DEFAULT_BLOG_PATH,
+  PAYLOAD_VIEWS_KEY,
   SPRINT_VERSION,
   WEEK_DAY_COUNT,
   COLLECTION_BLOG,
@@ -74,6 +78,9 @@ import {
   toPublicUser,
   verifyJwt,
 } from './cmsAuth.utils';
+import { findPublishedBlogBySlug, listPublishedBlog } from './cmsBlogFeed';
+
+export { listPublishedBlog };
 
 const findUserByIdentity = async (
   databaseUrl: string,
@@ -419,6 +426,68 @@ const ensureKvTable = async (databaseUrl: string): Promise<void> => {
   `;
 };
 
+const payloadViews = (payload: Record<string, unknown>): number => {
+  const value = payload[PAYLOAD_VIEWS_KEY];
+  if (typeof value === 'number' && Number.isFinite(value) && value >= NUMBER_ZERO) {
+    return value;
+  }
+  return NUMBER_ZERO;
+};
+
+export const publicSiteChrome = async (params: {
+  databaseUrl: string;
+  request: Request;
+}): Promise<CmsAuthResult> => {
+  const { databaseUrl } = params;
+  try {
+    await ensureKvTable(databaseUrl);
+    const sql = neon(databaseUrl);
+    const rows = await sql`
+      SELECT key, value
+      FROM cms_kv
+      WHERE key = ${SETTINGS_KV_SITE}
+      LIMIT 1
+    `;
+    const row = firstRow<CmsKvRow>(rows);
+    const parsed = row ? parseKvValue(row.value) : null;
+    let hiddenPublicNavIds: string[] = [];
+    let blogPath = DEFAULT_BLOG_PATH;
+    let showTopNav = true;
+    let items: Array<{ id: string; label: string; href: string; visible: boolean }> = [];
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const record = parsed as Record<string, unknown>;
+      if (Array.isArray(record.hiddenPublicNavIds)) {
+        hiddenPublicNavIds = record.hiddenPublicNavIds.filter(
+          (id): id is string => typeof id === 'string',
+        );
+      }
+      if (typeof record.blogPath === 'string' && record.blogPath.trim()) {
+        blogPath = record.blogPath.trim();
+      }
+      if (record.showTopNav === false) {
+        showTopNav = false;
+      }
+      if (Array.isArray(record.publicNavItems)) {
+        items = record.publicNavItems
+          .filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object')
+          .map((entry) => ({
+            id: typeof entry.id === 'string' ? entry.id : '',
+            label: typeof entry.label === 'string' ? entry.label : '',
+            href: typeof entry.href === 'string' ? entry.href : '',
+            visible: entry.visible !== false,
+          }))
+          .filter((entry) => entry.id && entry.label && entry.href);
+      }
+    }
+    return {
+      status: HTTP_STATUS_OK,
+      body: { hiddenPublicNavIds, blogPath, showTopNav, items },
+    };
+  } catch {
+    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
+  }
+};
+
 export const handleSettings = async (params: {
   databaseUrl: string;
   request: Request;
@@ -561,27 +630,6 @@ export const pageBySlugQuery = async (params: {
   }
 };
 
-export const listPublishedBlog = async (params: {
-  databaseUrl: string;
-  request: Request;
-}): Promise<CmsAuthResult> => {
-  const { databaseUrl } = params;
-  try {
-    const sql = neon(databaseUrl);
-    const rows = (await sql`
-      SELECT id, collection, slug, locale, title, payload, status, created_at, updated_at
-      FROM cms_content
-      WHERE collection = ${COLLECTION_BLOG}
-        AND status = ${CMS_CONTENT_STATUS_PUBLISHED}
-        AND locale = ${CMS_DOCS_LOCALE}
-      ORDER BY updated_at DESC
-    `) as CmsAdminContentRow[];
-    return { status: HTTP_STATUS_OK, body: { items: rows.map(mapContentItem) } };
-  } catch {
-    return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
-  }
-};
-
 export const publishedBlogBySlug = async (params: {
   databaseUrl: string;
   request: Request;
@@ -596,11 +644,21 @@ export const publishedBlogBySlug = async (params: {
     return { status: HTTP_STATUS_OK, body: { item: null } };
   }
   try {
-    const item = await publishedContentBySlug({ databaseUrl, slug });
-    if (!item || item.collection !== COLLECTION_BLOG) {
+    const item = await findPublishedBlogBySlug({ databaseUrl, slug });
+    if (!item) {
       return { status: HTTP_STATUS_OK, body: { item: null } };
     }
-    return { status: HTTP_STATUS_OK, body: { item } };
+    const nextPayload = {
+      ...item.payload,
+      [PAYLOAD_VIEWS_KEY]: payloadViews(item.payload) + NUMBER_ONE,
+    };
+    const sql = neon(databaseUrl);
+    await sql`
+      UPDATE cms_content
+      SET payload = ${JSON.stringify(nextPayload)}
+      WHERE id = ${item.id}
+    `;
+    return { status: HTTP_STATUS_OK, body: { item: { ...item, payload: nextPayload } } };
   } catch {
     return { status: HTTP_STATUS_INTERNAL_SERVER_ERROR, body: { error: ERROR_INTERNAL } };
   }

@@ -5,7 +5,7 @@ import { PlanCompareTable } from '@components/PlanCompareTable';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
 import { authNucleus, plansNucleus } from '@sdk/index';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 
 export const PlansPages: FC = () => {
   const { t } = useI18n();
@@ -33,14 +33,12 @@ export const PlansPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.PLANS}>
       <Flex direction="column" gap={4}>
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.dashboard.plansTitle}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {t.dashboard.plansSubtitle}
-          </Typography>
-        </div>
+        <CmsPageHeader
+          title={t.dashboard.plansTitle}
+          subtitle={t.dashboard.plansSubtitle}
+          actionTitle={t.dashboard.plansCurrent}
+          actionBody={t.dashboard.plansSubtitle}
+        />
 
         {loading ? (
           <Flex align="center" gap={2}>

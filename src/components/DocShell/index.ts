@@ -1,2 +1,2 @@
 export { DocShell } from './DocShell';
-export type { DocShellProps } from './DocShell.types';
+export type { DocShellProps, DocShellTocItem } from './DocShell.types';

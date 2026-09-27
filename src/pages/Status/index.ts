@@ -1,1 +1,1 @@
-export { StatusPage } from './Status';
+export { StatusPage, StatusView } from './Status';

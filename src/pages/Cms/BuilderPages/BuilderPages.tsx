@@ -482,10 +482,29 @@ export const BuilderPages: FC = () => {
     </Card>
   );
 
+  const headerActionTitle = installed ? t.cmsBuilder.saveCanvas : t.cmsBuilder.lockedTitle;
+  const headerActionBody = installed ? t.cmsBuilder.subtitle : t.cmsBuilder.lockedBody;
+
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.BUILDER}>
       <Flex direction="column" gap={6} className="bifrost-cms-builder">
-        <CmsPageHeader title={t.cmsBuilder.title} subtitle={t.cmsBuilder.subtitle} />
+        <CmsPageHeader
+          title={t.cmsBuilder.title}
+          subtitle={t.cmsBuilder.subtitle}
+          actionTitle={headerActionTitle}
+          actionBody={headerActionBody}
+          extra={
+            !installed && (
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
+              >
+                {t.cmsBuilder.openStore}
+              </Button>
+            )
+          }
+        />
         <BuilderBoardNiche />
         {installed ? (
           <div

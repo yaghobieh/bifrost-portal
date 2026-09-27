@@ -6,6 +6,7 @@ import {
 } from './cmsDocs.const';
 
 export type CmsContentRow = {
+  id: string;
   collection: string;
   slug: string;
   title: string;
@@ -17,6 +18,7 @@ export type CmsContentRow = {
 export type CmsDocsRow = CmsContentRow;
 
 type SqlDocsRow = {
+  id: string;
   slug: string;
   title: string;
   status: string;
@@ -35,6 +37,7 @@ const parsePayload = (value: Record<string, unknown> | string): Record<string, u
 };
 
 const mapRow = (row: SqlDocsRow, collection: string): CmsContentRow => ({
+  id: row.id,
   collection,
   slug: row.slug,
   title: row.title,
@@ -49,7 +52,7 @@ export const listPublishedContent = async (
 ): Promise<CmsContentRow[]> => {
   const sql = neon(databaseUrl);
   const rows = (await sql`
-    SELECT slug, title, status, updated_at, payload
+    SELECT id, slug, title, status, updated_at, payload
     FROM cms_content
     WHERE collection = ${collection}
       AND status = ${CMS_CONTENT_STATUS_PUBLISHED}
@@ -66,7 +69,7 @@ export const getPublishedContent = async (
 ): Promise<CmsContentRow | null> => {
   const sql = neon(databaseUrl);
   const rows = (await sql`
-    SELECT slug, title, status, updated_at, payload
+    SELECT id, slug, title, status, updated_at, payload
     FROM cms_content
     WHERE collection = ${collection}
       AND slug = ${slug}

@@ -6,7 +6,7 @@ import { EMPTY_STRING } from '@const/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { fetchCrewRoles, fetchCrewUsers, notifyTaskAgentsRequest } from '@sdk/modules/cms';
 import type { CrewRole, CrewUser } from '../CrewPages/CrewPages.const';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { useCmsLive } from '../CmsShell/CmsLiveProvider';
 import { TaskBoardCard } from './TaskBoardCard';
 import { TaskBoardSettings } from './TaskBoardSettings';
@@ -182,31 +182,31 @@ export const TasksPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.TASKS}>
       <Flex direction="column" gap={4} className="bifrost-cms-board">
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.cmsTasks.title}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {t.cmsTasks.subtitle}
-          </Typography>
-        </div>
-        <Flex align="center" gap={2} className="flex-wrap">
-          <Button
-            size="sm"
-            variant="primary"
-            icon={<BearIcons.PlusIcon size={CMS_ICON_SIZE} />}
-            onClick={() => openCreate(TASK_STATUS.TODO)}
-          >
-            {t.cmsTasks.add}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            aria-label={t.cmsTasks.boardSettings}
-            icon={<BearIcons.SettingsIcon size={CMS_ICON_SIZE} />}
-            onClick={() => setSettingsOpen(true)}
-          />
-        </Flex>
+        <CmsPageHeader
+          title={t.cmsTasks.title}
+          subtitle={t.cmsTasks.subtitle}
+          actionTitle={t.cmsTasks.add}
+          actionBody={t.cmsTasks.subtitle}
+          extra={
+            <>
+              <Button
+                size="sm"
+                variant="primary"
+                icon={<BearIcons.PlusIcon size={CMS_ICON_SIZE} />}
+                onClick={() => openCreate(TASK_STATUS.TODO)}
+              >
+                {t.cmsTasks.add}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                aria-label={t.cmsTasks.boardSettings}
+                icon={<BearIcons.SettingsIcon size={CMS_ICON_SIZE} />}
+                onClick={() => setSettingsOpen(true)}
+              />
+            </>
+          }
+        />
         <div className="bifrost-cms-board__columns">
           {board.statuses.map((status) => {
             const columnTasks = tasks.filter((task) => task.status === status.id);

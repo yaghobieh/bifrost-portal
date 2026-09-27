@@ -4,15 +4,18 @@ import {
   pluginCatalogPayload,
   versionPayload,
 } from '../server/cmsAuth';
+import { statusPayload } from '../server/cmsPublicStatus';
 import {
   API_CMS_MEDIA_CONFIG_PATH,
   API_PUBLIC_PLUGINS_PATH,
+  API_STATUS_PATH,
   API_V1_VERSION_PATH,
   API_VERSION_PATH,
   EMPTY_STRING,
   QUERY_REST,
   REST_MEDIA_CONFIG,
   REST_PLUGINS,
+  REST_STATUS,
   REST_VERSION,
 } from '../server/cmsAuth.const';
 import { handleGetHealth } from '../server/cmsAuthRoute';
@@ -25,6 +28,10 @@ export default async function handler(request: Request): Promise<Response> {
   const rest = (url.searchParams.get(QUERY_REST) ?? EMPTY_STRING).trim();
   if (rest === REST_VERSION || pathname.includes(API_V1_VERSION_PATH) || pathname === API_VERSION_PATH) {
     return handleGetHealth(request, versionPayload());
+  }
+  if (rest === REST_STATUS || pathname === API_STATUS_PATH) {
+    const databaseUrl = process.env.DATABASE_URL ?? '';
+    return handleGetHealth(request, await statusPayload(databaseUrl));
   }
   if (rest === REST_MEDIA_CONFIG || pathname.includes(API_CMS_MEDIA_CONFIG_PATH)) {
     return handleGetHealth(request, mediaConfigPayload());

@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Plugin } from 'vite';
 import { loadEnv } from 'vite';
-import { getPublishedPage } from './server/cmsDocs';
+import { getPublishedPage, listPublishedDocs } from './server/cmsDocs';
 import {
   CONTENT_TYPE_JSON,
   ERROR_DOCS_UNAVAILABLE,
@@ -68,7 +68,8 @@ export const cmsDocsPlugin = (mode: string): Plugin => ({
         const rest = segmentsAfter(url, prefix);
         const slug = rest[0] ?? '';
         if (!slug) {
-          next();
+          const items = await listPublishedDocs(databaseUrl);
+          sendJson(res, HTTP_STATUS_OK, { items });
           return;
         }
         const item = await getPublishedPage(databaseUrl, slug);

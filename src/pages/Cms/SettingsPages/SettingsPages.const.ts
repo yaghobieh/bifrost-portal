@@ -135,6 +135,19 @@ export const SETTINGS_PUBLIC_NAV_DEFAULT_ITEMS = [
   { id: 'askAi', label: 'Ask AI', href: '/ai', visible: false },
 ] as const;
 
+export const SETTINGS_PUBLIC_NAV_IDS = [
+  'product',
+  'docs',
+  'plans',
+  'demo',
+  'changelog',
+  'status',
+  'blog',
+  'guides',
+  'api',
+  'askAi',
+] as const;
+
 export const SETTINGS_NAV_TOGGLE_IDS = [
   CMS_NAV_IDS.DASHBOARD,
   CMS_NAV_IDS.PAGES,
