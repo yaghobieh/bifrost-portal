@@ -421,6 +421,8 @@ export interface Messages {
     collectionTypes: string;
     singleTypes: string;
     components: string;
+    articles: string;
+    schemaFields: string;
     team: string;
     planFallback: string;
     accountFallback: string;

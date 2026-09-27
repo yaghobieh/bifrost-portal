@@ -12,7 +12,6 @@ export type CmsPresenceStatus = 'online' | 'away' | 'busy' | 'not_there';
 
 export type CmsPresenceUser = {
   id: string;
-  sessionId: string;
   name: string;
   avatar: string;
   location: string;
@@ -40,7 +39,6 @@ export type CmsLiveContextValue = {
   items: CmsNotification[];
   unread: number;
   selfId: string;
-  selfSessionId: string;
   onlineUsers: CmsPresenceUser[];
   tasks: CmsTask[] | null;
   board: TaskBoardConfig | null;

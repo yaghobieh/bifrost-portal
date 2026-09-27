@@ -30,6 +30,7 @@ export interface Messages {
   version: string;
   searchPlaceholder: string;
   searchEmpty: string;
+  searchHome: string;
   docsLoading: string;
   docsMissing: string;
   onThisPage: string;

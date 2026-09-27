@@ -5,6 +5,12 @@ import {
   HTML_TAG_IMG,
 } from '@const/strings.const';
 import { bearWidgetHtml } from '../ContentEdit/bearWidget.utils';
+import {
+  DEFAULT_GRID_TABLE,
+  GRID_TABLE_BEAR_GRID_TABLE,
+  GRID_TABLE_WIDGET_ID,
+  serializeGridTableHtml,
+} from '@components/WidgetGridTable';
 import type { BearPaletteWidget } from './BearPalette.types';
 
 export const BEAR_PALETTE_GROUP = {
@@ -442,6 +448,13 @@ export const BEAR_PALETTE: readonly BearPaletteWidget[] = [
     bearComponent: 'DataTable',
     group: BEAR_PALETTE_GROUP.GENERAL,
     html: wrap('DataTable', 'DataTable'),
+  },
+  {
+    id: GRID_TABLE_WIDGET_ID,
+    label: GRID_TABLE_BEAR_GRID_TABLE,
+    bearComponent: GRID_TABLE_BEAR_GRID_TABLE,
+    group: BEAR_PALETTE_GROUP.GENERAL,
+    html: serializeGridTableHtml(DEFAULT_GRID_TABLE),
   },
   {
     id: 'date-picker',

@@ -2,6 +2,7 @@ import { EMPTY_STRING, TYPE_BOOLEAN, TYPE_OBJECT, TYPE_STRING } from '@const/str
 import { fetchVersionInfo } from './version.api';
 import { TARGET_CMS_VERSION } from './version.const';
 import type { CmsUpdateResult } from './version.types';
+import { isOnTargetCms } from './version.utils';
 
 export type CmsUpdateCandidate = {
   from: string;
@@ -24,11 +25,15 @@ export const isCmsUpdateResult = (value: CmsUpdateCandidate | null): boolean => 
 
 export const optimisticUpdateResult = async (): Promise<CmsUpdateResult> => {
   const info = await fetchVersionInfo();
-  const from = info.portal || info.version || EMPTY_STRING;
+  const from = info.version || info.portal || EMPTY_STRING;
+  const onTarget = isOnTargetCms({
+    current: from,
+    sprint: info.sprint,
+  });
   return {
     from,
-    to: TARGET_CMS_VERSION,
-    updated: from !== TARGET_CMS_VERSION,
+    to: onTarget ? from : TARGET_CMS_VERSION,
+    updated: !onTarget,
     packages: Object.entries(info.packages).map((entry) => `${entry[0]}@${entry[1]}`),
     notes: info.notes,
   };

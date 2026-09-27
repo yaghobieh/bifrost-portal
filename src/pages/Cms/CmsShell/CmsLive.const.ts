@@ -1,5 +1,3 @@
-import { NUMBER_FIFTEEN_HUNDRED } from '@const/numbers.const';
-
 export const CMS_LIVE_PATH = '/api/cms/live';
 export const CMS_HEALTH_PATH = '/api/health';
 export const CMS_LIVE_HTTP_PROTOCOL = /^http/i;
@@ -33,11 +31,5 @@ export const CMS_LIVE_TYPE_CHAT_MESSAGE = 'chat:message';
 export const CMS_LIVE_LOCAL_ROOM_PREFIX = 'local-';
 export const CMS_LIVE_LOCAL_MSG_PREFIX = 'local-msg-';
 export const CMS_LIVE_PING_MS = 5000;
-export const CMS_LIVE_HTTP_POLL_MS = NUMBER_FIFTEEN_HUNDRED;
 export const CMS_LIVE_RECONNECT_MS = 1000;
 export const CMS_LIVE_RECONNECT_MAX_MS = 8000;
-export const CMS_LIVE_SESSION_KEY = 'cms-live-session';
-export const CMS_LIVE_EVENTS_KEY = 'events';
-export const CMS_LIVE_TRANSPORT_WS = 'ws';
-export const CMS_LIVE_TRANSPORT_HTTP = 'http';
-export const CMS_LIVE_HEADER_CONTENT_TYPE = 'Content-Type';

@@ -328,6 +328,7 @@ export const PAYLOAD_ITEMS_KEY = 'items';
 export const PAYLOAD_ORDERED_KEY = 'ordered';
 export const PAYLOAD_BODY_KEY = 'body';
 export const PAYLOAD_HEADING_KEY = 'heading';
+export const PAYLOAD_ID_KEY = 'id';
 export const PAYLOAD_PARAGRAPHS_KEY = 'paragraphs';
 export const PAYLOAD_CALLOUT_KEY = 'callout';
 export const PAYLOAD_KIND_KEY = 'kind';

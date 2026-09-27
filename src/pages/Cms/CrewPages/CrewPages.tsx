@@ -44,7 +44,7 @@ import {
 export const CrewPages: FC = () => {
   const { t } = useI18n();
   const { token } = useNucleus(authNucleus);
-  const { onlineUsers, selfId, selfSessionId } = useCmsLive();
+  const { onlineUsers, selfId } = useCmsLive();
   const [users, setUsers] = useState<CrewUser[]>([]);
   const [roles, setRoles] = useState<CrewRole[]>(DEFAULT_CREW_ROLES);
   const [name, setName] = useState(EMPTY_STRING);
@@ -201,15 +201,28 @@ export const CrewPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.CREW}>
-      <Flex direction="column" gap={6}>
+      <Flex direction="column" gap={6} className="bifrost-cms-page">
         <CmsPageHeader
           title={t.cmsCrew.pageTitle}
           subtitle={t.cmsCrew.subtitle}
+          extra={
+            <Card variant="elevated" padding="md">
+              <Flex justify="between" align="center" gap={3} className="flex-wrap">
+                <div>
+                  <Typography variant="h4" className="mb-1">
+                    {t.cmsCrew.usersTitle}
+                  </Typography>
+                  <Typography variant="body2" className="bifrost-cms__muted mb-0">
+                    {t.cmsCrew.subtitle}
+                  </Typography>
+                </div>
+              </Flex>
+            </Card>
+          }
           actions={
             <LiveEditors
               users={onlineUsers}
               currentUserId={selfId}
-              currentSessionId={selfSessionId}
               location={currentLiveLocation().location}
             />
           }

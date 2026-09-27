@@ -36,6 +36,9 @@ export type CmsDocsListResponse = {
 };
 
 export type DocSearchHit = {
+  id: string;
   slug: string;
+  path: string;
   title: string;
+  tag: string;
 };

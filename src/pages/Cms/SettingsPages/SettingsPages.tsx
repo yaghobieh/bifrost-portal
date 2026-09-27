@@ -339,7 +339,12 @@ export const SettingsPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.SETTINGS}>
       <Flex direction="column" gap={6} className="bifrost-cms-page">
-        <CmsPageHeader title={t.settings.title} subtitle={t.settings.subtitle} />
+        <CmsPageHeader
+          title={t.settings.title}
+          subtitle={t.settings.subtitle}
+          actionTitle={t.settings.profileTitle}
+          actionBody={t.settings.subtitle}
+        />
 
         <Card variant="elevated" padding="md">
           <Tabs defaultTab={SETTINGS_TABS.PROFILE} variant="line">
@@ -811,27 +816,35 @@ export const SettingsPages: FC = () => {
                       ))}
                     </div>
                   </div>
-                  <SettingsPublicNav
-                    items={site.publicNavItems}
-                    disabled={!canEditSettings}
-                    title={t.settings.publicNavVisibility}
-                    hint={t.settings.publicNavHint}
-                    labelTitle={t.settings.publicNavLabel}
-                    hrefTitle={t.settings.publicNavHref}
-                    addLabel={t.settings.publicNavAdd}
-                    removeLabel={t.settings.publicNavRemove}
-                    moveUpLabel={t.settings.publicNavMoveUp}
-                    moveDownLabel={t.settings.publicNavMoveDown}
-                    visibleLabel={t.settings.publicNavVisible}
-                    onChange={(items) => {
-                      setSite((current) => ({
-                        ...current,
-                        publicNavItems: items,
-                        hiddenPublicNavIds: hiddenIdsFromPublicNav(items),
-                      }));
-                      markDirty();
-                    }}
-                  />
+                  <div>
+                    <Typography variant="h5" className="mb-1">
+                      {t.settings.publicNavVisibility}
+                    </Typography>
+                    <Typography variant="caption" className="bifrost-cms__muted mb-2 block">
+                      {t.settings.publicNavHint}
+                    </Typography>
+                    <SettingsPublicNav
+                      items={site.publicNavItems}
+                      disabled={!canEditSettings}
+                      title={t.settings.publicNavVisibility}
+                      hint={t.settings.publicNavHint}
+                      labelTitle={t.settings.publicNavLabel}
+                      hrefTitle={t.settings.publicNavHref}
+                      addLabel={t.settings.publicNavAdd}
+                      removeLabel={t.settings.publicNavRemove}
+                      moveUpLabel={t.settings.publicNavMoveUp}
+                      moveDownLabel={t.settings.publicNavMoveDown}
+                      visibleLabel={t.settings.publicNavVisible}
+                      onChange={(items) => {
+                        setSite((current) => ({
+                          ...current,
+                          publicNavItems: items,
+                          hiddenPublicNavIds: hiddenIdsFromPublicNav(items),
+                        }));
+                        markDirty();
+                      }}
+                    />
+                  </div>
                 </SettingsSection>
                 ) : null}
                 {sitePanel === SETTINGS_SITE_PANELS.READING ? (
@@ -847,6 +860,18 @@ export const SettingsPages: FC = () => {
                       setSite((current) => ({
                         ...current,
                         homepagePath: event.target.value,
+                      }));
+                      markDirty();
+                    }}
+                  />
+                  <Input
+                    id={SETTINGS_SITE_INPUT_IDS.BLOG_PATH}
+                    label={t.settings.blogPath}
+                    value={site.blogPath}
+                    onChange={(event) => {
+                      setSite((current) => ({
+                        ...current,
+                        blogPath: event.target.value,
                       }));
                       markDirty();
                     }}

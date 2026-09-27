@@ -50,7 +50,7 @@ export const PORTAL_APP_ROUTES = [
   { path: ROUTES.STATUS, name: 'status', component: StatusPage },
   { path: ROUTES.PLANS, name: 'plans', component: Plans },
   { path: ROUTES.CMS_LOGIN, name: 'cms-login', component: CmsLogin },
-  { path: ROUTES.CMS, name: 'cms', component: withCmsGate(ContentPages) },
+  { path: ROUTES.CMS, name: 'cms', component: withCmsGate(Dashboard) },
   { path: ROUTES.CMS_CONTENT, name: 'cms-content', component: withCmsGate(ContentPages) },
   { path: ROUTES.CMS_ANALYTICS, name: 'cms-analytics', component: withCmsGate(Dashboard) },
   { path: ROUTES.CMS_BLOG, name: 'cms-blog', component: withCmsGate(BlogPages) },

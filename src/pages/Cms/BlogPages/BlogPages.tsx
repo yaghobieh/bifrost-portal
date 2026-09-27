@@ -1,7 +1,7 @@
 import { useEffect, type FC } from 'react';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { useNucleus } from '@forgedevstack/synapse';
-import { Button, Flex, Typography } from '@forgedevstack/bear';
+import { Button, Card, Flex, Typography } from '@forgedevstack/bear';
 import { GridTable } from '@forgedevstack/grid-table';
 import type { ColumnDefinition } from '@forgedevstack/grid-table';
 import { useAuth } from '@hooks/index';
@@ -14,8 +14,6 @@ import {
   DOCUMENT_DEFAULT_LOCALE,
   DOCUMENT_STARTER_STATUS,
   CONTENT_TEMPLATE_EMPTY,
-  CONTENT_TABLE_PAGE_SIZE,
-  CONTENT_TABLE_PAGE_SIZE_OPTIONS,
 } from '../ContentPages/ContentPages.const';
 import { formatContentUpdated, payloadActor } from '../ContentPages/ContentPages.utils';
 import {
@@ -101,17 +99,27 @@ export const BlogPages: FC = () => {
         <CmsPageHeader
           title={t.dashboard.blogTitle}
           subtitle={t.dashboard.blogSubtitle}
-          actionTitle={t.dashboard.blogNewPost}
-          actionBody={t.dashboard.blogSubtitle}
           extra={
-            <Button
-              size="sm"
-              variant="primary"
-              disabled={saving || !activeToken}
-              onClick={() => void onNewPost()}
-            >
-              {t.dashboard.blogNewPost}
-            </Button>
+            <Card variant="elevated" padding="md">
+              <Flex justify="between" align="center" gap={3} className="flex-wrap">
+                <div>
+                  <Typography variant="h4" className="mb-1">
+                    {t.dashboard.blogNewPost}
+                  </Typography>
+                  <Typography variant="body2" className="bifrost-cms__muted mb-0">
+                    {t.dashboard.blogSubtitle}
+                  </Typography>
+                </div>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  disabled={saving || !activeToken}
+                  onClick={() => void onNewPost()}
+                >
+                  {t.dashboard.blogNewPost}
+                </Button>
+              </Flex>
+            </Card>
           }
         />
         {error && (
@@ -124,11 +132,7 @@ export const BlogPages: FC = () => {
             data={rows}
             loading={loading}
             stickyHeader
-            showPagination
-            paginationConfig={{
-              initialPageSize: CONTENT_TABLE_PAGE_SIZE,
-              pageSizeOptions: CONTENT_TABLE_PAGE_SIZE_OPTIONS,
-            }}
+            showPagination={false}
             showFilter={false}
             emptyContent={
               <Typography variant="body2" className="bifrost-cms__muted mb-0">

@@ -9,7 +9,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "seed:cms": "tsx scripts/seedCms.ts"
+    "seed:cms": "tsx scripts/seedCms.ts",
+    "test:brand": "tsx scripts/testBranding.ts",
+    "test:assets": "tsx --test test/**/*.test.ts",
+    "test": "npm run test:brand && npm run test:assets"
   },
   "dependencies": {
     "@forgedevstack/anvil": "^1.0.6",
@@ -18,7 +21,7 @@
     "@forgedevstack/forge-compass": "^1.0.0",
     "@forgedevstack/forge-form": "^1.0.0",
     "@forgedevstack/grid-table": "^1.1.2",
-    "@forgedevstack/ink": "^1.1.7",
+    "@forgedevstack/ink": "file:../ink",
     "@forgedevstack/lingo": "^1.0.2",
     "@forgedevstack/synapse": "^1.2.1",
     "@neondatabase/serverless": "^0.10.4",

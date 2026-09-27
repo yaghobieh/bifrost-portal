@@ -3,6 +3,7 @@ export { Dashboard } from './Dashboard';
 export { CmsLogin } from './CmsLogin';
 export { ContentPages } from './ContentPages';
 export { BlogPages } from './BlogPages';
+export { BlogEdit } from './BlogEdit';
 export { ContentEdit } from './ContentEdit';
 export { MediaPages } from './MediaPages';
 export { EditorsPages } from './EditorsPages';

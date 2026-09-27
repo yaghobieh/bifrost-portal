@@ -2286,11 +2286,13 @@ html.bifrost-cms-host #root {
 @keyframes bifrost-cms-glow {
   0%,
   100% {
-    filter: drop-shadow(0 0 0.25rem #2951c4);
-    opacity: 0.72;
+    filter: drop-shadow(0 0 0.35rem rgba(79, 70, 229, 0.45)) drop-shadow(0 0 0.8rem rgba(236, 72, 153, 0.25));
+    transform: scale(0.98);
+    opacity: 0.8;
   }
   50% {
-    filter: drop-shadow(0 0 1rem #2951c4);
+    filter: drop-shadow(0 0 1.2rem rgba(79, 70, 229, 0.8)) drop-shadow(0 0 1.8rem rgba(236, 72, 153, 0.6));
+    transform: scale(1.04);
     opacity: 1;
   }
 }
