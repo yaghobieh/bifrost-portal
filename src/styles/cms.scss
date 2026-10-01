@@ -5043,44 +5043,6 @@ html.bifrost-cms-host #root {
   }
 }
 
-.anchor-stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.anchor-stat-card {
-  background: var(--anchor-surface);
-  border: 1px solid var(--anchor-border);
-  border-radius: var(--anchor-radius-md);
-  padding: 18px 20px;
-  box-shadow: var(--anchor-shadow-card);
-
-  .num {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--anchor-ink);
-  }
-
-  .lbl {
-    font-size: 13px;
-    color: var(--anchor-ink-muted);
-    margin-top: 4px;
-  }
-
-  .delta {
-    font-size: 12px;
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-
-    &.up { color: var(--anchor-success); }
-    &.warn { color: var(--anchor-warning); }
-  }
-}
-
 .anchor-panel {
   background: var(--anchor-surface);
   border: 1px solid var(--anchor-border);
@@ -5102,42 +5064,6 @@ html.bifrost-cms-host #root {
     margin: 0;
     font-weight: 600;
     color: var(--anchor-ink);
-  }
-}
-
-.anchor-activity {
-  padding: 6px 20px 12px;
-
-  .activity-row {
-    display: flex;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--anchor-border);
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    .activity-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--anchor-accent);
-      margin-top: 6px;
-      flex: none;
-    }
-
-    .txt {
-      font-size: 13.5px;
-      line-height: 1.5;
-      color: var(--anchor-ink);
-    }
-
-    .when {
-      font-size: 12px;
-      color: var(--anchor-ink-faint);
-      margin-top: 2px;
-    }
   }
 }
 

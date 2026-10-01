@@ -102,86 +102,14 @@ export const Dashboard: FC = () => {
           </Card>
         ) : null}
 
-        {loading ? (
+        {loading && (
           <Flex align="center" gap={2}>
             <Spinner size="sm" />
             <Typography variant="body2" className="mb-0">
               {t.dashboard.loading}
             </Typography>
           </Flex>
-        ) : null}
-
-        {/* Anchor Headless CMS Redesign Stat Grid */}
-        <div className="anchor-stat-grid">
-          <div className="anchor-stat-card">
-            <div className="num">{data.documents || 482}</div>
-            <div className="lbl">Content items</div>
-            <div className="delta up">↑ 12 this week</div>
-          </div>
-          <div className="anchor-stat-card">
-            <div className="num">128,904</div>
-            <div className="lbl">API requests today</div>
-            <div className="delta up">↑ 8.4%</div>
-          </div>
-          <div className="anchor-stat-card">
-            <div className="num">6</div>
-            <div className="lbl">Active locales</div>
-            <div className="delta warn">1 pending review</div>
-          </div>
-          <div className="anchor-stat-card">
-            <div className="num">2.4 GB</div>
-            <div className="lbl">Media storage used</div>
-            <div className="delta up">of 10 GB</div>
-          </div>
-        </div>
-
-        {/* Anchor Recent Activity Panel */}
-        <div className="anchor-panel">
-          <div className="anchor-panel-head">
-            <h3>Recent activity</h3>
-            <a className="text-xs font-semibold text-pink-600 hover:text-pink-700" href="#activity">
-              View all
-            </a>
-          </div>
-          <div className="anchor-activity">
-            <div className="activity-row">
-              <div className="activity-dot" />
-              <div>
-                <div className="txt">
-                  <b>Maya Chen</b> published <b>Getting started with GraphQL</b> to Blog
-                </div>
-                <div className="when">18 minutes ago</div>
-              </div>
-            </div>
-            <div className="activity-row">
-              <div className="activity-dot" />
-              <div>
-                <div className="txt">
-                  <b>Sam Okoye</b> updated the <b>Pricing</b> page
-                </div>
-                <div className="when">1 hour ago</div>
-              </div>
-            </div>
-            <div className="activity-row">
-              <div className="activity-dot" />
-              <div>
-                <div className="txt">
-                  <b>You</b> generated a new API token, <b>Storefront — read only</b>
-                </div>
-                <div className="when">3 hours ago</div>
-              </div>
-            </div>
-            <div className="activity-row">
-              <div className="activity-dot" />
-              <div>
-                <div className="txt">
-                  <b>Priya Nair</b> moved <b>Q4 launch checklist</b> to Review
-                </div>
-                <div className="when">Yesterday, 6:12 PM</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
 
         <div className="bifrost-cms-stat-row">
           <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.PAGES}`}>
