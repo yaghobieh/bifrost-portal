@@ -13,11 +13,15 @@ export type ContentKind = typeof CONTENT_KIND_PAGE | typeof CONTENT_KIND_ITEM;
 
 export const CONTENT_COLLECTION_DOCS = 'docs';
 export const CONTENT_COLLECTION_PAGES = 'pages';
+export const CONTENT_COLLECTION_ARTICLES = 'articles';
+export const CONTENT_COLLECTION_BLOG = 'blog';
 export const CONTENT_COLLECTION_TEMPLATES = 'templates';
 export const CONTENT_COLLECTION_PAGE_META = 'page-meta';
 export const CONTENT_LIST_COLLECTIONS = [
   CONTENT_COLLECTION_DOCS,
   CONTENT_COLLECTION_PAGES,
+  CONTENT_COLLECTION_ARTICLES,
+  CONTENT_COLLECTION_BLOG,
 ] as const;
 
 export const DOCUMENT_TEMPLATE_ID = 'document';
@@ -122,6 +126,25 @@ export const TEMPLATE_KIND = {
 
 export const CONTENT_TEMPLATE_FILTER_ALL = 'all';
 
+export const STATUS_FILTER = {
+  ALL: 'all',
+  PUBLISHED: 'published',
+  DRAFT: 'draft',
+  REVIEW: 'review',
+} as const;
+
+export type StatusFilter = (typeof STATUS_FILTER)[keyof typeof STATUS_FILTER];
+
+export const COLLECTION_TAB_ID = {
+  ALL: CONTENT_TEMPLATE_FILTER_ALL,
+  ARTICLES: 'articles',
+  PAGES: 'pages',
+  BLOG: 'blog',
+  DOC: 'doc',
+  CATEGORY: 'category',
+  AUTHOR: 'author',
+} as const;
+
 export const CONTENT_CUBE_KIND_ORDER = [
   TEMPLATE_KIND.DOC,
   TEMPLATE_KIND.ARTICLE,
@@ -135,6 +158,8 @@ export const CONTENT_DATE_LOCALE = 'en-CA';
 
 export const CONTENT_STATUS_PUBLISHED = 'published';
 export const CONTENT_STATUS_DRAFT = 'draft';
+export const CONTENT_STATUS_REVIEW = 'review';
+export const STATUS_REVIEW_VARIANTS = ['review', 'in review'] as const;
 export const CONTENT_TEMPLATE_EMPTY = '—';
 export const SAVED_TEMPLATES_DIVIDER_KEY = 'saved-templates-divider';
 export const CONTENT_ROW_ID_ACCESSOR = 'id';

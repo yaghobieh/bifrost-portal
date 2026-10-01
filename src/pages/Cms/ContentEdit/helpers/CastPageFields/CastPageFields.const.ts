@@ -20,6 +20,9 @@ export const CAST_FIELD_TYPE_VALUES = [
   CAST_FIELD_TYPE.FILE,
   CAST_FIELD_TYPE.BACKGROUND,
   CAST_FIELD_TYPE.SELECT,
+  CAST_FIELD_TYPE.DATE,
+  CAST_FIELD_TYPE.BOOLEAN,
+  CAST_FIELD_TYPE.RELATION,
 ] as const satisfies readonly CastFieldType[];
 
 type CastTypeLabelKey = keyof Pick<
@@ -33,6 +36,9 @@ type CastTypeLabelKey = keyof Pick<
   | 'typeFile'
   | 'typeBackground'
   | 'typeSelect'
+  | 'typeDate'
+  | 'typeBoolean'
+  | 'typeRelation'
 >;
 
 export const CAST_FIELD_TYPE_LABEL_KEY: Record<CastFieldType, CastTypeLabelKey> = {
@@ -45,6 +51,9 @@ export const CAST_FIELD_TYPE_LABEL_KEY: Record<CastFieldType, CastTypeLabelKey> 
   [CAST_FIELD_TYPE.FILE]: 'typeFile',
   [CAST_FIELD_TYPE.BACKGROUND]: 'typeBackground',
   [CAST_FIELD_TYPE.SELECT]: 'typeSelect',
+  [CAST_FIELD_TYPE.DATE]: 'typeDate',
+  [CAST_FIELD_TYPE.BOOLEAN]: 'typeBoolean',
+  [CAST_FIELD_TYPE.RELATION]: 'typeRelation',
 };
 
 export const CAST_VALUE_INPUT_TYPE = {
@@ -57,6 +66,9 @@ export const CAST_VALUE_INPUT_TYPE = {
   [CAST_FIELD_TYPE.FILE]: 'text',
   [CAST_FIELD_TYPE.BACKGROUND]: 'text',
   [CAST_FIELD_TYPE.SELECT]: 'text',
+  [CAST_FIELD_TYPE.DATE]: 'date',
+  [CAST_FIELD_TYPE.BOOLEAN]: 'checkbox',
+  [CAST_FIELD_TYPE.RELATION]: 'text',
 } as const;
 
 export const CAST_VALUE_SUMMARY_JOIN = ' · ';

@@ -467,27 +467,25 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       children: generalChildren,
     },
   ];
-  if (devPrefs.showDeveloperPage) {
-    sidebarGroups.push({
-      id: CMS_NAV_SECTIONS.DEVELOPER,
-      label: t.cmsShell.developer,
-      icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
-      children: [
-        {
-          id: CMS_NAV_IDS.DEVELOPER,
-          label: t.cmsShell.developer,
-          icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
-          href: CMS_NAV_ROUTES[CMS_NAV_IDS.DEVELOPER],
-        },
-        {
-          id: CMS_NAV_IDS.AUDIT,
-          label: t.cmsShell.audit,
-          icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
-          href: CMS_NAV_ROUTES[CMS_NAV_IDS.AUDIT],
-        },
-      ].filter(visibleLeaf),
-    });
-  }
+  sidebarGroups.push({
+    id: CMS_NAV_SECTIONS.DEVELOPER,
+    label: t.cmsShell.developer || 'API & Developer',
+    icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+    children: [
+      {
+        id: CMS_NAV_IDS.DEVELOPER,
+        label: 'API Reference',
+        icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+        href: CMS_NAV_ROUTES[CMS_NAV_IDS.DEVELOPER],
+      },
+      {
+        id: CMS_NAV_IDS.AUDIT,
+        label: t.cmsShell.audit,
+        icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+        href: CMS_NAV_ROUTES[CMS_NAV_IDS.AUDIT],
+      },
+    ].filter(visibleLeaf),
+  });
   const visibleGroups = sidebarGroups.filter((group) => (group.children?.length ?? 0) > 0);
   const sidebarItems: CmsSidebarNavItem[] = resolveSidebarNavItems({
     groups: visibleGroups,

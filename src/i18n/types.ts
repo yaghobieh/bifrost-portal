@@ -802,6 +802,19 @@ export interface Messages {
     entriesFound: string;
     searchEntries: string;
     listEmpty: string;
+    deleteConfirm: string;
+    statusPublished: string;
+    statusInReview: string;
+    statusDrafts: string;
+    statusAll: string;
+    bulkApply: string;
+    bulkPublish: string;
+    bulkDraft: string;
+    bulkDuplicate: string;
+    bulkDelete: string;
+    bulkDeselect: string;
+    filterLabel: string;
+    filterByStatus: string;
     weekdays: {
       mon: string;
       tue: string;
@@ -1159,6 +1172,9 @@ export interface Messages {
     typeFile: string;
     typeBackground: string;
     typeSelect: string;
+    typeDate: string;
+    typeBoolean: string;
+    typeRelation: string;
     fieldOptions: string;
     fieldRequired: string;
     emailFormat: string;

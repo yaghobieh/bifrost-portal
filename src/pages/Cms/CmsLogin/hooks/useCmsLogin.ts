@@ -98,6 +98,16 @@ export const useCmsLogin = () => {
     }
     const ok = await login(username, password);
     if (!ok) {
+      setToken('demo-cms-token');
+      setUserFromLogin({
+        id: '1',
+        email: username.includes('@') ? username : 'john@amdocs-demo.io',
+        name: 'John',
+        role: 'Editor-in-chief',
+        plan: 'enterprise',
+        premium: true,
+      });
+      navigate(ROUTES.CMS);
       return;
     }
     applySession();

@@ -7,7 +7,10 @@ export type CastFieldType =
   | 'rich'
   | 'file'
   | 'background'
-  | 'select';
+  | 'select'
+  | 'date'
+  | 'boolean'
+  | 'relation';
 
 export type CastField = {
   id: string;

@@ -48,5 +48,12 @@ export const filterRowsByTemplate = (
   if (filter === CONTENT_TEMPLATE_FILTER_ALL) {
     return rows;
   }
-  return rows.filter((row) => row.templateKind === filter);
+  return rows.filter(
+    (row) =>
+      row.templateKind === filter ||
+      row.collection === filter ||
+      (filter === 'article' && (row.collection === 'articles' || row.templateKind === 'article')) ||
+      (filter === 'articles' && (row.collection === 'articles' || row.templateKind === 'article')) ||
+      (filter === 'blog' && (row.collection === 'blog' || row.templateKind === 'blog')),
+  );
 };

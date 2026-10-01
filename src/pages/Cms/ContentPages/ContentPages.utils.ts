@@ -29,7 +29,11 @@ import {
   DOCS_FIELD_NAME,
   DOCS_LAYOUT_IDS,
   MARKETING_LAYOUT_IDS,
+  STATUS_FILTER,
+  STATUS_REVIEW_VARIANTS,
+  CONTENT_STATUS_REVIEW,
   TEMPLATE_KIND,
+  type StatusFilter,
 } from './ContentPages.const';
 import { PAGE_START_LAYOUT } from './helpers/PageStart';
 
@@ -142,9 +146,15 @@ type TemplateKindParams = {
 };
 
 const TEMPLATE_KIND_RESOLVERS: Array<(params: TemplateKindParams) => string | null> = [
-  ({ kindValue }) => {
-    if (kindValue === PAGE_KIND_ARTICLE) {
+  ({ kindValue, collection }) => {
+    if (kindValue === PAGE_KIND_ARTICLE || collection === 'articles' || collection === 'article') {
       return TEMPLATE_KIND.ARTICLE;
+    }
+    return null;
+  },
+  ({ collection }) => {
+    if (collection === 'blog') {
+      return 'blog';
     }
     return null;
   },
@@ -163,6 +173,12 @@ const TEMPLATE_KIND_RESOLVERS: Array<(params: TemplateKindParams) => string | nu
   ({ layoutId }) => {
     if (layoutId === PAGE_START_LAYOUT.BLANK) {
       return TEMPLATE_KIND.BLANK;
+    }
+    return null;
+  },
+  ({ collection }) => {
+    if (collection && collection !== CONTENT_COLLECTION_PAGES) {
+      return collection;
     }
     return null;
   },
@@ -191,8 +207,11 @@ export const labelTemplateKind = (kind: string, copy: Messages['dashboard']): st
   if (kind === TEMPLATE_KIND.DOC) {
     return copy.contentTemplateDoc;
   }
-  if (kind === TEMPLATE_KIND.ARTICLE) {
+  if (kind === TEMPLATE_KIND.ARTICLE || kind === 'articles') {
     return copy.contentTemplateArticle;
+  }
+  if (kind === 'blog') {
+    return 'Blog';
   }
   if (kind === TEMPLATE_KIND.LANDING || kind === TEMPLATE_KIND.MARKETING) {
     return copy.contentTemplateLanding;
@@ -200,7 +219,54 @@ export const labelTemplateKind = (kind: string, copy: Messages['dashboard']): st
   if (kind === TEMPLATE_KIND.BLANK) {
     return copy.contentTemplateBlank;
   }
-  return copy.contentTemplatePage;
+  if (kind === TEMPLATE_KIND.PAGE) {
+    return copy.contentTemplatePage;
+  }
+  // Humanize custom page type identifiers (e.g. "case-studies" -> "Case Studies")
+  return kind
+    .split(/[-_]/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+};
+
+export const isReviewStatus = (status: unknown): boolean => {
+  const normalized = String(status || EMPTY_STRING).toLowerCase();
+  return (STATUS_REVIEW_VARIANTS as readonly string[]).includes(normalized);
+};
+
+export const matchesStatusFilter = (status: unknown, filter: StatusFilter): boolean => {
+  if (filter === STATUS_FILTER.ALL) {
+    return true;
+  }
+  const normalized = String(status || EMPTY_STRING).toLowerCase();
+  if (filter === STATUS_FILTER.PUBLISHED) {
+    return normalized === CONTENT_STATUS_PUBLISHED;
+  }
+  if (filter === STATUS_FILTER.DRAFT) {
+    return normalized === CONTENT_STATUS_DRAFT;
+  }
+  if (filter === STATUS_FILTER.REVIEW) {
+    return isReviewStatus(normalized);
+  }
+  return true;
+};
+
+export const runBulkAction = async <T,>(
+  items: T[],
+  action: (item: T) => Promise<void> | void,
+  onError?: (error: unknown) => void,
+): Promise<boolean> => {
+  try {
+    for (const item of items) {
+      await action(item);
+    }
+    return true;
+  } catch (error) {
+    if (onError) {
+      onError(error);
+    }
+    return false;
+  }
 };
 
 export const rowsFromPublicDocs = (params: {

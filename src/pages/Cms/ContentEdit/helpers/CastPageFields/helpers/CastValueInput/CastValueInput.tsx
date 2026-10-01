@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Input, Select, Typography } from '@forgedevstack/bear';
+import { Flex, Input, Select, Switch, Typography } from '@forgedevstack/bear';
 import { isStringValue } from '@utils';
 import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
 import {
@@ -36,24 +36,66 @@ export const CastValueInput: FC<CastValueInputProps> = (props) => {
     );
   }
 
-  if (field.type === CAST_FIELD_TYPE.SELECT) {
+  if (field.type === CAST_FIELD_TYPE.BOOLEAN) {
+    const isChecked = value === 'true' || value === '1';
     return (
-      <Select
+      <Flex align="center" justify="between" className="py-2 border-b border-gray-100">
+        <div>
+          <Typography variant="body2" className="font-medium text-gray-800 mb-0">
+            {label}
+          </Typography>
+          <Typography variant="caption" className="text-xs text-gray-400">
+            {isChecked ? 'Enabled' : 'Disabled'}
+          </Typography>
+        </div>
+        <Switch
+          id={fieldId}
+          checked={isChecked}
+          onCheckedChange={(checked) => {
+            onValueChange(field.name, checked ? 'true' : 'false');
+          }}
+        />
+      </Flex>
+    );
+  }
+
+  if (field.type === CAST_FIELD_TYPE.DATE) {
+    return (
+      <Input
         id={fieldId}
-        options={parseCastSelectOptions(field.options)}
+        label={label}
         value={value}
+        type="date"
         size="sm"
         fullWidth
-        onChange={(next) => {
-          if (isStringValue(next)) {
-            onValueChange(field.name, next);
-          }
-        }}
+        onChange={(event) => onValueChange(field.name, event.target.value)}
       />
     );
   }
 
-  if (isLongText) {
+  if (field.type === CAST_FIELD_TYPE.SELECT || field.type === CAST_FIELD_TYPE.RELATION) {
+    return (
+      <div className="flex flex-col gap-1">
+        <Typography variant="caption" className="text-xs font-semibold text-gray-700">
+          {label}
+        </Typography>
+        <Select
+          id={fieldId}
+          options={parseCastSelectOptions(field.options)}
+          value={value}
+          size="sm"
+          fullWidth
+          onChange={(next) => {
+            if (isStringValue(next)) {
+              onValueChange(field.name, next);
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (isLongText || field.type === CAST_FIELD_TYPE.RICH) {
     return (
       <Input
         id={fieldId}
@@ -73,7 +115,7 @@ export const CastValueInput: FC<CastValueInputProps> = (props) => {
       id={fieldId}
       label={label}
       value={value}
-      type={CAST_VALUE_INPUT_TYPE[field.type]}
+      type={CAST_VALUE_INPUT_TYPE[field.type] || 'text'}
       size="sm"
       fullWidth
       onChange={(event) => onValueChange(field.name, event.target.value)}

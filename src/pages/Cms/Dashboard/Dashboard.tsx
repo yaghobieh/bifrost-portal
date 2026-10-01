@@ -102,14 +102,14 @@ export const Dashboard: FC = () => {
           </Card>
         ) : null}
 
-        {loading ? (
+        {loading && (
           <Flex align="center" gap={2}>
             <Spinner size="sm" />
             <Typography variant="body2" className="mb-0">
               {t.dashboard.loading}
             </Typography>
           </Flex>
-        ) : null}
+        )}
 
         <div className="bifrost-cms-stat-row">
           <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.PAGES}`}>
