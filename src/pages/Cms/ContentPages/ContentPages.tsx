@@ -281,12 +281,12 @@ export const ContentPages: FC = () => {
             variant="outlined"
             padding="sm"
             className={`cursor-pointer transition-all bg-white border rounded-lg shadow-sm hover:border-gray-300 ${
-              statusFilter === 'all' ? 'ring-2 ring-pink-500' : 'border-gray-100'
+              statusFilter === STATUS_FILTER.ALL ? 'ring-2 ring-pink-500' : 'border-gray-100'
             }`}
-            onClick={() => setStatusFilter('all')}
+            onClick={() => handleSelectStatusFilter(STATUS_FILTER.ALL)}
           >
             <Typography variant="caption" className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-1 block">
-              Total Entries
+              {t.dashboard.statusAll}
             </Typography>
             <Typography variant="h3" className="text-xl font-bold text-gray-900 mb-0">
               {totalCount}
@@ -296,12 +296,12 @@ export const ContentPages: FC = () => {
             variant="outlined"
             padding="sm"
             className={`cursor-pointer transition-all bg-white border rounded-lg shadow-sm hover:border-emerald-300 ${
-              statusFilter === 'published' ? 'ring-2 ring-emerald-500' : 'border-gray-100'
+              statusFilter === STATUS_FILTER.PUBLISHED ? 'ring-2 ring-emerald-500' : 'border-gray-100'
             }`}
-            onClick={() => setStatusFilter('published')}
+            onClick={() => handleSelectStatusFilter(STATUS_FILTER.PUBLISHED)}
           >
-            <Typography variant="caption" className="text-xs uppercase tracking-wider text-emerald-600 font-semibold mb-1 block">
-              ● Published
+            <Typography variant="caption" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-emerald-600 font-semibold mb-1">
+              <BearIcons.CheckIcon size={12} /> {t.dashboard.statusPublished}
             </Typography>
             <Typography variant="h3" className="text-xl font-bold text-emerald-700 mb-0">
               {publishedCount}
@@ -311,12 +311,12 @@ export const ContentPages: FC = () => {
             variant="outlined"
             padding="sm"
             className={`cursor-pointer transition-all bg-white border rounded-lg shadow-sm hover:border-gray-400 ${
-              statusFilter === 'draft' ? 'ring-2 ring-gray-500' : 'border-gray-100'
+              statusFilter === STATUS_FILTER.DRAFT ? 'ring-2 ring-gray-500' : 'border-gray-100'
             }`}
-            onClick={() => setStatusFilter('draft')}
+            onClick={() => handleSelectStatusFilter(STATUS_FILTER.DRAFT)}
           >
-            <Typography variant="caption" className="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1 block">
-              ○ Drafts
+            <Typography variant="caption" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">
+              <BearIcons.EditIcon size={12} /> {t.dashboard.statusDrafts}
             </Typography>
             <Typography variant="h3" className="text-xl font-bold text-gray-700 mb-0">
               {draftCount}
@@ -326,12 +326,12 @@ export const ContentPages: FC = () => {
             variant="outlined"
             padding="sm"
             className={`cursor-pointer transition-all bg-white border rounded-lg shadow-sm hover:border-amber-300 ${
-              statusFilter === 'review' ? 'ring-2 ring-amber-500' : 'border-gray-100'
+              statusFilter === STATUS_FILTER.REVIEW ? 'ring-2 ring-amber-500' : 'border-gray-100'
             }`}
-            onClick={() => setStatusFilter('review')}
+            onClick={() => handleSelectStatusFilter(STATUS_FILTER.REVIEW)}
           >
-            <Typography variant="caption" className="text-xs uppercase tracking-wider text-amber-600 font-semibold mb-1 block">
-              ◐ In Review
+            <Typography variant="caption" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-amber-600 font-semibold mb-1">
+              <BearIcons.ClockIcon size={12} /> {t.dashboard.statusInReview}
             </Typography>
             <Typography variant="h3" className="text-xl font-bold text-amber-700 mb-0">
               {reviewCount}
@@ -345,15 +345,14 @@ export const ContentPages: FC = () => {
           </Typography>
         )}
 
-        {/* Multi-select Bulk Actions Bar */}
-        {selectedRows.length > 0 && (
+        {selectedRows.length > NUMBER_ZERO && (
           <div className="p-3 bg-pink-50 border border-pink-200 rounded-lg flex flex-wrap items-center justify-between gap-3 shadow-sm animate-fadeIn">
             <Flex gap={2} align="center">
               <Badge variant="info" className="bg-pink-600 text-white font-bold">
                 {selectedRows.length} selected
               </Badge>
               <Typography variant="body2" className="text-sm text-pink-900 font-medium">
-                Apply bulk action to selected entries
+                {t.dashboard.bulkApply}
               </Typography>
             </Flex>
             <Flex gap={2} align="center" className="flex-wrap">
@@ -363,8 +362,9 @@ export const ContentPages: FC = () => {
                 disabled={bulkLoading}
                 onClick={handleBulkPublish}
                 className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                icon={<BearIcons.CheckIcon size={12} />}
               >
-                ● Publish All
+                {t.dashboard.bulkPublish}
               </Button>
               <Button
                 size="sm"
@@ -372,8 +372,9 @@ export const ContentPages: FC = () => {
                 disabled={bulkLoading}
                 onClick={handleBulkDraft}
                 className="text-gray-700 border-gray-300 hover:bg-gray-100"
+                icon={<BearIcons.EditIcon size={12} />}
               >
-                ○ Move to Draft
+                {t.dashboard.bulkDraft}
               </Button>
               <Button
                 size="sm"
@@ -381,8 +382,9 @@ export const ContentPages: FC = () => {
                 disabled={bulkLoading}
                 onClick={handleBulkDuplicate}
                 className="text-pink-700 border-pink-300 hover:bg-pink-50"
+                icon={<BearIcons.CopyIcon size={12} />}
               >
-                Duplicate
+                {t.dashboard.bulkDuplicate}
               </Button>
               <Button
                 size="sm"
@@ -390,8 +392,9 @@ export const ContentPages: FC = () => {
                 disabled={bulkLoading}
                 onClick={handleBulkDelete}
                 className="text-red-700 border-red-300 hover:bg-red-50"
+                icon={<BearIcons.DeleteIcon size={12} />}
               >
-                Delete
+                {t.dashboard.bulkDelete}
               </Button>
               <Button
                 size="sm"
@@ -399,14 +402,13 @@ export const ContentPages: FC = () => {
                 onClick={() => setSelectedRows([])}
                 className="text-gray-500"
               >
-                Deselect
+                {t.dashboard.bulkDeselect}
               </Button>
             </Flex>
           </div>
         )}
 
         <div className="bifrost-cms-card bifrost-cms-pages-wrap">
-          {/* Collection tabs & search toolbar */}
           <div className="p-4 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between gap-3 items-stretch md:items-center">
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
               {collectionTabs.map((tab) => {
@@ -437,73 +439,73 @@ export const ContentPages: FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Filtering popover button */}
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowFilterPopover(!showFilterPopover)}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium border flex items-center gap-1.5 cursor-pointer ${
-                    statusFilter !== 'all'
+                    statusFilter !== STATUS_FILTER.ALL
                       ? 'bg-pink-100 text-pink-800 border-pink-300 font-semibold'
                       : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  <span>Filter</span>
-                  {statusFilter !== 'all' && <span className="w-2 h-2 rounded-full bg-pink-600" />}
+                  <BearIcons.FilterIcon size={12} />
+                  <span>{t.dashboard.filterLabel}</span>
+                  {statusFilter !== STATUS_FILTER.ALL && <span className="w-2 h-2 rounded-full bg-pink-600" />}
                 </button>
 
                 {showFilterPopover && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20 p-2">
                     <Typography variant="caption" className="text-xs uppercase font-bold text-gray-400 px-2 py-1 block">
-                      Filter by Status
+                      {t.dashboard.filterByStatus}
                     </Typography>
                     <button
                       type="button"
-                      onClick={() => {
-                        setStatusFilter('all');
-                        setShowFilterPopover(false);
-                      }}
+                      onClick={() => handleSelectStatusFilter(STATUS_FILTER.ALL)}
                       className={`w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-100 flex justify-between ${
-                        statusFilter === 'all' ? 'font-bold text-pink-600' : 'text-gray-700'
+                        statusFilter === STATUS_FILTER.ALL ? 'font-bold text-pink-600' : 'text-gray-700'
                       }`}
                     >
-                      All statuses <span>{totalCount}</span>
+                      {t.dashboard.statusAll} <span>{totalCount}</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        setStatusFilter('published');
-                        setShowFilterPopover(false);
-                      }}
+                      onClick={() => handleSelectStatusFilter(STATUS_FILTER.PUBLISHED)}
                       className={`w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-100 flex justify-between ${
-                        statusFilter === 'published' ? 'font-bold text-emerald-600' : 'text-gray-700'
+                        statusFilter === STATUS_FILTER.PUBLISHED ? 'font-bold text-emerald-600' : 'text-gray-700'
                       }`}
                     >
-                      Published <span>{publishedCount}</span>
+                      <span className="flex items-center gap-1.5">
+                        <BearIcons.CheckIcon size={12} className="text-emerald-600" />
+                        {t.dashboard.statusPublished}
+                      </span>
+                      <span>{publishedCount}</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        setStatusFilter('draft');
-                        setShowFilterPopover(false);
-                      }}
+                      onClick={() => handleSelectStatusFilter(STATUS_FILTER.DRAFT)}
                       className={`w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-100 flex justify-between ${
-                        statusFilter === 'draft' ? 'font-bold text-gray-700' : 'text-gray-700'
+                        statusFilter === STATUS_FILTER.DRAFT ? 'font-bold text-gray-700' : 'text-gray-700'
                       }`}
                     >
-                      Drafts <span>{draftCount}</span>
+                      <span className="flex items-center gap-1.5">
+                        <BearIcons.EditIcon size={12} className="text-gray-500" />
+                        {t.dashboard.statusDrafts}
+                      </span>
+                      <span>{draftCount}</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        setStatusFilter('review');
-                        setShowFilterPopover(false);
-                      }}
+                      onClick={() => handleSelectStatusFilter(STATUS_FILTER.REVIEW)}
                       className={`w-full text-left px-2 py-1.5 text-xs rounded hover:bg-gray-100 flex justify-between ${
-                        statusFilter === 'review' ? 'font-bold text-amber-600' : 'text-gray-700'
+                        statusFilter === STATUS_FILTER.REVIEW ? 'font-bold text-amber-600' : 'text-gray-700'
                       }`}
                     >
-                      In Review <span>{reviewCount}</span>
+                      <span className="flex items-center gap-1.5">
+                        <BearIcons.ClockIcon size={12} className="text-amber-600" />
+                        {t.dashboard.statusInReview}
+                      </span>
+                      <span>{reviewCount}</span>
                     </button>
                   </div>
                 )}
