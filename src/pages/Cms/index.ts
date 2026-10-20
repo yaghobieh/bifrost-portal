@@ -24,3 +24,4 @@ export { CmsLookPicker } from './CmsLook';
 export { CmsOnboarding } from './CmsOnboarding';
 export { DeveloperPages } from './DeveloperPages';
 export { AuditPages } from './DeveloperPages';
+export { ContentTypeBuilder } from './ContentTypeBuilder';

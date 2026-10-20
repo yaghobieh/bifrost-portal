@@ -18,7 +18,7 @@ export const INK_EXCEL_GITHUB_URL = 'https://github.com/yaghobieh/ink-excel';
 export const INK_EXCEL_PACKAGE_NAME = '@forgedevstack/ink-excel';
 
 const installmentRaw =
-  typeof import.meta.env.VITE_BIFROST_INSTALLMENT_URL === 'string'
+  typeof import.meta.env?.VITE_BIFROST_INSTALLMENT_URL === 'string'
     ? import.meta.env.VITE_BIFROST_INSTALLMENT_URL.trim()
     : '';
 

@@ -162,6 +162,8 @@ export const ContentPages: FC = () => {
     ...pageTypes
       .filter(
         (pageType) =>
+          pageType.kind !== 'single' &&
+          pageType.kind !== 'component' &&
           ![
             COLLECTION_TAB_ID.ARTICLES,
             COLLECTION_TAB_ID.PAGES,

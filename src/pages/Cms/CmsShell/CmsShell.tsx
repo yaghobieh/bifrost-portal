@@ -387,8 +387,8 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const designChildren: CmsSidebarNavItem[] = [
     {
       id: CMS_NAV_IDS.BUILDER,
-      label: t.cmsShell.contentTypeBuilder,
-      icon: <BearIcons.GridIcon size={CMS_ICON_SIZE} />,
+      label: t.cmsShell.builder,
+      icon: <BearIcons.LayersIcon size={CMS_ICON_SIZE} />,
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.BUILDER],
     },
     {
@@ -399,8 +399,8 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     },
     {
       id: CMS_NAV_IDS.SCHEMA_FIELDS,
-      label: t.cmsShell.schemaFields,
-      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+      label: t.cmsShell.contentTypeBuilder,
+      icon: <BearIcons.GridIcon size={CMS_ICON_SIZE} />,
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.SCHEMA_FIELDS],
     },
     {

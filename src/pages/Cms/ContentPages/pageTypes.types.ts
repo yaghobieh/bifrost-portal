@@ -6,15 +6,21 @@ export type PageTypeDesignPreset =
   | 'catalog'
   | 'blank';
 
+export type PageTypeKind = 'collection' | 'single' | 'component';
+
 export type PageTypeFieldType =
   | 'text'
   | 'rich-text'
   | 'image'
+  | 'media'
   | 'tags'
   | 'author'
   | 'date'
   | 'boolean'
-  | 'number';
+  | 'number'
+  | 'relation'
+  | 'json'
+  | 'component';
 
 export type PageTypeFieldDef = {
   id: string;
@@ -23,16 +29,20 @@ export type PageTypeFieldDef = {
   required?: boolean;
   defaultValue?: string;
   description?: string;
+  relationTarget?: string;
+  componentTarget?: string;
 };
 
 export type PageTypeDefinition = {
-  id: string; // collection slug, e.g. 'blog', 'articles', 'case-studies'
-  name: string; // Human label, e.g. 'Blog', 'Articles', 'Case Studies'
+  id: string;
+  name: string;
+  kind?: PageTypeKind;
   description: string;
-  iconName: string; // Key for BearIcons: 'FileText' | 'Bookmark' | 'Layers' | 'Grid' | 'Folder' | 'Sparkles' | 'Tag' | 'Database'
+  iconName: string;
   designPreset: PageTypeDesignPreset;
   color?: string;
   fields: PageTypeFieldDef[];
   isBuiltIn?: boolean;
   createdAt?: string;
 };
+
