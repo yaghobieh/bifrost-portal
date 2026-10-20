@@ -3,8 +3,16 @@ import { Badge, BearIcons, Button, Card, Flex, Typography } from '@forgedevstack
 import { GridTable } from '@forgedevstack/grid-table';
 import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
 import { EMPTY_STRING } from '@const/index';
-import { NUMBER_ZERO } from '@const/numbers.const';
 import {
+  NUMBER_FOURTEEN,
+  NUMBER_SIX,
+  NUMBER_TEN,
+  NUMBER_TWELVE,
+  NUMBER_TWO,
+  NUMBER_ZERO,
+} from '@const/numbers.const';
+import {
+  CLOSE_SYMBOL,
   COLLECTION_TAB_ID,
   CONTENT_COLLECTION_DOCS,
   CONTENT_STATUS_DRAFT,
@@ -28,7 +36,7 @@ import { useContentPages } from './hooks';
 import type { ContentTableRow } from './ContentPages.types';
 import { CreatePageTypeModal } from './helpers/CreatePageTypeModal';
 import { loadAllPageTypes, PAGE_TYPES_UPDATED_EVENT } from './pageTypes.utils';
-import type { PageTypeDefinition } from './pageTypes.types';
+import { PAGE_TYPE_KIND, type PageTypeDefinition } from './pageTypes.types';
 
 export const ContentPages: FC = () => {
   const {
@@ -143,7 +151,7 @@ export const ContentPages: FC = () => {
     },
     {
       id: COLLECTION_TAB_ID.BLOG,
-      label: 'Blog',
+      label: t.cmsShell.blog,
       count: rows.filter(
         (row) =>
           row.collection === COLLECTION_TAB_ID.BLOG ||
@@ -162,14 +170,14 @@ export const ContentPages: FC = () => {
     ...pageTypes
       .filter(
         (pageType) =>
-          pageType.kind !== 'single' &&
-          pageType.kind !== 'component' &&
+          pageType.kind !== PAGE_TYPE_KIND.SINGLE &&
+          pageType.kind !== PAGE_TYPE_KIND.COMPONENT &&
           ![
             COLLECTION_TAB_ID.ARTICLES,
             COLLECTION_TAB_ID.PAGES,
             COLLECTION_TAB_ID.BLOG,
             CONTENT_COLLECTION_DOCS,
-          ].includes(pageType.id),
+          ].includes(pageType.id as (typeof COLLECTION_TAB_ID)[keyof typeof COLLECTION_TAB_ID]),
       )
       .map((pageType) => ({
         id: pageType.id,
@@ -239,7 +247,7 @@ export const ContentPages: FC = () => {
 
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.PAGES}>
-      <Flex direction="column" gap={6} className="bifrost-cms-page">
+      <Flex direction="column" gap={NUMBER_SIX} className="bifrost-cms-page">
         <div className="bifrost-cms-header-row flex justify-between items-center flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-3">
@@ -254,25 +262,27 @@ export const ContentPages: FC = () => {
               {t.dashboard.contentSubtitle}
             </Typography>
           </div>
-          <Flex gap={2} align="center">
+          <Flex gap={NUMBER_TWO} align="center">
             <Button
               size="sm"
               variant="outline"
+              icon={<BearIcons.PlusIcon size={NUMBER_FOURTEEN} />}
               onClick={() => setShowCreateTypeModal(true)}
               className="border-pink-600 text-pink-600 hover:bg-pink-50 font-semibold shadow-2xs"
             >
-              ＋ New Page Type
+              {t.dashboard.newPageType}
             </Button>
             <Button
               size="sm"
               variant="primary"
               disabled={saving || !activeToken}
+              icon={<BearIcons.PlusIcon size={NUMBER_FOURTEEN} />}
               onClick={() => {
                 void onNewPage(templateFilter);
               }}
               className="bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow-sm"
             >
-              ＋ {t.dashboard.createEntry}
+              {t.dashboard.createEntry}
             </Button>
           </Flex>
         </div>
@@ -303,7 +313,7 @@ export const ContentPages: FC = () => {
             onClick={() => handleSelectStatusFilter(STATUS_FILTER.PUBLISHED)}
           >
             <Typography variant="caption" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-emerald-600 font-semibold mb-1">
-              <BearIcons.CheckIcon size={12} /> {t.dashboard.statusPublished}
+              <BearIcons.CheckIcon size={NUMBER_TWELVE} /> {t.dashboard.statusPublished}
             </Typography>
             <Typography variant="h3" className="text-xl font-bold text-emerald-700 mb-0">
               {publishedCount}
@@ -318,7 +328,7 @@ export const ContentPages: FC = () => {
             onClick={() => handleSelectStatusFilter(STATUS_FILTER.DRAFT)}
           >
             <Typography variant="caption" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-500 font-semibold mb-1">
-              <BearIcons.EditIcon size={12} /> {t.dashboard.statusDrafts}
+              <BearIcons.EditIcon size={NUMBER_TWELVE} /> {t.dashboard.statusDrafts}
             </Typography>
             <Typography variant="h3" className="text-xl font-bold text-gray-700 mb-0">
               {draftCount}
@@ -333,7 +343,7 @@ export const ContentPages: FC = () => {
             onClick={() => handleSelectStatusFilter(STATUS_FILTER.REVIEW)}
           >
             <Typography variant="caption" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-amber-600 font-semibold mb-1">
-              <BearIcons.ClockIcon size={12} /> {t.dashboard.statusInReview}
+              <BearIcons.ClockIcon size={NUMBER_TWELVE} /> {t.dashboard.statusInReview}
             </Typography>
             <Typography variant="h3" className="text-xl font-bold text-amber-700 mb-0">
               {reviewCount}
@@ -349,22 +359,22 @@ export const ContentPages: FC = () => {
 
         {selectedRows.length > NUMBER_ZERO && (
           <div className="p-3 bg-pink-50 border border-pink-200 rounded-lg flex flex-wrap items-center justify-between gap-3 shadow-sm animate-fadeIn">
-            <Flex gap={2} align="center">
+            <Flex gap={NUMBER_TWO} align="center">
               <Badge variant="info" className="bg-pink-600 text-white font-bold">
-                {selectedRows.length} selected
+                {t.dashboard.selectedCount.replace(COUNT_TOKEN, String(selectedRows.length))}
               </Badge>
               <Typography variant="body2" className="text-sm text-pink-900 font-medium">
                 {t.dashboard.bulkApply}
               </Typography>
             </Flex>
-            <Flex gap={2} align="center" className="flex-wrap">
+            <Flex gap={NUMBER_TWO} align="center" className="flex-wrap">
               <Button
                 size="sm"
                 variant="outline"
                 disabled={bulkLoading}
                 onClick={handleBulkPublish}
                 className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
-                icon={<BearIcons.CheckIcon size={12} />}
+                icon={<BearIcons.CheckIcon size={NUMBER_TWELVE} />}
               >
                 {t.dashboard.bulkPublish}
               </Button>
@@ -374,7 +384,7 @@ export const ContentPages: FC = () => {
                 disabled={bulkLoading}
                 onClick={handleBulkDraft}
                 className="text-gray-700 border-gray-300 hover:bg-gray-100"
-                icon={<BearIcons.EditIcon size={12} />}
+                icon={<BearIcons.EditIcon size={NUMBER_TWELVE} />}
               >
                 {t.dashboard.bulkDraft}
               </Button>
@@ -384,7 +394,7 @@ export const ContentPages: FC = () => {
                 disabled={bulkLoading}
                 onClick={handleBulkDuplicate}
                 className="text-pink-700 border-pink-300 hover:bg-pink-50"
-                icon={<BearIcons.CopyIcon size={12} />}
+                icon={<BearIcons.CopyIcon size={NUMBER_TWELVE} />}
               >
                 {t.dashboard.bulkDuplicate}
               </Button>
@@ -394,7 +404,7 @@ export const ContentPages: FC = () => {
                 disabled={bulkLoading}
                 onClick={handleBulkDelete}
                 className="text-red-700 border-red-300 hover:bg-red-50"
-                icon={<BearIcons.DeleteIcon size={12} />}
+                icon={<BearIcons.DeleteIcon size={NUMBER_TWELVE} />}
               >
                 {t.dashboard.bulkDelete}
               </Button>
@@ -433,10 +443,11 @@ export const ContentPages: FC = () => {
               <button
                 type="button"
                 onClick={() => setShowCreateTypeModal(true)}
-                className="px-2.5 py-1 rounded-full text-xs font-semibold text-pink-600 border border-dashed border-pink-300 hover:border-pink-500 hover:bg-pink-50 cursor-pointer whitespace-nowrap transition-all ml-1 shadow-2xs"
-                title="Create a new collection / page type"
+                className="px-2.5 py-1 rounded-full text-xs font-semibold text-pink-600 border border-dashed border-pink-300 hover:border-pink-500 hover:bg-pink-50 cursor-pointer whitespace-nowrap transition-all ml-1 shadow-2xs flex items-center gap-1"
+                title={t.dashboard.createTypeTitle}
               >
-                ＋ New Type
+                <BearIcons.PlusIcon size={NUMBER_TEN} />
+                <span>{t.dashboard.newType}</span>
               </button>
             </div>
 
@@ -451,7 +462,7 @@ export const ContentPages: FC = () => {
                       : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  <BearIcons.FilterIcon size={12} />
+                  <BearIcons.FilterIcon size={NUMBER_TWELVE} />
                   <span>{t.dashboard.filterLabel}</span>
                   {statusFilter !== STATUS_FILTER.ALL && <span className="w-2 h-2 rounded-full bg-pink-600" />}
                 </button>
@@ -478,7 +489,7 @@ export const ContentPages: FC = () => {
                       }`}
                     >
                       <span className="flex items-center gap-1.5">
-                        <BearIcons.CheckIcon size={12} className="text-emerald-600" />
+                        <BearIcons.CheckIcon size={NUMBER_TWELVE} className="text-emerald-600" />
                         {t.dashboard.statusPublished}
                       </span>
                       <span>{publishedCount}</span>
@@ -491,7 +502,7 @@ export const ContentPages: FC = () => {
                       }`}
                     >
                       <span className="flex items-center gap-1.5">
-                        <BearIcons.EditIcon size={12} className="text-gray-500" />
+                        <BearIcons.EditIcon size={NUMBER_TWELVE} className="text-gray-500" />
                         {t.dashboard.statusDrafts}
                       </span>
                       <span>{draftCount}</span>
@@ -504,7 +515,7 @@ export const ContentPages: FC = () => {
                       }`}
                     >
                       <span className="flex items-center gap-1.5">
-                        <BearIcons.ClockIcon size={12} className="text-amber-600" />
+                        <BearIcons.ClockIcon size={NUMBER_TWELVE} className="text-amber-600" />
                         {t.dashboard.statusInReview}
                       </span>
                       <span>{reviewCount}</span>
@@ -528,7 +539,7 @@ export const ContentPages: FC = () => {
                     onClick={() => setSearchQuery(EMPTY_STRING)}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
                   >
-                    ✕
+                    {CLOSE_SYMBOL}
                   </button>
                 )}
               </div>

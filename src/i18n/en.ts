@@ -867,6 +867,10 @@ export const en: Messages = {
     bulkDeselect: 'Deselect',
     filterLabel: 'Filter',
     filterByStatus: 'Filter by Status',
+    newPageType: 'New Page Type',
+    newType: 'New Type',
+    selectedCount: '{count} selected',
+    createTypeTitle: 'Create a new collection / page type',
     weekdays: {
       mon: 'Mon',
       tue: 'Tue',

@@ -177,3 +177,4 @@ export const CONTENT_TABLE_PAGE_SIZE_OPTIONS = [
 ] as const;
 
 export const COUNT_TOKEN = '{count}';
+export const CLOSE_SYMBOL = '✕';
