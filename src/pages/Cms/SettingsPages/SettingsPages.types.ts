@@ -114,6 +114,7 @@ export type SettingsTabId =
 
 export type SettingsSitePanelId =
   | 'general'
+  | 'sites'
   | 'writing'
   | 'discussion'
   | 'chrome'

@@ -11,7 +11,8 @@ export type ApiErrorCode =
   | 'plans'
   | 'media'
   | 'nav'
-  | 'blog';
+  | 'blog'
+  | 'sites';
 
 export type ApiErrorPayload = {
   mode: ApiErrorMode;
