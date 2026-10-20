@@ -33,6 +33,7 @@ import {
   TasksPages,
   TemplatesPages,
   TranslationsPages,
+  ContentTypeBuilder,
   withCmsGate,
 } from '@pages/Cms';
 
@@ -62,7 +63,8 @@ const routes = [
   { path: ROUTES.CMS_TEMPLATES, name: 'cms-templates', component: withCmsGate(TemplatesPages) },
   { path: ROUTES.CMS_BUILDER, name: 'cms-builder', component: withCmsGate(BuilderPages) },
   { path: ROUTES.CMS_TRANSLATIONS, name: 'cms-translations', component: withCmsGate(TranslationsPages) },
-  { path: ROUTES.CMS_CAST, name: 'cms-cast', component: withCmsGate(CastPages) },
+  { path: ROUTES.CMS_CAST, name: 'cms-cast', component: withCmsGate(ContentTypeBuilder) },
+  { path: ROUTES.CMS_CONTENT_TYPES, name: 'cms-content-types', component: withCmsGate(ContentTypeBuilder) },
   { path: ROUTES.CMS_SETTINGS, name: 'cms-settings', component: withCmsGate(SettingsPages) },
   { path: ROUTES.CMS_DEVELOPER, name: 'cms-developer', component: withCmsGate(DeveloperPages) },
   { path: ROUTES.CMS_AUDIT, name: 'cms-audit', component: withCmsGate(AuditPages) },

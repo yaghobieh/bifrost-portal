@@ -47,6 +47,7 @@ export const ROUTES = {
   CMS_BUILDER: '/cms/builder',
   CMS_TRANSLATIONS: '/cms/translations',
   CMS_CAST: '/cms/cast',
+  CMS_CONTENT_TYPES: '/cms/content-types',
   CMS_TASKS: '/cms/tasks',
   CMS_BLOG: '/cms/blog',
   CMS_BLOG_EDIT: '/cms/blog/:id',

@@ -7,6 +7,7 @@ export const BUILT_IN_PAGE_TYPES: PageTypeDefinition[] = [
   {
     id: 'articles',
     name: 'Articles',
+    kind: 'collection',
     description: 'Long-form editorial and technical articles with dedicated DB collection',
     iconName: 'FileText',
     designPreset: 'article',
@@ -26,6 +27,7 @@ export const BUILT_IN_PAGE_TYPES: PageTypeDefinition[] = [
   {
     id: 'pages',
     name: 'Pages',
+    kind: 'collection',
     description: 'Standard site pages, policy documents, and custom layout views',
     iconName: 'Layers',
     designPreset: 'landing',
@@ -42,6 +44,7 @@ export const BUILT_IN_PAGE_TYPES: PageTypeDefinition[] = [
   {
     id: 'blog',
     name: 'Blog',
+    kind: 'collection',
     description: 'Chronological posts, press announcements, and company news stories',
     iconName: 'Bookmark',
     designPreset: 'blog',
@@ -61,6 +64,7 @@ export const BUILT_IN_PAGE_TYPES: PageTypeDefinition[] = [
   {
     id: 'docs',
     name: 'Documentation',
+    kind: 'collection',
     description: 'Technical guides, API references, and developer documentation guides',
     iconName: 'Folder',
     designPreset: 'doc',
@@ -72,6 +76,101 @@ export const BUILT_IN_PAGE_TYPES: PageTypeDefinition[] = [
       { id: 'lead', name: 'Overview', type: 'text' },
       { id: 'body', name: 'Guide Content', type: 'rich-text' },
       { id: 'steps', name: 'Steps & Snippets', type: 'text' },
+    ],
+  },
+  {
+    id: 'homepage',
+    name: 'Homepage',
+    kind: 'single',
+    description: 'Main landing page layout and hero sections',
+    iconName: 'Layers',
+    designPreset: 'landing',
+    color: '#EC4899',
+    isBuiltIn: true,
+    fields: [
+      { id: 'heroHeadline', name: 'Hero Headline', type: 'text', required: true },
+      { id: 'heroSubtitle', name: 'Hero Subtitle', type: 'text' },
+      { id: 'ctaText', name: 'Call To Action Text', type: 'text' },
+      { id: 'ctaLink', name: 'Call To Action URL', type: 'text' },
+      { id: 'heroImage', name: 'Hero Banner Image', type: 'media' },
+    ],
+  },
+  {
+    id: 'global-seo',
+    name: 'Global SEO',
+    kind: 'single',
+    description: 'Default search engine and social open graph metadata',
+    iconName: 'Tag',
+    designPreset: 'blank',
+    color: '#06B6D4',
+    isBuiltIn: true,
+    fields: [
+      { id: 'siteName', name: 'Site Name', type: 'text', required: true },
+      { id: 'metaTitle', name: 'Meta Title', type: 'text', required: true },
+      { id: 'metaDescription', name: 'Meta Description', type: 'text' },
+      { id: 'ogImage', name: 'Open Graph Image', type: 'media' },
+      { id: 'twitterHandle', name: 'Twitter / X Handle', type: 'text' },
+    ],
+  },
+  {
+    id: 'footer',
+    name: 'Footer',
+    kind: 'single',
+    description: 'Global footer navigation links, copyright, and disclaimers',
+    iconName: 'Bookmark',
+    designPreset: 'blank',
+    color: '#64748B',
+    isBuiltIn: true,
+    fields: [
+      { id: 'copyrightText', name: 'Copyright Text', type: 'text', required: true },
+      { id: 'contactEmail', name: 'Contact Email', type: 'text' },
+      { id: 'disclaimer', name: 'Disclaimer Notice', type: 'rich-text' },
+    ],
+  },
+  {
+    id: 'seo-block',
+    name: 'SEO Block',
+    kind: 'component',
+    description: 'Reusable SEO metadata structure for pages and posts',
+    iconName: 'Sparkles',
+    designPreset: 'blank',
+    color: '#F59E0B',
+    isBuiltIn: true,
+    fields: [
+      { id: 'metaTitle', name: 'Meta Title', type: 'text', required: true },
+      { id: 'metaDescription', name: 'Meta Description', type: 'text' },
+      { id: 'canonicalUrl', name: 'Canonical URL', type: 'text' },
+    ],
+  },
+  {
+    id: 'social-links',
+    name: 'Social Links',
+    kind: 'component',
+    description: 'Reusable social platform links with URLs and icons',
+    iconName: 'Grid',
+    designPreset: 'blank',
+    color: '#14B8A6',
+    isBuiltIn: true,
+    fields: [
+      { id: 'platform', name: 'Platform Name', type: 'text', required: true },
+      { id: 'url', name: 'Profile URL', type: 'text', required: true },
+      { id: 'isEnabled', name: 'Is Enabled', type: 'boolean' },
+    ],
+  },
+  {
+    id: 'pricing-tier',
+    name: 'Pricing Tier',
+    kind: 'component',
+    description: 'Reusable pricing plan card with features and rates',
+    iconName: 'Database',
+    designPreset: 'blank',
+    color: '#6366F1',
+    isBuiltIn: true,
+    fields: [
+      { id: 'planName', name: 'Plan Name', type: 'text', required: true },
+      { id: 'price', name: 'Price (USD)', type: 'number', required: true },
+      { id: 'interval', name: 'Billing Interval', type: 'text' },
+      { id: 'isPopular', name: 'Highlighted Tier', type: 'boolean' },
     ],
   },
 ];
@@ -87,7 +186,10 @@ export const loadAllPageTypes = (): PageTypeDefinition[] => {
     const customFiltered = customList.filter(
       (c) => !BUILT_IN_PAGE_TYPES.some((b) => b.id === c.id),
     );
-    return [...BUILT_IN_PAGE_TYPES, ...customFiltered];
+    return [...BUILT_IN_PAGE_TYPES, ...customFiltered].map((item) => ({
+      ...item,
+      kind: item.kind || 'collection',
+    }));
   } catch {
     return BUILT_IN_PAGE_TYPES;
   }

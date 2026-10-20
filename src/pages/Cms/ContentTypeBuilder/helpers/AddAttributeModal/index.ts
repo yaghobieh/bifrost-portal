@@ -1,0 +1,1 @@
+export { AddAttributeModal } from './AddAttributeModal';
