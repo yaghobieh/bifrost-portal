@@ -6,7 +6,14 @@ export type PageTypeDesignPreset =
   | 'catalog'
   | 'blank';
 
-export type PageTypeKind = 'collection' | 'single' | 'component';
+export const PAGE_TYPE_KIND = {
+  COLLECTION: 'collection',
+  SINGLE: 'single',
+  COMPONENT: 'component',
+} as const;
+
+export type PageTypeKind =
+  (typeof PAGE_TYPE_KIND)[keyof typeof PAGE_TYPE_KIND];
 
 export type PageTypeFieldType =
   | 'text'

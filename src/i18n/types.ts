@@ -815,6 +815,10 @@ export interface Messages {
     bulkDeselect: string;
     filterLabel: string;
     filterByStatus: string;
+    newPageType: string;
+    newType: string;
+    selectedCount: string;
+    createTypeTitle: string;
     weekdays: {
       mon: string;
       tue: string;

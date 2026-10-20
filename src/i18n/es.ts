@@ -867,6 +867,10 @@ export const es: Messages = {
     bulkDeselect: 'Deseleccionar',
     filterLabel: 'Filtrar',
     filterByStatus: 'Filtrar por estado',
+    newPageType: 'Nuevo tipo de página',
+    newType: 'Nuevo tipo',
+    selectedCount: '{count} seleccionados',
+    createTypeTitle: 'Crear una nueva colección / tipo de página',
     weekdays: {
       mon: 'Lun',
       tue: 'Mar',
