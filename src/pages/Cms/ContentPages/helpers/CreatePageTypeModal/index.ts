@@ -1,0 +1,1 @@
+export { CreatePageTypeModal } from './CreatePageTypeModal';

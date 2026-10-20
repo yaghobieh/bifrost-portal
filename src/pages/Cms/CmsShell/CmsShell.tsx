@@ -72,6 +72,7 @@ import {
   CMS_SEARCH_INPUT_ID,
   CMS_SEARCH_KEY,
   CMS_KEY_ENTER,
+  CMS_SIDEBAR_ACTIVE_VARIANT,
   CMS_SIDEBAR_COLLAPSED_WIDTH_PX,
   CMS_BOTTOM_NAV_IDS,
   CMS_CREW_PENDING_PREFIX,
@@ -467,27 +468,25 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       children: generalChildren,
     },
   ];
-  if (devPrefs.showDeveloperPage) {
-    sidebarGroups.push({
-      id: CMS_NAV_SECTIONS.DEVELOPER,
-      label: t.cmsShell.developer,
-      icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
-      children: [
-        {
-          id: CMS_NAV_IDS.DEVELOPER,
-          label: t.cmsShell.developer,
-          icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
-          href: CMS_NAV_ROUTES[CMS_NAV_IDS.DEVELOPER],
-        },
-        {
-          id: CMS_NAV_IDS.AUDIT,
-          label: t.cmsShell.audit,
-          icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
-          href: CMS_NAV_ROUTES[CMS_NAV_IDS.AUDIT],
-        },
-      ].filter(visibleLeaf),
-    });
-  }
+  sidebarGroups.push({
+    id: CMS_NAV_SECTIONS.DEVELOPER,
+    label: t.cmsShell.developer || 'API & Developer',
+    icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+    children: [
+      {
+        id: CMS_NAV_IDS.DEVELOPER,
+        label: 'API Reference',
+        icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+        href: CMS_NAV_ROUTES[CMS_NAV_IDS.DEVELOPER],
+      },
+      {
+        id: CMS_NAV_IDS.AUDIT,
+        label: t.cmsShell.audit,
+        icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+        href: CMS_NAV_ROUTES[CMS_NAV_IDS.AUDIT],
+      },
+    ].filter(visibleLeaf),
+  });
   const visibleGroups = sidebarGroups.filter((group) => (group.children?.length ?? 0) > 0);
   const sidebarItems: CmsSidebarNavItem[] = resolveSidebarNavItems({
     groups: visibleGroups,
@@ -647,7 +646,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
         collapsed={collapsed}
         onCollapsedChange={onCollapsedChange}
         fullHeight
-        activeVariant="indicator"
+        activeVariant={CMS_SIDEBAR_ACTIVE_VARIANT}
         variant="default"
         position="left"
         className="bifrost-cms__sidebar"

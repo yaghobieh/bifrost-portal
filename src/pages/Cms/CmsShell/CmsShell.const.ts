@@ -19,6 +19,8 @@ export {
 
 export const CMS_CARD_PADDING = 'md' as const;
 
+export const CMS_SIDEBAR_ACTIVE_VARIANT = 'fill' as const;
+
 export const CMS_NAV_IDS = {
   DASHBOARD: 'dashboard',
   CONTENT: 'content',

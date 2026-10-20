@@ -16,20 +16,17 @@ export const CmsLoginBrand: FC<CmsLoginBrandProps> = (props) => {
         </Typography>
       </Flex>
       <div className="bifrost-cms-login__brand-mid">
-        <Typography variant="h2" className="bifrost-cms-login__headline mb-0">
-          {headline}
+        <Typography variant="h2" className="bifrost-cms-login__headline mb-2 text-3xl font-bold text-white leading-tight">
+          {headline || 'Content that holds still while everything around it changes.'}
         </Typography>
-        <Typography variant="body2" className="bifrost-cms-login__brand-body mb-0">
-          {body}
+        <Typography variant="body2" className="bifrost-cms-login__brand-body mb-0 text-gray-300 leading-relaxed">
+          {body || 'One structured source of content, delivered through REST and GraphQL to your site, app, and anything you build next.'}
         </Typography>
       </div>
-      <div className="bifrost-cms-login__quote">
-        <Typography variant="body2" className="bifrost-cms-login__quote-text mb-0">
-          {quote}
-        </Typography>
-        <Typography variant="caption" className="bifrost-cms-login__quote-by mb-0">
-          {quoteBy}
-        </Typography>
+      <div className="anchor-login-foot mt-auto pt-6 flex gap-6 text-xs text-gray-400">
+        <span>SOC 2 Type II</span>
+        <span>99.98% uptime</span>
+        <span>v4.2</span>
       </div>
     </div>
   );
