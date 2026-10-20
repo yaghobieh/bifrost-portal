@@ -48,6 +48,7 @@ export const SETTINGS_TABS = {
 
 export const SETTINGS_SITE_PANELS = {
   GENERAL: 'general',
+  SITES: 'sites',
   WRITING: 'writing',
   DISCUSSION: 'discussion',
   CHROME: 'chrome',

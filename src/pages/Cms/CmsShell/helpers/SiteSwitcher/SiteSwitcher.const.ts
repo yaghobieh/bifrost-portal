@@ -1,0 +1,11 @@
+import {
+  NUMBER_FOURTEEN,
+  NUMBER_SIXTEEN,
+  NUMBER_TWO_HUNDRED_TWENTY,
+} from '@const/numbers.const';
+
+export const SITE_SWITCHER_ICON_SIZE = NUMBER_FOURTEEN;
+export const SITE_SWITCHER_CHEVRON_SIZE = NUMBER_SIXTEEN;
+export const SITE_SWITCHER_DROPDOWN_WIDTH = NUMBER_TWO_HUNDRED_TWENTY;
+export const SITE_SWITCHER_TEST_ID = 'cms-site-switcher';
+export const SITE_SWITCHER_MANAGE_TAB_ID = 'site';

@@ -36,6 +36,7 @@ import { parseCloudinaryCloudName, parseCloudinaryCredentials } from '@sdk/modul
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { DeveloperPanel } from '../DeveloperPages';
 import { SettingsPublicNav } from './helpers/SettingsPublicNav';
+import { SettingsSitesPanel } from './helpers/SettingsSitesPanel';
 import {
   SETTINGS_AVATAR_ACCEPT,
   SETTINGS_CHAT_SIDES,
@@ -536,6 +537,7 @@ export const SettingsPages: FC = () => {
                   {(
                     [
                       [SETTINGS_SITE_PANELS.GENERAL, t.settings.sectionGeneral],
+                      [SETTINGS_SITE_PANELS.SITES, t.settings.tabMultiSite],
                       [SETTINGS_SITE_PANELS.WRITING, t.settings.sectionWriting],
                       [SETTINGS_SITE_PANELS.DISCUSSION, t.settings.sectionDiscussion],
                       [SETTINGS_SITE_PANELS.CHROME, t.settings.sectionChrome],
@@ -660,6 +662,9 @@ export const SettingsPages: FC = () => {
                     fullWidth
                   />
                 </SettingsSection>
+                ) : null}
+                {sitePanel === SETTINGS_SITE_PANELS.SITES ? (
+                  <SettingsSitesPanel />
                 ) : null}
                 {sitePanel === SETTINGS_SITE_PANELS.WRITING ? (
                 <SettingsSection

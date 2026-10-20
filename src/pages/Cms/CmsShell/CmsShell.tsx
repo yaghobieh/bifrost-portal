@@ -94,6 +94,7 @@ import { ErrorHost } from './ErrorHost';
 import { CmsUpdateBanner } from './helpers/CmsUpdateBanner';
 import { CmsBottomNav } from './helpers/CmsBottomNav';
 import { CmsNavOverlay } from './helpers/CmsNavOverlay';
+import { SiteSwitcher } from './helpers/SiteSwitcher';
 import { useCmsLive } from './CmsLiveProvider';
 import { CMS_LIVE_LOCAL_ROOM_PREFIX } from './CmsLive.const';
 import { findDirectRoom, findServerMatch } from './CmsLive.utils';
@@ -731,6 +732,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             leftContent={
               <Flex align="center" gap={2} className="bifrost-cms__appbar-left">
                 {navToggle}
+                <SiteSwitcher token={activeToken} />
                 <div className="bifrost-cms__search-wrap">
                 <Input
                   id={CMS_SEARCH_INPUT_ID}
