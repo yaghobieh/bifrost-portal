@@ -7,7 +7,6 @@ import { BearProvider } from '@forgedevstack/bear';
 import { LingoProvider } from '@forgedevstack/lingo';
 import { I18nProvider } from '@i18n/index';
 import { portalLingo } from '@i18n/portalLingo';
-import { inkTheme, inkVariants } from '@config/ink-theme';
 import { bifrostTheme, bifrostVariants } from '@config/bear-theme';
 import { CMS_PATH } from '@config/cms.config';
 import { SLASH, THEME_STORAGE_KEY } from '@const/strings.const';
@@ -43,8 +42,8 @@ createRoot(document.getElementById('root')!).render(
     defaultMode="light"
     persistPreference
     storageKey={THEME_STORAGE_KEY}
-    theme={onCmsHost ? inkTheme : bifrostTheme}
-    customVariants={onCmsHost ? inkVariants : bifrostVariants}
+    theme={bifrostTheme}
+    customVariants={bifrostVariants}
     defaultProps={onCmsHost ? { Card: { padding: CMS_CARD_PADDING } } : undefined}
   >
     {onCmsHost ? app : <LingoProvider instance={portalLingo}>{app}</LingoProvider>}

@@ -72,6 +72,7 @@ import {
   CMS_SEARCH_INPUT_ID,
   CMS_SEARCH_KEY,
   CMS_KEY_ENTER,
+  CMS_SIDEBAR_ACTIVE_VARIANT,
   CMS_SIDEBAR_COLLAPSED_WIDTH_PX,
   CMS_BOTTOM_NAV_IDS,
   CMS_CREW_PENDING_PREFIX,
@@ -645,7 +646,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
         collapsed={collapsed}
         onCollapsedChange={onCollapsedChange}
         fullHeight
-        activeVariant="indicator"
+        activeVariant={CMS_SIDEBAR_ACTIVE_VARIANT}
         variant="default"
         position="left"
         className="bifrost-cms__sidebar"

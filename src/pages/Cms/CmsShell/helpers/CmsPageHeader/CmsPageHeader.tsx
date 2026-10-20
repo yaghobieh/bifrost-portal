@@ -19,7 +19,11 @@ export const CmsPageHeader: FC<CmsPageHeaderProps> = (props) => {
         </div>
         {actions}
       </Flex>
-      {extra}
+      {extra ? (
+        <Flex align="center" gap={2} wrap="wrap" className="bifrost-cms-page-header__extra">
+          {extra}
+        </Flex>
+      ) : null}
     </Flex>
   );
 };

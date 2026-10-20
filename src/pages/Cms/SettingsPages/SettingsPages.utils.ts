@@ -145,6 +145,9 @@ export const applyCmsThemeColors = (
   );
 };
 
+const isStaleThemePrimary = (primary: string): boolean =>
+  SETTINGS_STALE_THEME_PRIMARIES.some((value) => value.toLowerCase() === primary.toLowerCase());
+
 export const loadCmsThemeColors = (): CmsThemeColors => {
   try {
     const raw = localStorage.getItem(SETTINGS_THEME_STORAGE_KEY);
@@ -159,7 +162,7 @@ export const loadCmsThemeColors = (): CmsThemeColors => {
     const background = isHexColor(parsed.background)
       ? parsed.background
       : SETTINGS_THEME_DEFAULTS.background;
-    if (SETTINGS_STALE_THEME_PRIMARIES.some((value) => value === primary)) {
+    if (isStaleThemePrimary(primary)) {
       return { ...SETTINGS_THEME_DEFAULTS };
     }
     return { primary, accent, background };
@@ -598,6 +601,7 @@ export const loadUserThemeColors = (userKey: string): CmsThemeColors | null => {
     if (!isHexColor(parsed.primary) || !isHexColor(parsed.accent) || !isHexColor(parsed.background)) {
       return null;
     }
+    if (isStaleThemePrimary(parsed.primary)) return null;
     return {
       primary: parsed.primary,
       accent: parsed.accent,
