@@ -34,6 +34,7 @@ import type {
   LiveIncoming,
   LiveMessageRow,
   LivePresenceRow,
+  LivePresenceUser,
   LiveRoomRow,
   LiveTasksRow,
 } from './cmsLive.types';
