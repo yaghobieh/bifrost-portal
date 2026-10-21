@@ -45,6 +45,14 @@
       "destination": "/api/c/pages?rest=blog&slug=:slug"
     },
     {
+      "source": "/api/sites",
+      "destination": "/api/c/sites"
+    },
+    {
+      "source": "/api/sites/:path*",
+      "destination": "/api/c/sites?path=:path*"
+    },
+    {
       "source": "/api/cms/users",
       "destination": "/api/c/users"
     },
