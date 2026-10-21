@@ -1,0 +1,1 @@
+export { DemoTabs } from './DemoTabs';

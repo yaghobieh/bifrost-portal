@@ -104,6 +104,7 @@ export type SettingsTabId =
   | 'profile'
   | 'crew'
   | 'site'
+  | 'sites'
   | 'developer'
   | 'theme'
   | 'media'
@@ -114,6 +115,7 @@ export type SettingsTabId =
 
 export type SettingsSitePanelId =
   | 'general'
+  | 'sites'
   | 'writing'
   | 'discussion'
   | 'chrome'

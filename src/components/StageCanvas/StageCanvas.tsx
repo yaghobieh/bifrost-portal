@@ -3,9 +3,20 @@ import { Card, Flex, Typography } from '@forgedevstack/bear';
 import { NUMBER_FOUR, NUMBER_ZERO } from '@const/numbers.const';
 import { EMPTY_STRING } from '@const/strings.const';
 import { rewriteHtmlImages } from '@sdk/modules/media';
+import { WidgetGridTable, isGridTableHtml, isGridTableWidgetId } from '@components/WidgetGridTable';
 import { CANVAS_KIND, DIRECTION_BY_KIND, WRAP_BY_KIND } from './StageCanvas.const';
 import type { CanvasNode, StageCanvasProps } from './StageCanvas.types';
 import { isContainerKind, nodeColorStyle, nodeText } from './StageCanvas.utils';
+
+const renderWidgetHtml = (node: CanvasNode, html: string): ReactNode => {
+  if (isGridTableWidgetId(node.widgetId) || isGridTableHtml(html)) {
+    return <WidgetGridTable html={html} className="Bp-doc-table" />;
+  }
+  if (!html) {
+    return null;
+  }
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+};
 
 const renderNode = (node: CanvasNode, cloudName: string): ReactNode => {
   const kids = node.children.map((child) => renderNode(child, cloudName));
@@ -45,7 +56,7 @@ const renderNode = (node: CanvasNode, cloudName: string): ReactNode => {
       >
         {cssBlock}
         {text && <Typography variant="body1">{text}</Typography>}
-        {html && <div dangerouslySetInnerHTML={{ __html: html }} />}
+        {renderWidgetHtml(node, html)}
         {kids}
       </Flex>
     );
@@ -61,7 +72,7 @@ const renderNode = (node: CanvasNode, cloudName: string): ReactNode => {
     >
       {cssBlock}
       {text && <Typography variant="body1">{text}</Typography>}
-      {html && <div dangerouslySetInnerHTML={{ __html: html }} />}
+      {renderWidgetHtml(node, html)}
       {kids}
     </Card>
   );

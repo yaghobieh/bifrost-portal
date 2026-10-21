@@ -5,10 +5,23 @@ import { EMPTY_STRING } from '@const/strings.const';
 import {
   DEFAULT_ERROR_MESSAGE,
   HTTP_NETWORK_STATUS,
+  HTTP_SPA_FALLBACK_STATUS,
   NETWORK_ERROR_MESSAGE,
+  SPA_FALLBACK_MESSAGE,
 } from './requestWithError.const';
 import type { ApiErrorPayload, RequestWithErrorOptions } from './http.types';
-import { reasonFromCaught, requestUrl, snippet } from './requestWithError.utils';
+import { isHtmlResponse, reasonFromCaught, requestUrl, snippet } from './requestWithError.utils';
+
+const reportOrNotify = (
+  options: RequestWithErrorOptions | undefined,
+  payload: ApiErrorPayload,
+): void => {
+  if (options?.onError) {
+    options.onError(payload);
+    return;
+  }
+  reportApiError(payload);
+};
 
 export const requestWithError = async (
   input: RequestInfo | URL,
@@ -23,7 +36,7 @@ export const requestWithError = async (
     const response = await fetch(input, init);
     if (!response.ok) {
       const body = snippet(await response.clone().text().catch(() => EMPTY_STRING));
-      const payload: ApiErrorPayload = {
+      reportOrNotify(options, {
         mode: resolveApiErrorMode(options?.mode),
         message: options?.message || `${DEFAULT_ERROR_MESSAGE} (${response.status})`,
         code: options?.code,
@@ -32,12 +45,25 @@ export const requestWithError = async (
         status: response.status,
         reason: response.statusText || DEFAULT_ERROR_MESSAGE,
         response: body,
-      };
-      if (options?.onError) {
-        options.onError(payload);
-      } else {
-        reportApiError(payload);
-      }
+      });
+      return response;
+    }
+    const preview = snippet(await response.clone().text().catch(() => EMPTY_STRING));
+    if (isHtmlResponse(response, preview)) {
+      reportOrNotify(options, {
+        mode: resolveApiErrorMode(options?.mode),
+        message: options?.message || SPA_FALLBACK_MESSAGE,
+        code: options?.code,
+        href: options?.href,
+        url,
+        status: HTTP_SPA_FALLBACK_STATUS,
+        reason: SPA_FALLBACK_MESSAGE,
+        response: preview,
+      });
+      return new Response(null, {
+        status: HTTP_SPA_FALLBACK_STATUS,
+        statusText: SPA_FALLBACK_MESSAGE,
+      });
     }
     return response;
   } catch (error) {
@@ -45,7 +71,7 @@ export const requestWithError = async (
     if (error instanceof Error) {
       reason = reasonFromCaught(error);
     }
-    const payload: ApiErrorPayload = {
+    reportOrNotify(options, {
       mode: resolveApiErrorMode(options?.mode),
       message: options?.message || NETWORK_ERROR_MESSAGE,
       code: options?.code,
@@ -54,12 +80,7 @@ export const requestWithError = async (
       status: HTTP_NETWORK_STATUS,
       reason,
       response: EMPTY_STRING,
-    };
-    if (options?.onError) {
-      options.onError(payload);
-    } else {
-      reportApiError(payload);
-    }
+    });
     return new Response(null, { status: HTTP_NETWORK_STATUS, statusText: reason });
   } finally {
     if (!options?.silent) {

@@ -16,6 +16,7 @@ import {
   CMS_THEME_EVENT,
   EMPTY_STRING,
   PINK_HEX,
+  PINK_SOFT_HEX,
   BRIDGE_BLUE_HEX,
 } from '@const/index';
 import { CMS_NAV_IDS } from '../CmsShell/CmsShell.const';
@@ -36,6 +37,7 @@ export const SETTINGS_TABS = {
   PROFILE: 'profile',
   CREW: 'crew',
   SITE: 'site',
+  SITES: 'sites',
   DEVELOPER: 'developer',
   THEME: 'theme',
   MEDIA: 'media',
@@ -47,6 +49,7 @@ export const SETTINGS_TABS = {
 
 export const SETTINGS_SITE_PANELS = {
   GENERAL: 'general',
+  SITES: 'sites',
   WRITING: 'writing',
   DISCUSSION: 'discussion',
   CHROME: 'chrome',
@@ -57,14 +60,14 @@ export const SETTINGS_SITE_PANELS = {
 export const SETTINGS_SAVE_SOURCE = 'settings' as const;
 
 export const SETTINGS_THEME_DEFAULTS_LIGHT = {
-  primary: BRIDGE_BLUE_HEX,
-  accent: BRIDGE_BLUE_HEX,
-  background: '#f5f6f8',
+  primary: PINK_HEX,
+  accent: PINK_HEX,
+  background: '#F6F6F4',
 } as const;
 
 export const SETTINGS_THEME_DEFAULTS_DARK = {
-  primary: '#54a0ff',
-  accent: '#54a0ff',
+  primary: PINK_HEX,
+  accent: PINK_HEX,
   background: '#12192c',
 } as const;
 
@@ -135,6 +138,19 @@ export const SETTINGS_PUBLIC_NAV_DEFAULT_ITEMS = [
   { id: 'askAi', label: 'Ask AI', href: '/ai', visible: false },
 ] as const;
 
+export const SETTINGS_PUBLIC_NAV_IDS = [
+  'product',
+  'docs',
+  'plans',
+  'demo',
+  'changelog',
+  'status',
+  'blog',
+  'guides',
+  'api',
+  'askAi',
+] as const;
+
 export const SETTINGS_NAV_TOGGLE_IDS = [
   CMS_NAV_IDS.DASHBOARD,
   CMS_NAV_IDS.PAGES,
@@ -183,7 +199,7 @@ export const SETTINGS_CHAT_SHOW = {
 
 export const SETTINGS_CHAT_PREFS_DEFAULTS = {
   sound: SETTINGS_CHAT_SOUND.ALL,
-  color: BRIDGE_BLUE_HEX,
+  color: PINK_HEX,
   show: SETTINGS_CHAT_SHOW.BOTH,
   roomSounds: {},
 } as const;
@@ -212,8 +228,8 @@ export const SETTINGS_SITE_SLUG_FALLBACK = 'bifrost';
 
 export const SETTINGS_MCP_JSON_INDENT = 2;
 
-export const SETTINGS_ACCENT_SOFT_LIGHT = '#EAF0FE';
-export const SETTINGS_ACCENT_SOFT_DARK = 'rgba(41, 81, 196, 0.22)';
+export const SETTINGS_ACCENT_SOFT_LIGHT = PINK_SOFT_HEX;
+export const SETTINGS_ACCENT_SOFT_DARK = 'rgba(234, 10, 142, 0.22)';
 
 export const SETTINGS_COLOR_INPUT_IDS = {
   PRIMARY: 'bifrost-cms-theme-primary',
@@ -309,7 +325,8 @@ export const SETTINGS_DEV_PREFS_EVENT = CMS_DEV_PREFS_EVENT;
 export const SETTINGS_DEV_PREFS_DEFAULTS = {
   showDeveloperPage: true,
 } as const;
-export const SETTINGS_STALE_THEME_PRIMARIES = [PINK_HEX];
+export const SETTINGS_STALE_THEME_PRIMARY_SKY = '#54a0ff';
+export const SETTINGS_STALE_THEME_PRIMARIES = [BRIDGE_BLUE_HEX, SETTINGS_STALE_THEME_PRIMARY_SKY];
 export const SETTINGS_STALE_SITE_NAMES = ['Ink CMS', 'ink CMS', 'testing 2', 'testing-2'];
 export const SETTINGS_CATALOG_STORAGE_KEY = CMS_CATALOG_STORAGE_KEY;
 export const SETTINGS_CATALOG_FORMAT = {

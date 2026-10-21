@@ -19,6 +19,8 @@ export {
 
 export const CMS_CARD_PADDING = 'md' as const;
 
+export const CMS_SIDEBAR_ACTIVE_VARIANT = 'fill' as const;
+
 export const CMS_NAV_IDS = {
   DASHBOARD: 'dashboard',
   CONTENT: 'content',
@@ -45,6 +47,9 @@ export const CMS_NAV_IDS = {
   TASKS: 'tasks',
   CHAT: 'chat',
   NOTIFICATIONS: 'notifications',
+  ARTICLES: 'articles',
+  SCHEMA_FIELDS: 'schema-fields',
+  SITES: 'sites',
 } as const;
 
 export const CMS_NAV_SECTIONS = {
@@ -71,8 +76,11 @@ export const CMS_NAV_ROUTES: Record<string, string> = {
   [CMS_NAV_IDS.BUILDER]: ROUTES.CMS_BUILDER,
   [CMS_NAV_IDS.TRANSLATIONS]: ROUTES.CMS_TRANSLATIONS,
   [CMS_NAV_IDS.CAST]: ROUTES.CMS_CAST,
+  [CMS_NAV_IDS.SCHEMA_FIELDS]: ROUTES.CMS_CAST,
   [CMS_NAV_IDS.BLOG]: ROUTES.CMS_BLOG,
+  [CMS_NAV_IDS.ARTICLES]: `${ROUTES.CMS_CONTENT}?kind=article`,
   [CMS_NAV_IDS.SETTINGS]: ROUTES.CMS_SETTINGS,
+  [CMS_NAV_IDS.SITES]: ROUTES.CMS_SITES,
   [CMS_NAV_IDS.HELP]: ROUTES.DOCS,
   [CMS_NAV_IDS.DEVELOPER]: ROUTES.CMS_DEVELOPER,
   [CMS_NAV_IDS.AUDIT]: ROUTES.CMS_AUDIT,
@@ -90,7 +98,7 @@ export const POINTER_EVENT_UP = 'mouseup';
 export const CMS_BOTTOM_NAV_IDS = [
   CMS_NAV_IDS.DASHBOARD,
   CMS_NAV_IDS.PAGES,
-  CMS_NAV_IDS.PLANS,
+  CMS_NAV_IDS.SITES,
   CMS_NAV_IDS.BUNDLES,
   CMS_NAV_IDS.SETTINGS,
 ] as const;

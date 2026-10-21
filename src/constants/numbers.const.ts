@@ -201,6 +201,6 @@ export const EXPLORER_COLLECTION_COL_PX = NUMBER_ONE_HUNDRED_SIXTY;
 export const EXPLORER_PAGE_SIZE = NUMBER_TEN;
 export const EXPLORER_PAGE_SIZE_MAX = NUMBER_TWENTY_FIVE;
 export const HTTP_STATUS_GONE = 410;
-export const PORT_PORTAL = 5173;
+export const PORT_PORTAL = 5174;
 export const PORT_CMS_FE = 5180;
 export const PORT_CMS_API = 4000;

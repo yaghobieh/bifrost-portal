@@ -129,16 +129,18 @@ export const TemplatesPages: FC = () => {
         <CmsPageHeader
           title={t.cmsTemplates.title}
           subtitle={t.cmsTemplates.subtitle}
-          actions={
-          <Button
-            size="sm"
-            variant="primary"
-            icon={<BearIcons.PlusIcon size={CMS_ICON_SIZE} />}
-            onClick={() => void onNewTemplate()}
-            disabled={saving || !activeToken}
-          >
-            {t.cmsTemplates.newTemplate}
-          </Button>
+          actionTitle={t.cmsTemplates.newTemplate}
+          actionBody={t.cmsTemplates.subtitle}
+          extra={
+            <Button
+              size="sm"
+              variant="primary"
+              icon={<BearIcons.PlusIcon size={CMS_ICON_SIZE} />}
+              onClick={() => void onNewTemplate()}
+              disabled={saving || !activeToken}
+            >
+              {t.cmsTemplates.newTemplate}
+            </Button>
           }
         />
         <Typography variant="h4" className="mb-0">

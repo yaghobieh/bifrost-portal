@@ -76,12 +76,14 @@ import {
   joinScheduleAt,
   loadPublicEditTarget,
   loadSeoCollapsed,
+  mergeDocTableWidgets,
   nowScheduleAt,
   payloadString,
   resolveEditBodyHtml,
   resolveEditTarget,
   saveSeoCollapsed,
   splitScheduleAt,
+  withDocTableSections,
 } from './ContentEdit.utils';
 import { CastPageFields } from './helpers/CastPageFields';
 import { ContentFieldStage } from './helpers/ContentFieldStage';
@@ -90,6 +92,7 @@ import { ContentTranslationWidget } from './helpers/ContentTranslationWidget';
 import type { TranslationApplyParams } from './helpers/ContentTranslationWidget';
 import { createCastField, createNamedCastField } from '@pages/Cms/CastPages/CastPages.utils';
 import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
+import { isGridTableWidgetId } from '@components/WidgetGridTable';
 import { buildDocsCastFields, docsCastValues, isDocsLayout } from '@pages/Cms/ContentPages/ContentPages.utils';
 import { TRANSLATION_CONTENT_COLLECTIONS } from '@pages/Cms/TranslationsPages/TranslationsPages.const';
 import type { BearWidgetDef, ContentEditTarget } from './ContentEdit.types';
@@ -131,7 +134,7 @@ export const ContentEdit: FC = () => {
   const params = useParams<{ id?: string }>();
   const { navigate } = useNavigate();
   const { token: providerToken } = useAuth();
-  const { onlineUsers, selfId, selfSessionId } = useCmsLive();
+  const { onlineUsers, selfId } = useCmsLive();
   const { token } = useNucleus(authNucleus);
   const {
     items,
@@ -273,8 +276,13 @@ export const ContentEdit: FC = () => {
       Object.keys(loadedValues).length > NUMBER_ZERO || !isDocsLayout(layoutId)
         ? loadedValues
         : docsCastValues();
-    setPageFields(seededFields);
-    setCastValues(seededValues);
+    const merged = mergeDocTableWidgets({
+      payload: target.payload ?? {},
+      fields: seededFields,
+      values: seededValues,
+    });
+    setPageFields(merged.fields);
+    setCastValues(merged.values);
     const orderRaw = target.payload?.[PAYLOAD_KEY_FIELD_ORDER];
     if (Array.isArray(orderRaw)) {
       setFieldOrder(orderRaw.filter((entry): entry is string => typeof entry === 'string'));
@@ -327,7 +335,9 @@ export const ContentEdit: FC = () => {
     setPageFields((current) => [...current, field]);
     setFieldOrder((current) => [...current, field.name]);
     setCastValues((current) => ({ ...current, [field.name]: widget.html }));
-    setBodyHtml((current) => appendWidgetHtml(current, widget.html));
+    if (!isGridTableWidgetId(widget.id)) {
+      setBodyHtml((current) => appendWidgetHtml(current, widget.html));
+    }
     setSaveOk(false);
   };
 
@@ -507,6 +517,7 @@ export const ContentEdit: FC = () => {
                 ...contentPage.payload,
                 ...extras,
                 html: nextBody,
+                ...withDocTableSections(contentPage.payload || {}, castValues),
               },
               status,
             }),
@@ -521,6 +532,7 @@ export const ContentEdit: FC = () => {
       blocks: [{ type: 'html', html: nextBody }],
       ...extras,
       [PAYLOAD_KEY_TEMPLATE]: existingTemplate || DOCUMENT_TEMPLATE_ID,
+      ...withDocTableSections(target.payload || {}, castValues),
     };
     const ok = await saveContent(activeToken, {
       collection: target.collection || EMPTY_STRING,
@@ -571,7 +583,6 @@ export const ContentEdit: FC = () => {
               <LiveEditors
                 users={onlineUsers}
                 currentUserId={selfId}
-                currentSessionId={selfSessionId}
                 location={currentLiveLocation().location}
               />
               {target && (

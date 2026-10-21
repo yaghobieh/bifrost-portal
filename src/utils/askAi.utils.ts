@@ -2,7 +2,8 @@ import type { DocPageModel } from '@data/docs.types';
 import { NUMBER_THREE, NUMBER_ZERO } from '@const/numbers.const';
 import { ASK_AI_EMPTY } from '@const/strings.const';
 import { fetchPublicDoc } from '@data/page.api';
-import { searchNav } from '@data/docs.data';
+import { searchSite } from '@data/docs.data';
+import { isDocsSearchHit } from '@data/docsSearch.utils';
 
 const formatDoc = (doc: DocPageModel): string => {
   const first = doc.sections[NUMBER_ZERO];
@@ -14,7 +15,7 @@ export const answerFromNav = async (
   titleOf: (key: string) => string,
   signal?: AbortSignal,
 ): Promise<string> => {
-  const hits = searchNav(question, titleOf);
+  const hits = searchSite({ query: question, titleOf }).filter(isDocsSearchHit);
   if (!hits.length) {
     return ASK_AI_EMPTY;
   }

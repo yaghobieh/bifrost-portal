@@ -13,12 +13,20 @@
       "destination": "/api/health?rest=plugins"
     },
     {
+      "source": "/api/public/nav",
+      "destination": "/api/c/pages?rest=nav"
+    },
+    {
       "source": "/api/v1/version",
       "destination": "/api/health?rest=version"
     },
     {
       "source": "/api/version",
       "destination": "/api/health?rest=version"
+    },
+    {
+      "source": "/api/status",
+      "destination": "/api/health?rest=status"
     },
     {
       "source": "/api/cms/settings/:key",
@@ -37,12 +45,12 @@
       "destination": "/api/c/pages?rest=blog&slug=:slug"
     },
     {
-      "source": "/api/public/nav",
-      "destination": "/api/c/pages?rest=nav"
+      "source": "/api/sites",
+      "destination": "/api/c/sites"
     },
     {
-      "source": "/api/cms/live",
-      "destination": "/api/c/live"
+      "source": "/api/sites/:path*",
+      "destination": "/api/c/sites?path=:path*"
     },
     {
       "source": "/api/cms/users",
@@ -51,6 +59,14 @@
     {
       "source": "/api/cms/roles",
       "destination": "/api/c/roles"
+    },
+    {
+      "source": "/api/cms/get-content",
+      "destination": "/api/c/get-content"
+    },
+    {
+      "source": "/api/cms/get-content/:collection",
+      "destination": "/api/c/get-content/:collection"
     },
     {
       "source": "/api/cms/create-user",

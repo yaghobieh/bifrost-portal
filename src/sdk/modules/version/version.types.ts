@@ -41,3 +41,8 @@ export type WhatsNewCopy = {
   lead: string;
   body: string;
 };
+
+export type OnTargetCmsParams = {
+  current: string;
+  sprint: string;
+};

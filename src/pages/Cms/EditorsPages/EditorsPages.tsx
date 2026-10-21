@@ -9,7 +9,7 @@ import { useI18n } from '@i18n/index';
 import { ROUTES, THEME_CLASS_SNOW } from '@const/index';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import type { PlaygroundVariant } from '@pages/Playground/Playground.types';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   EDITORS_COLLECTION,
   EDITOR_PREVIEW_MIN_HEIGHT_PX,
@@ -59,21 +59,19 @@ export const EditorsPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.EDITORS}>
       <Flex direction="column" gap={4}>
-        <Flex justify="between" align="center" className="gap-3 flex-wrap">
-          <div>
-            <Typography variant="h2" className="mb-1">
-              {t.dashboard.editorsTitle}
-            </Typography>
-            <Typography variant="body2" className="bifrost-cms__muted mb-0">
-              {t.dashboard.editorsSubtitle}
-            </Typography>
-          </div>
-          <Link to={ROUTES.PLAYGROUND}>
-            <Button size="sm" variant="primary">
-              {t.dashboard.openPlayground}
-            </Button>
-          </Link>
-        </Flex>
+        <CmsPageHeader
+          title={t.dashboard.editorsTitle}
+          subtitle={t.dashboard.editorsSubtitle}
+          actionTitle={t.dashboard.openPlayground}
+          actionBody={t.dashboard.editorsSubtitle}
+          extra={
+            <Link to={ROUTES.PLAYGROUND}>
+              <Button size="sm" variant="primary">
+                {t.dashboard.openPlayground}
+              </Button>
+            </Link>
+          }
+        />
 
         {loading ? (
           <Flex align="center" gap={2}>

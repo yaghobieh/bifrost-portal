@@ -39,6 +39,8 @@ export const ROUTES = {
   CMS_PLANS: '/cms/plans',
   CMS_CALENDAR: '/cms/calendar',
   CMS_SETTINGS: '/cms/settings',
+  CMS_SITES: '/cms/sites',
+  CMS_ANALYTICS: '/cms/analytics',
   CMS_DEVELOPER: '/cms/developer',
   CMS_AUDIT: '/cms/audit',
   CMS_NOTIFICATIONS: '/cms/notifications',
@@ -46,6 +48,7 @@ export const ROUTES = {
   CMS_BUILDER: '/cms/builder',
   CMS_TRANSLATIONS: '/cms/translations',
   CMS_CAST: '/cms/cast',
+  CMS_CONTENT_TYPES: '/cms/content-types',
   CMS_TASKS: '/cms/tasks',
   CMS_BLOG: '/cms/blog',
   CMS_BLOG_EDIT: '/cms/blog/:id',
@@ -74,17 +77,31 @@ export const cmsBuilderPath = (query?: { doc?: string; layout?: string }): strin
   return search ? `${ROUTES.CMS_BUILDER}?${search}` : ROUTES.CMS_BUILDER;
 };
 
-const NAV_LINKS_BASE = [
-  { id: 'docs' as const, href: ROUTES.DOCS },
+export const PUBLIC_NAV_IDS = {
+  PRODUCT: 'product',
+  DOCS: 'docs',
+  PLANS: 'plans',
+  DEMO: 'demo',
+  CHANGELOG: 'changelog',
+  STATUS: 'status',
+  BLOG: 'blog',
+  GUIDES: 'guides',
+  API: 'api',
+  ASK_AI: 'askAi',
+} as const;
+
+export const SHOW_LAB_NAV = false;
+
+export const NAV_LINKS_BASE = [
+  { id: PUBLIC_NAV_IDS.DOCS, href: ROUTES.DOCS },
   { id: 'demos' as const, href: ROUTES.DEMOS },
   { id: 'pricing' as const, href: ROUTES.PRICING },
   { id: 'plugins' as const, href: `${ROUTES.DOCS}/plugins` },
 ];
 
-export const NAV_LINKS = false
-  ? [...NAV_LINKS_BASE, { id: 'lab' as const, href: ROUTES.LAB }]
-  : NAV_LINKS_BASE;
+export const NAV_LINKS = NAV_LINKS_BASE;
 
 export const DEFAULT_DOC_SLUG = 'overview';
+export const DOC_INSTALLATION_SLUG = 'installation';
 
 export const DOC_PATH = (slug: string): string => `${ROUTES.DOCS}/${slug}`;

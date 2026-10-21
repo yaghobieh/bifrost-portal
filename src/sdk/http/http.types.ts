@@ -9,7 +9,10 @@ export type ApiErrorCode =
   | 'crew'
   | 'notifications'
   | 'plans'
-  | 'media';
+  | 'media'
+  | 'nav'
+  | 'blog'
+  | 'sites';
 
 export type ApiErrorPayload = {
   mode: ApiErrorMode;

@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Calendar } from '@forgedevstack/calendar';
 import { Button, Card, Dropdown, Flex, Input, Typography } from '@forgedevstack/bear';
-import { CmsGridTable, CmsShell, CMS_NAV_IDS } from '@pages/Cms/CmsShell';
+import { CmsGridTable, CmsShell, CMS_NAV_IDS, CmsPageHeader } from '@pages/Cms/CmsShell';
 import {
   CALENDAR_PAGE_ID,
   CALENDAR_TITLE_INPUT_ID,
@@ -31,10 +31,12 @@ export const CalendarPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.CALENDAR}>
       <Flex direction="column" gap={4} id={CALENDAR_PAGE_ID}>
-        <Flex direction="column" gap={1}>
-          <Typography variant="h2">{t.cmsCalendar.title}</Typography>
-          <Typography variant="body2">{t.cmsCalendar.subtitle}</Typography>
-        </Flex>
+        <CmsPageHeader
+          title={t.cmsCalendar.title}
+          subtitle={t.cmsCalendar.subtitle}
+          actionTitle={t.cmsCalendar.generateMeeting}
+          actionBody={t.cmsCalendar.notifyHint}
+        />
         <Card padding="md">
           <Flex direction="column" gap={2}>
             <Typography variant="h4">{t.cmsCalendar.generateMeeting}</Typography>

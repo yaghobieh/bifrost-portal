@@ -33,7 +33,10 @@ export type UseContentPagesResult = {
   loading: boolean;
   rows: ContentTableRow[];
   columns: ColumnDefinition<ContentTableRow>[];
-  onNewPage: () => void;
+  onNewPage: (targetCollection?: string, targetKind?: string) => Promise<void> | void;
   onOpenRow: (id: string) => void;
+  onSetStatus: (id: string, status: 'draft' | 'published') => Promise<void>;
+  onDeletePage: (id: string) => void;
+  onDuplicatePage: (id: string) => Promise<void>;
 };
 

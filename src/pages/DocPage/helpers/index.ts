@@ -1,0 +1,1 @@
+export { DocSectionTable } from './DocSectionTable';

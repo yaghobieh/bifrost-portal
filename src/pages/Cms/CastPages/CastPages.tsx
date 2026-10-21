@@ -131,28 +131,42 @@ export const CastPages: FC = () => {
     setSaved(true);
   };
 
+  const actionTitle = installed ? t.cmsCast.newGroup : t.cmsCast.lockedTitle;
+  const actionBody = installed ? t.cmsCast.subtitle : t.cmsCast.lockedBody;
+
   return (
-    <CmsShell activeNavId={CMS_NAV_IDS.CAST}>
+    <CmsShell activeNavId={CMS_NAV_IDS.SCHEMA_FIELDS}>
       <Flex direction="column" gap={6}>
-        <CmsPageHeader title={t.cmsCast.title} subtitle={t.cmsCast.subtitle} />
-        {!installed ? (
-          <Card padding="md">
-            <Typography variant="h4" className="mb-2">
-              {t.cmsCast.lockedTitle}
-            </Typography>
-            <Typography variant="body2" className="mb-3">
-              {t.cmsCast.lockedBody}
-            </Typography>
-            <Button
-              size="sm"
-              variant="primary"
-              icon={<BearIcons.PackageIcon size={CMS_ICON_SIZE} />}
-              onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
-            >
-              {t.cmsCast.openStore}
-            </Button>
-          </Card>
-        ) : (
+        <CmsPageHeader
+          title={t.cmsShell.schemaFields}
+          subtitle={t.cmsCast.subtitle}
+          actionTitle={actionTitle}
+          actionBody={actionBody}
+          extra={
+            <>
+              {installed && (
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => onTargetChange(CAST_NONE)}
+                >
+                  {t.cmsCast.newGroup}
+                </Button>
+              )}
+              {!installed && (
+                <Button
+                  size="sm"
+                  variant="primary"
+                  icon={<BearIcons.PackageIcon size={CMS_ICON_SIZE} />}
+                  onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
+                >
+                  {t.cmsCast.openStore}
+                </Button>
+              )}
+            </>
+          }
+        />
+        {installed && (
           <div className="bifrost-cms-cast">
             <Card padding="md">
               <Typography variant="h4" className="mb-2">

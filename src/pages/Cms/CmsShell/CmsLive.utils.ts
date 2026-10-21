@@ -1,19 +1,13 @@
-import { CONTENT_TYPE_JSON } from '@const/strings.const';
-import { HTTP_METHOD_GET, HTTP_METHOD_POST } from '@const/http.const';
-import { AUTH_BEARER_PREFIX, AUTH_HEADER_AUTHORIZATION } from '@hooks/auth.const';
 import { EMPTY_STRING, INK_API_URL } from '@const/index';
 import {
   CMS_HEALTH_PATH,
   CMS_LIVE_DOWN,
-  CMS_LIVE_EVENTS_KEY,
-  CMS_LIVE_HEADER_CONTENT_TYPE,
   CMS_LIVE_HTTP_PROTOCOL,
   CMS_LIVE_LOCAL_MSG_PREFIX,
   CMS_LIVE_LOCAL_ROOM_PREFIX,
   CMS_LIVE_OK,
   CMS_LIVE_PATH,
   CMS_LIVE_PATH_SEP,
-  CMS_LIVE_SESSION_KEY,
   CMS_LIVE_TOKEN_QUERY,
   CMS_LIVE_TYPE_PRESENCE_PING,
   CMS_LIVE_WS_PROTOCOL,
@@ -140,31 +134,15 @@ export const currentLiveLocation = (): { location: string; locationLabel: string
   return { location, locationLabel: parts[parts.length - 1] };
 };
 
-export const loadLiveSessionId = (): string => {
-  try {
-    const stored = window.localStorage.getItem(CMS_LIVE_SESSION_KEY);
-    if (stored) {
-      return stored;
-    }
-    const next = window.crypto.randomUUID();
-    window.localStorage.setItem(CMS_LIVE_SESSION_KEY, next);
-    return next;
-  } catch {
-    return `${Date.now()}`;
-  }
-};
-
 export const presencePingBody = (params: {
   name: string;
   avatar: string;
   availability: CmsPresenceStatus;
-  sessionId: string;
 }): string => {
-  const { name, avatar, availability, sessionId } = params;
+  const { name, avatar, availability } = params;
   const { location, locationLabel } = currentLiveLocation();
   return JSON.stringify({
     type: CMS_LIVE_TYPE_PRESENCE_PING,
-    sessionId,
     location,
     locationLabel,
     name,
@@ -215,7 +193,6 @@ export const resolvePresenceUsers = (value: unknown): CmsPresenceUser[] => {
     }
     users.push({
       id,
-      sessionId: readString(row.sessionId) || id,
       name: readString(row.name),
       avatar: readString(row.avatar),
       location: readString(row.location),
@@ -287,7 +264,6 @@ export type CmsLiveParsedPayload = {
   item: unknown;
   users: unknown;
   selfId: string;
-  selfSessionId: string;
   tasks: unknown;
   board: unknown;
   rooms: unknown;
@@ -313,49 +289,11 @@ export const parseLiveSocketPayload = (raw: string): CmsLiveParsedPayload | null
       item: parsed.item,
       users: parsed.users,
       selfId: readString(parsed.selfId),
-      selfSessionId: readString(parsed.selfSessionId),
       tasks: parsed.tasks,
       board: parsed.board,
       rooms: parsed.rooms,
       room: parsed.room,
     };
-  } catch {
-    return null;
-  }
-};
-
-export const liveEventsFromBody = (value: unknown): unknown[] => {
-  if (!isRecord(value)) {
-    return [];
-  }
-  const events = value[CMS_LIVE_EVENTS_KEY];
-  if (!Array.isArray(events)) {
-    return [];
-  }
-  return events;
-};
-
-export const requestCmsLiveHttp = async (params: {
-  token: string;
-  body?: string;
-}): Promise<unknown> => {
-  const { token, body } = params;
-  const headers: Record<string, string> = {
-    [AUTH_HEADER_AUTHORIZATION]: `${AUTH_BEARER_PREFIX}${token}`,
-  };
-  if (body) {
-    headers[CMS_LIVE_HEADER_CONTENT_TYPE] = CONTENT_TYPE_JSON;
-  }
-  try {
-    const response = await fetch(`${cmsApiOrigin()}${CMS_LIVE_PATH}`, {
-      method: body ? HTTP_METHOD_POST : HTTP_METHOD_GET,
-      headers,
-      body,
-    });
-    if (!response.ok) {
-      return null;
-    }
-    return response.json();
   } catch {
     return null;
   }

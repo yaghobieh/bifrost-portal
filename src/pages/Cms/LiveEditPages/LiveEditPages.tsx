@@ -2,7 +2,7 @@ import { useState, type FC } from 'react';
 import { Button, Card, Flex, Input, Typography } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
 import { EMPTY_STRING } from '@const/index';
-import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
+import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import {
   DEFAULT_CUSTOMER_SITE_URL,
   LIVE_EDIT_QUERY,
@@ -38,14 +38,24 @@ export const LiveEditPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.LIVE_EDIT}>
       <Flex direction="column" gap={4}>
-        <div>
-          <Typography variant="h2" className="mb-1">
-            {t.cmsLiveEdit.title}
-          </Typography>
-          <Typography variant="body2" className="bifrost-cms__muted mb-0">
-            {t.cmsLiveEdit.subtitle}
-          </Typography>
-        </div>
+        <CmsPageHeader
+          title={t.cmsLiveEdit.title}
+          subtitle={t.cmsLiveEdit.subtitle}
+          actionTitle={t.cmsLiveEdit.sessionTitle}
+          actionBody={t.cmsLiveEdit.sessionBody}
+          extra={
+            <Button
+              size="sm"
+              variant="primary"
+              disabled={!liveUrl}
+              onClick={() => {
+                void copyLink();
+              }}
+            >
+              {copied ? t.cmsLiveEdit.copied : t.cmsLiveEdit.copyLink}
+            </Button>
+          }
+        />
 
         <Card padding="md">
           <Typography variant="h4" className="mb-2">

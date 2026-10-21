@@ -63,7 +63,21 @@ export const Dashboard: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.DASHBOARD}>
       <Flex direction="column" gap={6} className="bifrost-cms-page">
-        <CmsPageHeader title={t.dashboard.title} subtitle={t.dashboard.subtitle} />
+        <CmsPageHeader
+          title={t.dashboard.title}
+          subtitle={t.dashboard.subtitle}
+          actionTitle={t.dashboard.templatesTitle}
+          actionBody={t.dashboard.templatesSubtitle}
+          extra={
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => navigate(CMS_NAV_ROUTES[CMS_NAV_IDS.PAGES] || ROUTES.CMS_CONTENT)}
+            >
+              {t.dashboard.newPage}
+            </Button>
+          }
+        />
 
         {showOnboarding ? (
           <Card variant="elevated" padding="md" className="bifrost-cms-onboarding-banner">
@@ -88,14 +102,14 @@ export const Dashboard: FC = () => {
           </Card>
         ) : null}
 
-        {loading ? (
+        {loading && (
           <Flex align="center" gap={2}>
             <Spinner size="sm" />
             <Typography variant="body2" className="mb-0">
               {t.dashboard.loading}
             </Typography>
           </Flex>
-        ) : null}
+        )}
 
         <div className="bifrost-cms-stat-row">
           <Card padding="md" className={`bifrost-cms-stat bifrost-cms-stat--${CMS_KPI_TONES.PAGES}`}>
@@ -268,9 +282,9 @@ export const Dashboard: FC = () => {
               size="sm"
               variant="outline"
               className="bifrost-cms-btn-ghost"
-              onClick={() => navigate(ROUTES.CMS_PLANS)}
+              onClick={() => navigate(ROUTES.CMS_SITES)}
             >
-              {t.dashboard.viewUsage}
+              {t.settings.tabMultiSite}
             </Button>
           </Card>
           <div className="bifrost-cms-focus">

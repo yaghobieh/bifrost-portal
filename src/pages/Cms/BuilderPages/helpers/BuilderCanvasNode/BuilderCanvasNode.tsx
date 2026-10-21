@@ -16,6 +16,7 @@ import {
   isContainerKind,
   nodeStyleObject,
 } from '@pages/Cms/BuilderPages/BuilderPages.utils';
+import { WidgetGridTable, isGridTableHtml, isGridTableWidgetId, serializeGridTableHtml } from '@components/WidgetGridTable';
 import type { CanvasNode } from '@pages/Cms/BuilderPages/BuilderPages.types';
 import { useCanvasNodeResize } from '@pages/Cms/BuilderPages/hooks';
 import { BuilderNodeHoverBar } from '../BuilderNodeHoverBar';
@@ -24,9 +25,10 @@ import type { BuilderCanvasNodeProps } from './BuilderCanvasNode.types';
 const renderCanvasBody = (input: {
   node: CanvasNode;
   html: string;
+  preview: boolean;
   onHtmlChange: (id: string, html: string) => void;
 }) => {
-  const { node, html, onHtmlChange } = input;
+  const { node, html, preview, onHtmlChange } = input;
   if (node.kind === CANVAS_KIND.INK) {
     return (
       <InkEditor
@@ -37,6 +39,16 @@ const renderCanvasBody = (input: {
         minHeight={NUMBER_TWO_HUNDRED_TWENTY}
         features={{ blocks: true, slash: true, ai: true }}
         ai={cmsInkAiProps()}
+      />
+    );
+  }
+  if (isGridTableWidgetId(node.widgetId) || isGridTableHtml(html)) {
+    return (
+      <WidgetGridTable
+        html={html}
+        editable={!preview}
+        className="bifrost-cms-grid"
+        onTableChange={(table) => onHtmlChange(node.id, serializeGridTableHtml(table))}
       />
     );
   }
@@ -118,7 +130,7 @@ export const BuilderCanvasNode: FC<BuilderCanvasNodeProps> = (props) => {
         />
       )}
       {node.css && <style>{`[data-node="${node.id}"]{${node.css}}`}</style>}
-      {renderCanvasBody({ node, html: canvasHtml, onHtmlChange })}
+      {renderCanvasBody({ node, html: canvasHtml, preview, onHtmlChange })}
       {node.children.map(renderChild)}
       {!preview && selected && (
         <Button

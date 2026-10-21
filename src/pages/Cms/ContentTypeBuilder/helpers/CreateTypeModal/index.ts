@@ -1,0 +1,1 @@
+export { CreateTypeModal } from './CreateTypeModal';

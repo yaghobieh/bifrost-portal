@@ -1,4 +1,11 @@
-import { TYPE_STRING } from '@const/strings.const';
+import {
+  CONTENT_TYPE_HTML,
+  EMPTY_STRING,
+  HEADER_CONTENT_TYPE,
+  HTML_DOCTYPE_PREFIX,
+  HTML_ROOT_OPEN,
+  TYPE_STRING,
+} from '@const/strings.const';
 import { NETWORK_ERROR_MESSAGE, RESPONSE_SNIPPET_MAX } from './requestWithError.const';
 
 export const requestUrl = (input: RequestInfo | URL): string => {
@@ -32,4 +39,16 @@ export const reasonFromCaught = (error: Error | string): string => {
     return error;
   }
   return NETWORK_ERROR_MESSAGE;
+};
+
+export const isHtmlResponse = (response: Response, body: string): boolean => {
+  const type = (response.headers.get(HEADER_CONTENT_TYPE) ?? EMPTY_STRING).toLowerCase();
+  if (type.includes(CONTENT_TYPE_HTML)) {
+    return true;
+  }
+  const trimmed = body.trim().toLowerCase();
+  if (trimmed.startsWith(HTML_DOCTYPE_PREFIX)) {
+    return true;
+  }
+  return trimmed.startsWith(HTML_ROOT_OPEN);
 };

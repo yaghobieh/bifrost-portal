@@ -4,7 +4,7 @@ import { useNucleus } from '@forgedevstack/synapse';
 import type { ColumnDefinition } from '@forgedevstack/grid-table';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
-import { cmsBuilderPath, cmsEditPath, EMPTY_STRING, PAGE_KIND_DOC, SLASH } from '@const/index';
+import { cmsBuilderPath, cmsEditPath, EMPTY_STRING, PAGE_KIND_ARTICLE, PAGE_KIND_DOC, SLASH } from '@const/index';
 import { authNucleus, contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
 import { loadCmsProfile, loadCmsSite, persistCmsSiteRemote } from '@pages/Cms/SettingsPages';
@@ -58,6 +58,7 @@ import {
 import {
   PAGE_SLUG_PREFIX,
 } from '@pages/Cms/TemplatesPages/TemplatesPages.const';
+import { useSites } from '@hooks/useSites';
 
 export const useContentPages = (): UseContentPagesResult => {
   const { t } = useI18n();
@@ -66,6 +67,7 @@ export const useContentPages = (): UseContentPagesResult => {
   const { token } = useNucleus(authNucleus);
   const { items, loading, error, saving, fetchContent, deleteContent } =
     useNucleus(contentNucleus);
+  const { activeSiteId } = useSites();
   const activeToken = token || providerToken;
   const actorName = loadCmsProfile().displayName || loadCmsProfile().username;
   const [publicDocs, setPublicDocs] = useState<CmsDocItem[]>([]);
@@ -87,9 +89,20 @@ export const useContentPages = (): UseContentPagesResult => {
     labelTemplateKind(kind, t.dashboard);
 
   const cmsRows: ContentTableRow[] = items
-    .filter((item) =>
-      CONTENT_LIST_COLLECTIONS.some((collection) => collection === item.collection),
-    )
+    .filter((item) => {
+      if (item.collection === 'page-meta' || item.collection === 'templates') {
+        return false;
+      }
+      if (!activeSiteId || activeSiteId === 'default') {
+        return true;
+      }
+      const itemSiteId =
+        item.payload?.siteId ||
+        item.payload?.site_id ||
+        (item as Record<string, unknown>).siteId ||
+        (item as Record<string, unknown>).site_id;
+      return itemSiteId === activeSiteId || !itemSiteId;
+    })
     .map((item) => {
       const kind = templateKindFromPayload(item.payload, item.collection);
       return {
@@ -125,22 +138,51 @@ export const useContentPages = (): UseContentPagesResult => {
   });
   const rows: ContentTableRow[] = [...publicRows, ...cmsRows];
 
-  const onNewPage = async () => {
+  const onNewPage = async (targetCollection?: string, targetKind?: string) => {
     if (!activeToken) {
       return;
     }
+    const collection =
+      targetCollection && targetCollection !== 'all'
+        ? targetCollection
+        : CONTENT_COLLECTION_PAGES;
+
+    const kind =
+      targetKind ||
+      (collection === 'articles' || collection === 'article'
+        ? PAGE_KIND_ARTICLE
+        : collection === 'blog'
+          ? 'blog'
+          : PAGE_KIND_DOC);
+
+    const title =
+      collection === 'articles' || collection === 'article'
+        ? 'Untitled Article'
+        : collection === 'blog'
+          ? 'New Blog Post'
+          : `${t.dashboard.newPageBlank}`;
+
+    const slugPrefix =
+      collection === 'articles' || collection === 'article'
+        ? 'article-'
+        : collection === 'blog'
+          ? 'blog-'
+          : PAGE_SLUG_PREFIX;
+
     const item = await saveContentRequest(activeToken, {
-      collection: CONTENT_COLLECTION_PAGES,
-      slug: `${PAGE_SLUG_PREFIX}${Date.now()}`,
+      collection,
+      slug: `${slugPrefix}${Date.now()}`,
       locale: DOCUMENT_DEFAULT_LOCALE,
-      title: t.dashboard.newPageBlank,
+      title,
       status: DOCUMENT_STARTER_STATUS,
       payload: {
-        [PAYLOAD_KIND_KEY]: PAGE_KIND_DOC,
+        [PAYLOAD_KIND_KEY]: kind,
         [PAYLOAD_LEAD_KEY]: EMPTY_STRING,
         [PAYLOAD_SECTIONS_KEY]: [],
         [PAYLOAD_KEY_CREATED_BY]: actorName,
         [PAYLOAD_KEY_UPDATED_BY]: actorName,
+        siteId: activeSiteId || 'default',
+        site_id: activeSiteId || 'default',
       },
     });
     if (!item) {
@@ -355,5 +397,8 @@ export const useContentPages = (): UseContentPagesResult => {
     columns,
     onNewPage,
     onOpenRow,
+    onSetStatus,
+    onDeletePage,
+    onDuplicatePage,
   };
 };

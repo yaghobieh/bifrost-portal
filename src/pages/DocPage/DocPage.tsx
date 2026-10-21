@@ -11,6 +11,7 @@ import { mapCmsDoc } from '@data/docs.mapper';
 import { PageLoader } from '@components/PageLoader';
 import { PublicPageCanvas } from '@components/PublicPageCanvas';
 import { DOC_CRUMB_SEP } from './DocPage.const';
+import { DocSectionTable } from './helpers/DocSectionTable';
 import { docPageTab, renderDocNext, renderDocPrev, renderInline } from './DocPage.utils';
 
 export const DocPage: FC = () => {
@@ -62,28 +63,7 @@ export const DocPage: FC = () => {
               </div>
             )}
             {section.code && <CodeBlock lang={section.code.lang} source={section.code.source} />}
-            {section.table && (
-              <table className="Bp-table">
-                <thead>
-                  <tr>
-                    {section.table.headers.map((header) => (
-                      <th key={header}>{header}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {section.table.rows.map((row) => (
-                    <tr key={row.join('-')}>
-                      {row.map((cell, index) => (
-                        <td key={`${cell}-${index}`} className={index === row.length - NUMBER_ONE ? 'desc' : undefined}>
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            {section.table && <DocSectionTable table={section.table} />}
           </section>
         ))}
         <div className="Bp-foot">

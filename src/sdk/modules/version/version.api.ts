@@ -1,5 +1,5 @@
 import { BIFROST_API_URL, INK_API_URL } from '@const/billing.const';
-import { CMS_CHANGELOG_SLUG, DEFAULT_API_BASE, EMPTY_STRING, PUBLIC_PAGES_PATH } from '@const/strings.const';
+import { CMS_CHANGELOG_SLUG, EMPTY_STRING, PUBLIC_PAGES_PATH } from '@const/strings.const';
 import { NUMBER_ZERO } from '@const/numbers.const';
 import { useApi } from '@sdk/http';
 import {
@@ -74,7 +74,7 @@ const fetchFrom = async (url: string): Promise<VersionInfo | null> => {
   }
 };
 
-const nestBase = (): string => BIFROST_API_URL || DEFAULT_API_BASE;
+const nestBase = (): string => BIFROST_API_URL || INK_API_URL;
 
 const notesFromCopy = (copy: WhatsNewCopy): string => {
   const parts = [copy.lead, copy.body].filter((part) => part.length > NUMBER_ZERO);
@@ -86,9 +86,6 @@ const notesFromCopy = (copy: WhatsNewCopy): string => {
 
 const whatsNewFromNest = async (): Promise<WhatsNewCopy | null> => {
   const base = nestBase();
-  if (!base) {
-    return null;
-  }
   try {
     const params = new URLSearchParams({ [CHANGELOG_SLUG_QUERY]: CMS_CHANGELOG_SLUG });
     const response = await useApi(`${base}${BIFROST_PAGES_PATH}?${params.toString()}`, undefined, {

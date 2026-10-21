@@ -36,6 +36,7 @@ import { parseCloudinaryCloudName, parseCloudinaryCredentials } from '@sdk/modul
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
 import { DeveloperPanel } from '../DeveloperPages';
 import { SettingsPublicNav } from './helpers/SettingsPublicNav';
+import { SettingsSitesPanel } from './helpers/SettingsSitesPanel';
 import {
   SETTINGS_AVATAR_ACCEPT,
   SETTINGS_CHAT_SIDES,
@@ -78,6 +79,7 @@ import type {
   CmsSite,
   CmsThemeColors,
   SettingsSitePanelId,
+  SettingsTabId,
 } from './SettingsPages.types';
 import {
   applyCmsThemeColors,
@@ -138,6 +140,12 @@ export const SettingsPages: FC = () => {
   const [mediaConfigured, setMediaConfigured] = useState(false);
   const [mediaHasKey, setMediaHasKey] = useState(false);
   const [sitePanel, setSitePanel] = useState<SettingsSitePanelId>(SETTINGS_SITE_PANELS.GENERAL);
+  const queryParams = new URLSearchParams(window.location.search);
+  const requestedTab = queryParams.get('tab') as SettingsTabId | null;
+  const initialSettingsTab: SettingsTabId =
+    requestedTab && Object.values(SETTINGS_TABS).includes(requestedTab)
+      ? requestedTab
+      : SETTINGS_TABS.PROFILE;
 
   useEffect(() => {
     if (!user) return;
@@ -339,13 +347,19 @@ export const SettingsPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.SETTINGS}>
       <Flex direction="column" gap={6} className="bifrost-cms-page">
-        <CmsPageHeader title={t.settings.title} subtitle={t.settings.subtitle} />
+        <CmsPageHeader
+          title={t.settings.title}
+          subtitle={t.settings.subtitle}
+          actionTitle={t.settings.profileTitle}
+          actionBody={t.settings.subtitle}
+        />
 
         <Card variant="elevated" padding="md">
-          <Tabs defaultTab={SETTINGS_TABS.PROFILE} variant="line">
+          <Tabs defaultTab={initialSettingsTab} variant="line">
             <TabList className="mb-4" wrap>
               <Tab id={SETTINGS_TABS.PROFILE}>{t.settings.tabProfile}</Tab>
               {chatInstalled ? <Tab id={SETTINGS_TABS.CREW}>{t.settings.tabCrew}</Tab> : null}
+              <Tab id={SETTINGS_TABS.SITES}>{t.settings.tabMultiSite}</Tab>
               <Tab id={SETTINGS_TABS.SITE}>{t.settings.tabSite}</Tab>
               {devPrefs.showDeveloperPage ? (
                 <Tab id={SETTINGS_TABS.DEVELOPER}>{t.settings.tabDeveloper}</Tab>
@@ -525,12 +539,18 @@ export const SettingsPages: FC = () => {
               </div>
             </TabPanel>
             ) : null}
+            <TabPanel tabId={SETTINGS_TABS.SITES}>
+              <div className="bifrost-cms-settings-box">
+                <SettingsSitesPanel />
+              </div>
+            </TabPanel>
             <TabPanel tabId={SETTINGS_TABS.SITE}>
               <div className="bifrost-cms-settings-split">
                 <nav className="bifrost-cms-settings-split__nav" aria-label={t.settings.tabSite}>
                   {(
                     [
                       [SETTINGS_SITE_PANELS.GENERAL, t.settings.sectionGeneral],
+                      [SETTINGS_SITE_PANELS.SITES, t.settings.tabMultiSite],
                       [SETTINGS_SITE_PANELS.WRITING, t.settings.sectionWriting],
                       [SETTINGS_SITE_PANELS.DISCUSSION, t.settings.sectionDiscussion],
                       [SETTINGS_SITE_PANELS.CHROME, t.settings.sectionChrome],
@@ -655,6 +675,9 @@ export const SettingsPages: FC = () => {
                     fullWidth
                   />
                 </SettingsSection>
+                ) : null}
+                {sitePanel === SETTINGS_SITE_PANELS.SITES ? (
+                  <SettingsSitesPanel />
                 ) : null}
                 {sitePanel === SETTINGS_SITE_PANELS.WRITING ? (
                 <SettingsSection
@@ -811,27 +834,35 @@ export const SettingsPages: FC = () => {
                       ))}
                     </div>
                   </div>
-                  <SettingsPublicNav
-                    items={site.publicNavItems}
-                    disabled={!canEditSettings}
-                    title={t.settings.publicNavVisibility}
-                    hint={t.settings.publicNavHint}
-                    labelTitle={t.settings.publicNavLabel}
-                    hrefTitle={t.settings.publicNavHref}
-                    addLabel={t.settings.publicNavAdd}
-                    removeLabel={t.settings.publicNavRemove}
-                    moveUpLabel={t.settings.publicNavMoveUp}
-                    moveDownLabel={t.settings.publicNavMoveDown}
-                    visibleLabel={t.settings.publicNavVisible}
-                    onChange={(items) => {
-                      setSite((current) => ({
-                        ...current,
-                        publicNavItems: items,
-                        hiddenPublicNavIds: hiddenIdsFromPublicNav(items),
-                      }));
-                      markDirty();
-                    }}
-                  />
+                  <div>
+                    <Typography variant="h5" className="mb-1">
+                      {t.settings.publicNavVisibility}
+                    </Typography>
+                    <Typography variant="caption" className="bifrost-cms__muted mb-2 block">
+                      {t.settings.publicNavHint}
+                    </Typography>
+                    <SettingsPublicNav
+                      items={site.publicNavItems}
+                      disabled={!canEditSettings}
+                      title={t.settings.publicNavVisibility}
+                      hint={t.settings.publicNavHint}
+                      labelTitle={t.settings.publicNavLabel}
+                      hrefTitle={t.settings.publicNavHref}
+                      addLabel={t.settings.publicNavAdd}
+                      removeLabel={t.settings.publicNavRemove}
+                      moveUpLabel={t.settings.publicNavMoveUp}
+                      moveDownLabel={t.settings.publicNavMoveDown}
+                      visibleLabel={t.settings.publicNavVisible}
+                      onChange={(items) => {
+                        setSite((current) => ({
+                          ...current,
+                          publicNavItems: items,
+                          hiddenPublicNavIds: hiddenIdsFromPublicNav(items),
+                        }));
+                        markDirty();
+                      }}
+                    />
+                  </div>
                 </SettingsSection>
                 ) : null}
                 {sitePanel === SETTINGS_SITE_PANELS.READING ? (
@@ -847,6 +878,18 @@ export const SettingsPages: FC = () => {
                       setSite((current) => ({
                         ...current,
                         homepagePath: event.target.value,
+                      }));
+                      markDirty();
+                    }}
+                  />
+                  <Input
+                    id={SETTINGS_SITE_INPUT_IDS.BLOG_PATH}
+                    label={t.settings.blogPath}
+                    value={site.blogPath}
+                    onChange={(event) => {
+                      setSite((current) => ({
+                        ...current,
+                        blogPath: event.target.value,
                       }));
                       markDirty();
                     }}

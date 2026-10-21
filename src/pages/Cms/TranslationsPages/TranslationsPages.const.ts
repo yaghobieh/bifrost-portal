@@ -9,3 +9,5 @@ export const TRANSLATION_CONTENT_COLLECTIONS: readonly string[] = [
   CONTENT_COLLECTION_PAGES,
   CONTENT_COLLECTION_DOCS,
 ];
+
+export const TRANSLATE_CATALOGS_PATH = '/api/cms/translate-catalogs';

@@ -2,6 +2,8 @@ import { useEffect, useState, type FC } from 'react';
 import { Flex } from '@forgedevstack/bear';
 import { useNucleus } from '@forgedevstack/synapse';
 import { EMPTY_STRING } from '@const/strings.const';
+import { fetchPublicDocsList } from '@data/index';
+import type { CmsDocItem } from '@data/docs.types';
 import { contentNucleus } from '@sdk/index';
 import { saveContentRequest } from '@sdk/modules/content';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '@pages/Cms/CmsShell';
@@ -26,14 +28,38 @@ export const TranslationsPages: FC = () => {
   const { token } = useAuth();
   const { items, fetchContent } = useNucleus(contentNucleus);
   const [pageId, setPageId] = useState(EMPTY_STRING);
+  const [publicDocs, setPublicDocs] = useState<CmsDocItem[]>([]);
   const bag = seedIfEmpty(loadCmsTranslationsLocal() || TRANSLATION_SEED);
-  const pages = items
+  const adminPages = items
     .filter((item) => TRANSLATION_CONTENT_COLLECTIONS.includes(item.collection))
     .map((item) => ({
       id: item.id,
       title: item.title || item.slug || item.id,
       keys: pageKeyCount(bag, item.id),
     }));
+  const knownIds = new Set(adminPages.map((page) => page.id));
+  const publicPages = publicDocs.flatMap((item) => {
+    if (!item.id) {
+      return [];
+    }
+    if (knownIds.has(item.id)) {
+      return [];
+    }
+    return [
+      {
+        id: item.id,
+        title: item.title || item.slug || item.id,
+        keys: pageKeyCount(bag, item.id),
+      },
+    ];
+  });
+  const pages = [...publicPages, ...adminPages];
+
+  useEffect(() => {
+    void fetchPublicDocsList().then((next) => {
+      setPublicDocs(next);
+    });
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -68,7 +94,12 @@ export const TranslationsPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.TRANSLATIONS}>
       <Flex direction="column" gap={4}>
-        <CmsPageHeader title={t.cmsTranslations.title} subtitle={t.cmsTranslations.subtitle} />
+        <CmsPageHeader
+          title={t.cmsTranslations.title}
+          subtitle={t.cmsTranslations.subtitle}
+          actionTitle={t.cmsTranslations.addPage}
+          actionBody={t.cmsTranslations.subtitle}
+        />
         <TranslationsManager
           pageId={pageId}
           onOpenPage={setPageId}

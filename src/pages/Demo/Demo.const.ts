@@ -1,3 +1,7 @@
-export const DEMO_DOC_HOW_TO = 'how-to-use';
-export const DEMO_DOC_INSTALLMENT = 'installment';
-export const DEMO_DOC_MCP = 'mcp';
+export const DEMO_TAB = {
+  INDEX: 'index',
+  ARTICLE: 'article',
+  STATUS: 'status',
+} as const;
+
+export const DEMO_TAB_ORDER = [DEMO_TAB.INDEX, DEMO_TAB.ARTICLE, DEMO_TAB.STATUS] as const;

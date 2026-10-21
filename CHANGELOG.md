@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.16
+
+### Planned
+- Open-source Headless CMS architecture & design rebuild (CMS-230)
+- Content Manager: Collection types list view with GridTable, search, filters, pagination, and dynamic schema form (CMS-231)
+- Content-Type Builder: Visual schema modeler for Collection Types, Single Types, and Components (CMS-232)
+- Admin Panel & Security: Roles, granular permissions, and API tokens (CMS-233)
+- Media Library: Grid & list asset viewer, folder organization, and upload cropping (CMS-234)
+- Marketplace & Analytics: In-portal extension marketplace and API traffic dashboard (CMS-235)
+
 ## 1.1.12
 
 ### Planned

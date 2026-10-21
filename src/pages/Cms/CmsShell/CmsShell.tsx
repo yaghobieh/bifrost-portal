@@ -63,8 +63,6 @@ import { CmsGlowLoader } from '../CmsGlowLoader';
 import { CmsHealthDot } from './CmsHealthDot';
 import { dispatchAgentApply } from './cmsAgent.utils';
 import { USER_MENU_MIN_WIDTH } from './cmsAgent.const';
-import { CmsBottomNav } from './helpers/CmsBottomNav';
-import { CmsNavOverlay } from './helpers/CmsNavOverlay';
 import {
   CMS_AVATAR_INITIALS_LENGTH,
   CMS_ICON_SIZE,
@@ -74,6 +72,7 @@ import {
   CMS_SEARCH_INPUT_ID,
   CMS_SEARCH_KEY,
   CMS_KEY_ENTER,
+  CMS_SIDEBAR_ACTIVE_VARIANT,
   CMS_SIDEBAR_COLLAPSED_WIDTH_PX,
   CMS_BOTTOM_NAV_IDS,
   CMS_CREW_PENDING_PREFIX,
@@ -92,8 +91,11 @@ import {
   saveSidebarWidth,
 } from './CmsShell.utils';
 import { ErrorHost } from './ErrorHost';
-import { CmsBrandLink } from './helpers/CmsBrandLink';
 import { CmsUpdateBanner } from './helpers/CmsUpdateBanner';
+import { CmsBottomNav } from './helpers/CmsBottomNav';
+import { CmsNavOverlay } from './helpers/CmsNavOverlay';
+import { SiteSwitcher } from './helpers/SiteSwitcher';
+import { AlloyAgentTrigger } from './helpers/AlloyAgentTrigger';
 import { useCmsLive } from './CmsLiveProvider';
 import { CMS_LIVE_LOCAL_ROOM_PREFIX } from './CmsLive.const';
 import { findDirectRoom, findServerMatch } from './CmsLive.utils';
@@ -126,9 +128,10 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     loadCmsModePreference(),
   );
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatPrompt, setChatPrompt] = useState<string | undefined>(undefined);
   const [crewRoomId, setCrewRoomId] = useState<string | null>(null);
   const [flyoutId, setFlyoutId] = useState<string | null>(null);
-  const { onlineUsers, rooms, createRoom, sendChat, selfId, selfSessionId, tasks, availability, setAvailability } = useCmsLive();
+  const { onlineUsers, rooms, createRoom, sendChat, selfId, tasks, availability, setAvailability } = useCmsLive();
   const [site, setSite] = useState(() => loadCmsSite());
   const [searchQuery, setSearchQuery] = useState(EMPTY_STRING);
   const [navOpen, setNavOpen] = useState(false);
@@ -342,16 +345,22 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.DASHBOARD],
     },
     {
-      id: CMS_NAV_IDS.PLANS,
-      label: t.cmsShell.plans,
-      icon: <BearIcons.BarChartIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.PLANS],
+      id: CMS_NAV_IDS.SITES,
+      label: t.settings.tabMultiSite,
+      icon: <BearIcons.GlobeIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.SITES],
     },
     {
       id: CMS_NAV_IDS.PAGES,
       label: t.cmsShell.pages,
       icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.PAGES],
+    },
+    {
+      id: CMS_NAV_IDS.ARTICLES,
+      label: t.cmsShell.articles,
+      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.ARTICLES],
     },
     {
       id: CMS_NAV_IDS.BLOG,
@@ -381,8 +390,8 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const designChildren: CmsSidebarNavItem[] = [
     {
       id: CMS_NAV_IDS.BUILDER,
-      label: t.cmsShell.contentTypeBuilder,
-      icon: <BearIcons.GridIcon size={CMS_ICON_SIZE} />,
+      label: t.cmsShell.builder,
+      icon: <BearIcons.LayersIcon size={CMS_ICON_SIZE} />,
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.BUILDER],
     },
     {
@@ -392,10 +401,10 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.TRANSLATIONS],
     },
     {
-      id: CMS_NAV_IDS.CAST,
-      label: t.cmsShell.cast,
-      icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.CAST],
+      id: CMS_NAV_IDS.SCHEMA_FIELDS,
+      label: t.cmsShell.contentTypeBuilder,
+      icon: <BearIcons.GridIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.SCHEMA_FIELDS],
     },
     {
       id: CMS_NAV_IDS.MEDIA,
@@ -417,6 +426,12 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     },
   ].filter(visibleLeaf);
   const generalChildren: CmsSidebarNavItem[] = [
+    {
+      id: CMS_NAV_IDS.SITES,
+      label: t.settings.tabMultiSite,
+      icon: <BearIcons.GlobeIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.SITES],
+    },
     {
       id: CMS_NAV_IDS.SETTINGS,
       label: t.cmsShell.projectSettings,
@@ -462,27 +477,25 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       children: generalChildren,
     },
   ];
-  if (devPrefs.showDeveloperPage) {
-    sidebarGroups.push({
-      id: CMS_NAV_SECTIONS.DEVELOPER,
-      label: t.cmsShell.developer,
-      icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
-      children: [
-        {
-          id: CMS_NAV_IDS.DEVELOPER,
-          label: t.cmsShell.developer,
-          icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
-          href: CMS_NAV_ROUTES[CMS_NAV_IDS.DEVELOPER],
-        },
-        {
-          id: CMS_NAV_IDS.AUDIT,
-          label: t.cmsShell.audit,
-          icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
-          href: CMS_NAV_ROUTES[CMS_NAV_IDS.AUDIT],
-        },
-      ].filter(visibleLeaf),
-    });
-  }
+  sidebarGroups.push({
+    id: CMS_NAV_SECTIONS.DEVELOPER,
+    label: t.cmsShell.developer || 'API & Developer',
+    icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+    children: [
+      {
+        id: CMS_NAV_IDS.DEVELOPER,
+        label: 'API Reference',
+        icon: <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />,
+        href: CMS_NAV_ROUTES[CMS_NAV_IDS.DEVELOPER],
+      },
+      {
+        id: CMS_NAV_IDS.AUDIT,
+        label: t.cmsShell.audit,
+        icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,
+        href: CMS_NAV_ROUTES[CMS_NAV_IDS.AUDIT],
+      },
+    ].filter(visibleLeaf),
+  });
   const visibleGroups = sidebarGroups.filter((group) => (group.children?.length ?? 0) > 0);
   const sidebarItems: CmsSidebarNavItem[] = resolveSidebarNavItems({
     groups: visibleGroups,
@@ -625,12 +638,12 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       className={`bifrost-cms bifrost-cms--${resolvedMode}${navOpen ? ' is-nav-open' : ''}`}
       data-color-mode={resolvedMode}
     >
-      {navOpen ? (
+      {navOpen && (
         <CmsNavOverlay
           label={t.cmsShell.closeNav}
           onClose={() => setNavOpen(false)}
         />
-      ) : null}
+      )}
       <div className="bifrost-cms__rail">
       <div className="bifrost-cms__rail-stack">
       <Sidebar
@@ -642,21 +655,26 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
         collapsed={collapsed}
         onCollapsedChange={onCollapsedChange}
         fullHeight
-        activeVariant="indicator"
+        activeVariant={CMS_SIDEBAR_ACTIVE_VARIANT}
         variant="default"
         position="left"
         className="bifrost-cms__sidebar"
         header={
           <Flex direction="column" gap={2} className="bifrost-cms__brand-block">
-            <CmsBrandLink
-              src={toCloudinarySrc(site.logoDataUrl || BIFROST_ICON_SRC, cloudName)}
-              alt={site.siteName || t.cmsShell.brand}
-              name={site.siteName || t.cmsShell.brand}
-              collapsed={collapsed}
-              href={ROUTES.HOME}
-              label={t.cmsShell.backToPortal}
-              logoSize={CMS_LOGO_SIZE_PX}
-            />
+            <Flex align="center" gap={2}>
+              <img
+                src={toCloudinarySrc(site.logoDataUrl || BIFROST_ICON_SRC, cloudName)}
+                alt={site.siteName || t.cmsShell.brand}
+                className="bifrost-cms__logo"
+                width={CMS_LOGO_SIZE_PX}
+                height={CMS_LOGO_SIZE_PX}
+              />
+              {collapsed ? null : (
+                <Typography variant="h6" className="bifrost-cms__brand mb-0">
+                  {site.siteName || t.cmsShell.brand}
+                </Typography>
+              )}
+            </Flex>
           </Flex>
         }
       />
@@ -666,7 +684,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               <span className="bifrost-cms__avatar-swatch">
                 <Avatar src={avatarSrc} initials={avatarInitials} size="sm" />
               </span>
-              {collapsed ? null : (
+              {!collapsed && (
                 <Typography variant="caption" className="bifrost-cms__footer-name mb-0">
                   {displayName}
                 </Typography>
@@ -685,7 +703,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
           </Flex>
       </div>
       </div>
-      {collapsed ? null : (
+      {!collapsed && (
         <button
           type="button"
           className="bifrost-cms__resize"
@@ -693,7 +711,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
           onMouseDown={onResizeStart}
         />
       )}
-      {collapsed && flyoutGroup ? (
+      {collapsed && flyoutGroup && (
         <div className="bifrost-cms__nav-flyout" role="menu">
           <Typography variant="caption" className="bifrost-cms__nav-flyout-title mb-0">
             {flyoutGroup.label}
@@ -710,7 +728,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             </button>
           ))}
         </div>
-      ) : null}
+      )}
       </div>
       <div className="bifrost-cms__main">
         {site.showTopNav ? (
@@ -722,6 +740,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             leftContent={
               <Flex align="center" gap={2} className="bifrost-cms__appbar-left">
                 {navToggle}
+                <SiteSwitcher token={activeToken} />
                 <div className="bifrost-cms__search-wrap">
                 <Input
                   id={CMS_SEARCH_INPUT_ID}
@@ -767,7 +786,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               </Flex>
             }
             centerContent={
-              showAgentBar && <CmsAgentBar onApply={onAgentApply} chipsClassName="flex-wrap" />
+              showAgentBar ? <CmsAgentBar onApply={onAgentApply} /> : undefined
             }
             rightContent={
               <Flex align="center" gap={3}>
@@ -778,11 +797,17 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
                   aria-label={t.cmsShell.bundles}
                   onClick={() => navigate(CMS_NAV_ROUTES[CMS_NAV_IDS.BUNDLES])}
                 />
+                <AlloyAgentTrigger
+                  onOpen={() => setChatOpen(true)}
+                  onSelectPrompt={(prompt) => {
+                    setChatPrompt(prompt);
+                    setChatOpen(true);
+                  }}
+                />
                 <CmsHealthDot />
                 <CmsOnlineStatus
                   users={onlineUsers}
                   currentUserId={currentUserId}
-                  currentSessionId={selfSessionId}
                   onOpenUser={openCrewWithUser}
                 />
                 <Button
@@ -917,7 +942,6 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
             onSend={sendChat}
             onOpenUser={openCrewWithUser}
             onOpenRoom={(id) => setCrewRoomId(id)}
-            onLeaveRoom={() => setCrewRoomId(CMS_CREW_DRAWER_OPEN)}
             onEnsureChannel={(tag, extraIds) =>
               createRoom([currentUserId, ...(extraIds ?? [])], tag)
             }
@@ -948,10 +972,14 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       />
       <CmsChat
         isOpen={chatOpen}
-        onClose={() => setChatOpen(false)}
+        onClose={() => {
+          setChatOpen(false);
+          setChatPrompt(undefined);
+        }}
         token={activeToken}
         side={site.chatSide}
         crewAvailable={canCrewChat}
+        initialPrompt={chatPrompt}
         onOpenCrew={() => {
           setChatOpen(false);
           setCrewRoomId(CMS_CREW_DRAWER_OPEN);

@@ -178,7 +178,12 @@ export const ExtensionsPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.BUNDLES}>
       <Flex direction="column" gap={6} className="bifrost-cms-page">
-        <CmsPageHeader title={t.cmsExtensions.title} subtitle={t.cmsExtensions.subtitle} />
+        <CmsPageHeader
+          title={t.cmsExtensions.title}
+          subtitle={t.cmsExtensions.subtitle}
+          actionTitle={t.cmsExtensions.install}
+          actionBody={t.cmsExtensions.subtitle}
+        />
         <div className="bifrost-cms-store-filter">
           <Input
             id={EXTENSION_SEARCH_INPUT_ID}

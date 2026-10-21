@@ -42,10 +42,12 @@ import {
   PAYLOAD_HTML_FALLBACK,
   PAYLOAD_HTML_KEY,
   PAYLOAD_HTML_LIST_KEYS,
+  PAYLOAD_ID_KEY,
   PAYLOAD_ITEMS_KEY,
   PAYLOAD_LEVEL_KEY,
   PAYLOAD_ORDERED_KEY,
   PAYLOAD_PARAGRAPHS_KEY,
+  PAYLOAD_SECTIONS_KEY,
   PAYLOAD_SRC_KEY,
   PAYLOAD_TABLE_KEY,
   PAYLOAD_TABLE_HEADERS_KEY,
@@ -55,8 +57,24 @@ import {
   PAYLOAD_TYPE_KEY,
   SCHEDULE_DEFAULT_TIME,
   SECTION_TYPE,
+  BEAR_WIDGET_COMPONENT,
 } from './ContentEdit.const';
 import type { ContentEditTarget } from './ContentEdit.types';
+import { CAST_FIELD_TYPE } from '@pages/Cms/CastPages/CastPages.const';
+import { createNamedCastField } from '@pages/Cms/CastPages/CastPages.utils';
+import type { CastField } from '@pages/Cms/CastPages/CastPages.types';
+import type { DocTable } from '@data/docs.types';
+import {
+  GRID_TABLE_FIELD_ID_PREFIX,
+  GRID_TABLE_FIELD_PREFIX,
+  GRID_TABLE_WIDGET_ID,
+} from '@components/WidgetGridTable/WidgetGridTable.const';
+import {
+  gridTableSectionIdFromFieldName,
+  isGridTableHtml,
+  parseTableFromHtml,
+  serializeGridTableHtml,
+} from '@components/WidgetGridTable';
 
 const escapeHtml = (value: string): string =>
   value
@@ -428,6 +446,7 @@ export const joinScheduleAt = (date: Date | null, time: string): string => {
 export const htmlFromCastValues = (values: Record<string, string>): string => {
   const blocks = Object.entries(values)
     .filter(([, text]) => text.trim().length > NUMBER_ZERO)
+    .filter(([, text]) => !isGridTableHtml(text))
     .map(([, text]) => `<p>${text}</p>`);
   if (blocks.length === NUMBER_ZERO) {
     return EMPTY_STRING;
@@ -449,4 +468,127 @@ export const resolveEditBodyHtml = (params: {
     return htmlFromCastValues(values);
   }
   return fallback;
+};
+
+const tableFromSection = (entry: Record<string, unknown>): DocTable | null => {
+  const table = asRecord(entry[PAYLOAD_TABLE_KEY]);
+  if (!table) {
+    return null;
+  }
+  const headersRaw = table[PAYLOAD_TABLE_HEADERS_KEY];
+  const rowsRaw = table[PAYLOAD_TABLE_ROWS_KEY];
+  if (!Array.isArray(headersRaw) || !Array.isArray(rowsRaw)) {
+    return null;
+  }
+  const headers = headersRaw.filter((cell): cell is string => isStringValue(cell));
+  const rows = rowsRaw
+    .filter((row): row is unknown[] => Array.isArray(row))
+    .map((row) => row.filter((cell): cell is string => isStringValue(cell)));
+  if (!headers.length || !rows.length) {
+    return null;
+  }
+  return { headers, rows };
+};
+
+const gridTableFieldName = (sectionId: string): string =>
+  `${GRID_TABLE_FIELD_PREFIX}${GRID_TABLE_WIDGET_ID}_${sectionId}`;
+
+const gridTableFieldId = (sectionId: string): string =>
+  `${GRID_TABLE_FIELD_ID_PREFIX}${GRID_TABLE_WIDGET_ID}-${sectionId}`;
+
+export const mergeDocTableWidgets = (params: {
+  payload: Record<string, unknown>;
+  fields: CastField[];
+  values: Record<string, string>;
+}): { fields: CastField[]; values: Record<string, string> } => {
+  const { payload, fields, values } = params;
+  const sections = payload[PAYLOAD_SECTIONS_KEY];
+  if (!Array.isArray(sections)) {
+    return { fields, values };
+  }
+  const nextFields = [...fields];
+  const nextValues = { ...values };
+  sections.forEach((section) => {
+    const entry = asRecord(section);
+    if (!entry) {
+      return;
+    }
+    const table = tableFromSection(entry);
+    if (!table) {
+      return;
+    }
+    const sectionId = stringField(entry, PAYLOAD_ID_KEY);
+    if (!sectionId) {
+      return;
+    }
+    const name = gridTableFieldName(sectionId);
+    const exists = nextFields.some((field) => field.name === name);
+    if (!exists) {
+      nextFields.push(
+        createNamedCastField({
+          id: gridTableFieldId(sectionId),
+          name,
+          label: BEAR_WIDGET_COMPONENT.GRID_TABLE,
+          type: CAST_FIELD_TYPE.TEXTAREA,
+        }),
+      );
+    }
+    if (!nextValues[name]) {
+      nextValues[name] = serializeGridTableHtml(table);
+    }
+  });
+  return { fields: nextFields, values: nextValues };
+};
+
+export const withDocTableSections = (
+  payload: Record<string, unknown>,
+  values: Record<string, string>,
+): Record<string, unknown> => {
+  const sections = payload[PAYLOAD_SECTIONS_KEY];
+  if (!Array.isArray(sections)) {
+    return payload;
+  }
+  const next = sections.map((section) => {
+    const entry = asRecord(section);
+    if (!entry) {
+      return section;
+    }
+    const sectionId = stringField(entry, PAYLOAD_ID_KEY);
+    if (!sectionId) {
+      return section;
+    }
+    const html = values[gridTableFieldName(sectionId)];
+    if (!html) {
+      return section;
+    }
+    const table = parseTableFromHtml(html);
+    if (!table) {
+      return section;
+    }
+    return { ...entry, [PAYLOAD_TABLE_KEY]: table };
+  });
+  Object.entries(values).forEach(([name, html]) => {
+    const sectionId = gridTableSectionIdFromFieldName(name);
+    if (!sectionId) {
+      return;
+    }
+    const already = next.some((section) => {
+      const entry = asRecord(section);
+      return Boolean(entry && stringField(entry, PAYLOAD_ID_KEY) === sectionId);
+    });
+    if (already) {
+      return;
+    }
+    const table = parseTableFromHtml(html);
+    if (!table) {
+      return;
+    }
+    next.push({
+      [PAYLOAD_ID_KEY]: sectionId,
+      [PAYLOAD_HEADING_KEY]: BEAR_WIDGET_COMPONENT.GRID_TABLE,
+      [PAYLOAD_PARAGRAPHS_KEY]: [],
+      [PAYLOAD_TABLE_KEY]: table,
+    });
+  });
+  return { ...payload, [PAYLOAD_SECTIONS_KEY]: next };
 };

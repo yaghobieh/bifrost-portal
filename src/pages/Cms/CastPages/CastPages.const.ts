@@ -23,6 +23,9 @@ export const CAST_FIELD_TYPE = {
   FILE: 'file',
   BACKGROUND: 'background',
   SELECT: 'select',
+  DATE: 'date',
+  BOOLEAN: 'boolean',
+  RELATION: 'relation',
 } as const satisfies Record<string, CastFieldType>;
 
 export const CAST_SLUG_REPLACE = /[^a-z0-9]+/g;
@@ -38,4 +41,7 @@ export const CAST_FIELD_TYPE_OPTIONS: readonly { value: CastFieldType; labelKey:
   { value: CAST_FIELD_TYPE.FILE, labelKey: CAST_FIELD_TYPE.FILE },
   { value: CAST_FIELD_TYPE.BACKGROUND, labelKey: CAST_FIELD_TYPE.BACKGROUND },
   { value: CAST_FIELD_TYPE.SELECT, labelKey: CAST_FIELD_TYPE.SELECT },
+  { value: CAST_FIELD_TYPE.DATE, labelKey: CAST_FIELD_TYPE.DATE },
+  { value: CAST_FIELD_TYPE.BOOLEAN, labelKey: CAST_FIELD_TYPE.BOOLEAN },
+  { value: CAST_FIELD_TYPE.RELATION, labelKey: CAST_FIELD_TYPE.RELATION },
 ];

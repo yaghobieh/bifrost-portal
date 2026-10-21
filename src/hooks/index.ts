@@ -22,3 +22,6 @@ export type {
 } from './auth.types';
 export { usePublicPage } from './usePublicPage';
 export type { UsePublicPageResult } from './usePublicPage.types';
+export { useSites, CMS_ACTIVE_SITE_KEY, CMS_ACTIVE_SITE_EVENT } from './useSites';
+export { useAlloyAgent } from './useAlloyAgent';
+export type { UseAlloyAgentOptions, UseAlloyAgentResult } from './useAlloyAgent';
