@@ -6,9 +6,9 @@ import { en } from '../src/i18n/en';
 import { es } from '../src/i18n/es';
 
 describe('CMS-240: Multi-Site nav visibility, navy theme, and Alloy Copilot UI', () => {
-  test('should have SITES in CMS_NAV_IDS and point to settings sites tab', () => {
+  test('should have SITES in CMS_NAV_IDS and point to dedicated /cms/sites route', () => {
     assert.strictEqual(CMS_NAV_IDS.SITES, 'sites');
-    assert.strictEqual(CMS_NAV_ROUTES[CMS_NAV_IDS.SITES], '/cms/settings?tab=sites');
+    assert.strictEqual(CMS_NAV_ROUTES[CMS_NAV_IDS.SITES], '/cms/sites');
   });
 
   test('should have SITES as a first-class tab in SETTINGS_TABS', () => {

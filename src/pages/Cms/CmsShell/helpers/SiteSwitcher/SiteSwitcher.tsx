@@ -116,7 +116,7 @@ export const SiteSwitcher: FC<SiteSwitcherProps> = ({ token, className }) => {
               fullWidth
               onClick={() => {
                 setOpen(false);
-                navigate(`${CMS_NAV_ROUTES[CMS_NAV_IDS.SETTINGS]}?tab=sites`);
+                navigate(CMS_NAV_ROUTES[CMS_NAV_IDS.SITES]);
               }}
               className="text-xs text-[#1e3a8a] hover:text-[#172554] hover:bg-blue-50 dark:hover:bg-blue-950/30 justify-center font-medium"
             >
