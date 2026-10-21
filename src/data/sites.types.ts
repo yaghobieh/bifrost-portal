@@ -23,4 +23,22 @@ export type CreateSiteInput = {
   isDefault?: boolean;
 };
 
-export type UpdateSiteInput = Partial<CreateSiteInput>;
+export type UpdateSiteInput = Partial<CreateSiteInput & { settings?: Record<string, unknown> }>;
+
+export type SitePlugin = {
+  id: string;
+  name: string;
+  enabled: boolean;
+  version?: string;
+  description?: string;
+};
+
+export type SiteUser = {
+  id: string;
+  name: string;
+  email?: string;
+  role: string;
+  globalAccess?: boolean;
+  isOwner?: boolean;
+  siteId?: string;
+};

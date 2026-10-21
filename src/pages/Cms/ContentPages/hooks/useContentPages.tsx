@@ -58,6 +58,7 @@ import {
 import {
   PAGE_SLUG_PREFIX,
 } from '@pages/Cms/TemplatesPages/TemplatesPages.const';
+import { useSites } from '@hooks/useSites';
 
 export const useContentPages = (): UseContentPagesResult => {
   const { t } = useI18n();
@@ -66,6 +67,7 @@ export const useContentPages = (): UseContentPagesResult => {
   const { token } = useNucleus(authNucleus);
   const { items, loading, error, saving, fetchContent, deleteContent } =
     useNucleus(contentNucleus);
+  const { activeSiteId } = useSites();
   const activeToken = token || providerToken;
   const actorName = loadCmsProfile().displayName || loadCmsProfile().username;
   const [publicDocs, setPublicDocs] = useState<CmsDocItem[]>([]);
@@ -87,9 +89,20 @@ export const useContentPages = (): UseContentPagesResult => {
     labelTemplateKind(kind, t.dashboard);
 
   const cmsRows: ContentTableRow[] = items
-    .filter((item) =>
-      item.collection !== 'page-meta' && item.collection !== 'templates',
-    )
+    .filter((item) => {
+      if (item.collection === 'page-meta' || item.collection === 'templates') {
+        return false;
+      }
+      if (!activeSiteId || activeSiteId === 'default') {
+        return true;
+      }
+      const itemSiteId =
+        item.payload?.siteId ||
+        item.payload?.site_id ||
+        (item as Record<string, unknown>).siteId ||
+        (item as Record<string, unknown>).site_id;
+      return itemSiteId === activeSiteId || !itemSiteId;
+    })
     .map((item) => {
       const kind = templateKindFromPayload(item.payload, item.collection);
       return {
@@ -168,6 +181,8 @@ export const useContentPages = (): UseContentPagesResult => {
         [PAYLOAD_SECTIONS_KEY]: [],
         [PAYLOAD_KEY_CREATED_BY]: actorName,
         [PAYLOAD_KEY_UPDATED_BY]: actorName,
+        siteId: activeSiteId || 'default',
+        site_id: activeSiteId || 'default',
       },
     });
     if (!item) {

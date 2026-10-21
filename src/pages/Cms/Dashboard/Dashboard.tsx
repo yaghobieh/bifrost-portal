@@ -282,9 +282,9 @@ export const Dashboard: FC = () => {
               size="sm"
               variant="outline"
               className="bifrost-cms-btn-ghost"
-              onClick={() => navigate(ROUTES.CMS_PLANS)}
+              onClick={() => navigate(ROUTES.CMS_SITES)}
             >
-              {t.dashboard.viewUsage}
+              {t.settings.tabMultiSite}
             </Button>
           </Card>
           <div className="bifrost-cms-focus">

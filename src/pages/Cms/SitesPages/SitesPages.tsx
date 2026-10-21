@@ -1,8 +1,8 @@
 import type { FC } from 'react';
-import { Card, Flex } from '@forgedevstack/bear';
+import { Flex } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
 import { CmsShell, CMS_NAV_IDS, CmsPageHeader } from '../CmsShell';
-import { SettingsSitesPanel } from '../SettingsPages/helpers/SettingsSitesPanel';
+import { NetworkManagerDashboard } from './NetworkManagerDashboard';
 
 export const SitesPages: FC = () => {
   const { t } = useI18n();
@@ -12,16 +12,12 @@ export const SitesPages: FC = () => {
       <Flex direction="column" gap={6} className="bifrost-cms-page">
         <CmsPageHeader
           title={t.settings.tabMultiSite}
-          subtitle="Manage multi-site network, domains, and localized portals"
+          subtitle="Multi-site network orchestration, scoped pages and URLs, independent plugins, and user permissions"
           actionTitle={t.settings.tabMultiSite}
-          actionBody="Create and configure multiple portals and sites in your Bifrost network"
+          actionBody="Supervise and administer all portals and sites across your Bifrost network"
         />
 
-        <Card variant="elevated" padding="md">
-          <div className="bifrost-cms-settings-box">
-            <SettingsSitesPanel />
-          </div>
-        </Card>
+        <NetworkManagerDashboard />
       </Flex>
     </CmsShell>
   );
