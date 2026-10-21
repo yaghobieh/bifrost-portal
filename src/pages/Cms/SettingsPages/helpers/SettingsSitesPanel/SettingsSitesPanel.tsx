@@ -162,7 +162,7 @@ export const SettingsSitesPanel: FC<SettingsSitesPanelProps> = ({
           variant="primary"
           icon={<BearIcons.PlusIcon size={SITES_ICON_SIZE} />}
           onClick={openCreateModal}
-          className="bg-pink-600 hover:bg-pink-700 text-white font-semibold shadow-sm"
+          className="bg-[#1e3a8a] hover:bg-[#172554] text-white font-semibold shadow-sm"
         >
           {t.settings.addSite}
         </Button>
@@ -190,7 +190,7 @@ export const SettingsSitesPanel: FC<SettingsSitesPanelProps> = ({
               variant="outlined"
               padding="md"
               className={`transition-all bg-white border rounded-xl shadow-xs relative flex flex-col justify-between ${
-                isActive ? 'border-pink-500 ring-2 ring-pink-500/20' : 'border-gray-200 hover:border-gray-300'
+                isActive ? 'border-[#1e3a8a] ring-2 ring-blue-900/20 bg-blue-50/20' : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               <div>
@@ -200,7 +200,7 @@ export const SettingsSitesPanel: FC<SettingsSitesPanelProps> = ({
                       {site.name}
                     </Typography>
                     {isActive && (
-                      <Badge variant="info" className="bg-pink-600 text-white font-semibold text-xs">
+                      <Badge variant="info" className="bg-[#1e3a8a] text-white font-semibold text-xs">
                         {t.settings.activeSiteBadge}
                       </Badge>
                     )}
@@ -222,7 +222,7 @@ export const SettingsSitesPanel: FC<SettingsSitesPanelProps> = ({
                   {Boolean(site.domain) && (
                     <Typography variant="caption" className="text-xs text-gray-500 block">
                       <span className="font-semibold text-gray-600">Domain:</span>{' '}
-                      <span className="text-pink-600 font-medium">{site.domain}</span>
+                      <span className="text-[#1e3a8a] font-medium">{site.domain}</span>
                     </Typography>
                   )}
                   {Boolean(site.description) && (
@@ -240,7 +240,7 @@ export const SettingsSitesPanel: FC<SettingsSitesPanelProps> = ({
                       size="xs"
                       variant="outline"
                       onClick={() => handleActivate(site)}
-                      className="border-pink-600 text-pink-600 hover:bg-pink-50 font-medium"
+                      className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-blue-50 font-medium"
                     >
                       {t.settings.makeActive}
                     </Button>
@@ -380,7 +380,7 @@ export const SettingsSitesPanel: FC<SettingsSitesPanelProps> = ({
                   id="form-is-default"
                   checked={formIsDefault}
                   onChange={(e) => setFormIsDefault(e.target.checked)}
-                  className="rounded text-pink-600 focus:ring-pink-500"
+                  className="rounded text-[#1e3a8a] focus:ring-[#1e3a8a]"
                 />
                 <label htmlFor="form-is-default" className="text-xs font-medium text-gray-700 cursor-pointer">
                   {t.settings.siteIsDefault}
@@ -396,7 +396,7 @@ export const SettingsSitesPanel: FC<SettingsSitesPanelProps> = ({
                   variant="primary"
                   type="submit"
                   disabled={formSubmitting || !formName.trim() || !formSlug.trim()}
-                  className="bg-pink-600 hover:bg-pink-700 text-white font-semibold"
+                  className="bg-[#1e3a8a] hover:bg-[#172554] text-white font-semibold"
                 >
                   {formSubmitting ? 'Saving...' : editingSite ? t.settings.editSite : t.settings.addSite}
                 </Button>

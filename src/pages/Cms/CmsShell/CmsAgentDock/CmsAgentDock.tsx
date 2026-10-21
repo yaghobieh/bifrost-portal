@@ -18,14 +18,6 @@ export const CmsAgentDock: FC<CmsAgentDockProps> = (props) => {
   return (
     <div className={dockClass}>
       <Flex direction="column" gap={2} align={dockAlign}>
-        <button
-          type="button"
-          className={`${AGENT_BUBBLE_CLASS} bifrost-cms__agent-bubble--ai`}
-          aria-label={t.cmsShell.dockAi}
-          onClick={onOpenAi}
-        >
-          <BearIcons.SparklesIcon size={CMS_ICON_SIZE} />
-        </button>
         <span className="bifrost-cms__agent-chat-wrap">
           {crewOpen && crewPanel}
           <button

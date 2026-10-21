@@ -49,6 +49,7 @@ export const CMS_NAV_IDS = {
   NOTIFICATIONS: 'notifications',
   ARTICLES: 'articles',
   SCHEMA_FIELDS: 'schema-fields',
+  SITES: 'sites',
 } as const;
 
 export const CMS_NAV_SECTIONS = {
@@ -79,6 +80,7 @@ export const CMS_NAV_ROUTES: Record<string, string> = {
   [CMS_NAV_IDS.BLOG]: ROUTES.CMS_BLOG,
   [CMS_NAV_IDS.ARTICLES]: `${ROUTES.CMS_CONTENT}?kind=article`,
   [CMS_NAV_IDS.SETTINGS]: ROUTES.CMS_SETTINGS,
+  [CMS_NAV_IDS.SITES]: `${ROUTES.CMS_SETTINGS}?tab=sites`,
   [CMS_NAV_IDS.HELP]: ROUTES.DOCS,
   [CMS_NAV_IDS.DEVELOPER]: ROUTES.CMS_DEVELOPER,
   [CMS_NAV_IDS.AUDIT]: ROUTES.CMS_AUDIT,

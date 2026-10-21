@@ -79,6 +79,7 @@ import type {
   CmsSite,
   CmsThemeColors,
   SettingsSitePanelId,
+  SettingsTabId,
 } from './SettingsPages.types';
 import {
   applyCmsThemeColors,
@@ -139,6 +140,12 @@ export const SettingsPages: FC = () => {
   const [mediaConfigured, setMediaConfigured] = useState(false);
   const [mediaHasKey, setMediaHasKey] = useState(false);
   const [sitePanel, setSitePanel] = useState<SettingsSitePanelId>(SETTINGS_SITE_PANELS.GENERAL);
+  const queryParams = new URLSearchParams(window.location.search);
+  const requestedTab = queryParams.get('tab') as SettingsTabId | null;
+  const initialSettingsTab: SettingsTabId =
+    requestedTab && Object.values(SETTINGS_TABS).includes(requestedTab)
+      ? requestedTab
+      : SETTINGS_TABS.PROFILE;
 
   useEffect(() => {
     if (!user) return;
@@ -348,10 +355,11 @@ export const SettingsPages: FC = () => {
         />
 
         <Card variant="elevated" padding="md">
-          <Tabs defaultTab={SETTINGS_TABS.PROFILE} variant="line">
+          <Tabs defaultTab={initialSettingsTab} variant="line">
             <TabList className="mb-4" wrap>
               <Tab id={SETTINGS_TABS.PROFILE}>{t.settings.tabProfile}</Tab>
               {chatInstalled ? <Tab id={SETTINGS_TABS.CREW}>{t.settings.tabCrew}</Tab> : null}
+              <Tab id={SETTINGS_TABS.SITES}>{t.settings.tabMultiSite}</Tab>
               <Tab id={SETTINGS_TABS.SITE}>{t.settings.tabSite}</Tab>
               {devPrefs.showDeveloperPage ? (
                 <Tab id={SETTINGS_TABS.DEVELOPER}>{t.settings.tabDeveloper}</Tab>
@@ -531,6 +539,11 @@ export const SettingsPages: FC = () => {
               </div>
             </TabPanel>
             ) : null}
+            <TabPanel tabId={SETTINGS_TABS.SITES}>
+              <div className="bifrost-cms-settings-box">
+                <SettingsSitesPanel />
+              </div>
+            </TabPanel>
             <TabPanel tabId={SETTINGS_TABS.SITE}>
               <div className="bifrost-cms-settings-split">
                 <nav className="bifrost-cms-settings-split__nav" aria-label={t.settings.tabSite}>

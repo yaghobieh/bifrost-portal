@@ -95,6 +95,7 @@ import { CmsUpdateBanner } from './helpers/CmsUpdateBanner';
 import { CmsBottomNav } from './helpers/CmsBottomNav';
 import { CmsNavOverlay } from './helpers/CmsNavOverlay';
 import { SiteSwitcher } from './helpers/SiteSwitcher';
+import { AlloyAgentTrigger } from './helpers/AlloyAgentTrigger';
 import { useCmsLive } from './CmsLiveProvider';
 import { CMS_LIVE_LOCAL_ROOM_PREFIX } from './CmsLive.const';
 import { findDirectRoom, findServerMatch } from './CmsLive.utils';
@@ -127,6 +128,7 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     loadCmsModePreference(),
   );
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatPrompt, setChatPrompt] = useState<string | undefined>(undefined);
   const [crewRoomId, setCrewRoomId] = useState<string | null>(null);
   const [flyoutId, setFlyoutId] = useState<string | null>(null);
   const { onlineUsers, rooms, createRoom, sendChat, selfId, tasks, availability, setAvailability } = useCmsLive();
@@ -424,6 +426,12 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     },
   ].filter(visibleLeaf);
   const generalChildren: CmsSidebarNavItem[] = [
+    {
+      id: CMS_NAV_IDS.SITES,
+      label: t.settings.tabMultiSite,
+      icon: <BearIcons.GlobeIcon size={CMS_ICON_SIZE} />,
+      href: CMS_NAV_ROUTES[CMS_NAV_IDS.SITES],
+    },
     {
       id: CMS_NAV_IDS.SETTINGS,
       label: t.cmsShell.projectSettings,
@@ -789,6 +797,13 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
                   aria-label={t.cmsShell.bundles}
                   onClick={() => navigate(CMS_NAV_ROUTES[CMS_NAV_IDS.BUNDLES])}
                 />
+                <AlloyAgentTrigger
+                  onOpen={() => setChatOpen(true)}
+                  onSelectPrompt={(prompt) => {
+                    setChatPrompt(prompt);
+                    setChatOpen(true);
+                  }}
+                />
                 <CmsHealthDot />
                 <CmsOnlineStatus
                   users={onlineUsers}
@@ -957,10 +972,14 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       />
       <CmsChat
         isOpen={chatOpen}
-        onClose={() => setChatOpen(false)}
+        onClose={() => {
+          setChatOpen(false);
+          setChatPrompt(undefined);
+        }}
         token={activeToken}
         side={site.chatSide}
         crewAvailable={canCrewChat}
+        initialPrompt={chatPrompt}
         onOpenCrew={() => {
           setChatOpen(false);
           setCrewRoomId(CMS_CREW_DRAWER_OPEN);

@@ -54,8 +54,9 @@ export const SiteSwitcher: FC<SiteSwitcherProps> = ({ token, className }) => {
         aria-expanded={open}
         aria-label={t.settings.switchSite}
       >
-        <BearIcons.GlobeIcon size={SITE_SWITCHER_ICON_SIZE} className="text-pink-600 shrink-0" />
-        <span className="truncate max-w-[120px]">{activeLabel}</span>
+        <BearIcons.GlobeIcon size={SITE_SWITCHER_ICON_SIZE} className="text-[#1e3a8a] shrink-0" />
+        <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Site:</span>
+        <span className="truncate max-w-[120px] font-semibold text-gray-900 dark:text-white">{activeLabel}</span>
         <BearIcons.ChevronDownIcon
           size={SITE_SWITCHER_CHEVRON_SIZE}
           className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
@@ -89,19 +90,19 @@ export const SiteSwitcher: FC<SiteSwitcherProps> = ({ token, className }) => {
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors ${
                     isSelected
-                      ? 'bg-pink-50 dark:bg-pink-950/40 text-pink-700 dark:text-pink-300 font-semibold'
+                      ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-300 font-semibold'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                   }`}
                 >
                   <Flex align="center" gap={NUMBER_TWO} className="truncate">
                     <BearIcons.GlobeIcon
                       size={NUMBER_FOURTEEN}
-                      className={isSelected ? 'text-pink-600' : 'text-gray-400'}
+                      className={isSelected ? 'text-[#1e3a8a]' : 'text-gray-400'}
                     />
                     <span className="truncate">{site.name}</span>
                   </Flex>
                   {isSelected ? (
-                    <BearIcons.CheckIcon size={NUMBER_FOURTEEN} className="text-pink-600 shrink-0" />
+                    <BearIcons.CheckIcon size={NUMBER_FOURTEEN} className="text-[#1e3a8a] shrink-0" />
                   ) : null}
                 </button>
               );
@@ -115,9 +116,9 @@ export const SiteSwitcher: FC<SiteSwitcherProps> = ({ token, className }) => {
               fullWidth
               onClick={() => {
                 setOpen(false);
-                navigate(CMS_NAV_ROUTES[CMS_NAV_IDS.SETTINGS]);
+                navigate(`${CMS_NAV_ROUTES[CMS_NAV_IDS.SETTINGS]}?tab=sites`);
               }}
-              className="text-xs text-pink-600 hover:text-pink-700 hover:bg-pink-50 dark:hover:bg-pink-950/30 justify-center"
+              className="text-xs text-[#1e3a8a] hover:text-[#172554] hover:bg-blue-50 dark:hover:bg-blue-950/30 justify-center font-medium"
             >
               ＋ {t.settings.createSiteTitle}
             </Button>
