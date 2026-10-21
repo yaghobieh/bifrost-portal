@@ -36,4 +36,5 @@ export type CmsChatProps = {
   side: 'left' | 'right';
   crewAvailable: boolean;
   onOpenCrew: () => void;
+  initialPrompt?: string;
 };

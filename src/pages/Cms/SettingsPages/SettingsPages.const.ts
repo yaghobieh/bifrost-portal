@@ -37,6 +37,7 @@ export const SETTINGS_TABS = {
   PROFILE: 'profile',
   CREW: 'crew',
   SITE: 'site',
+  SITES: 'sites',
   DEVELOPER: 'developer',
   THEME: 'theme',
   MEDIA: 'media',

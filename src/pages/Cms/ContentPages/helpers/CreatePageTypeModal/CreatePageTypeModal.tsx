@@ -150,10 +150,10 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-xl shadow-2xl border border-gray-200 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-pink-50/50 to-white">
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-blue-50/50 to-white">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-lg bg-pink-600 text-white flex items-center justify-center font-bold text-sm">
+              <span className="w-8 h-8 rounded-lg bg-[#1e3a8a] text-white flex items-center justify-center font-bold text-sm">
                 ＋
               </span>
               <Typography variant="h3" className="text-xl font-bold text-gray-900 mb-0">
@@ -184,20 +184,20 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Page Type Name <span className="text-pink-600">*</span>
+                  Page Type Name <span className="text-[#1e3a8a]">*</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Case Studies, Blog, Products"
                   value={name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] text-sm"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Collection Slug & API Path <span className="text-pink-600">*</span>
+                  Collection Slug & API Path <span className="text-[#1e3a8a]">*</span>
                 </label>
                 <div className="flex items-center">
                   <span className="px-2.5 py-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md text-gray-500 text-xs font-mono">
@@ -208,7 +208,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                     placeholder="case-studies"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value.toLowerCase().trim())}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm font-mono"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] text-sm font-mono"
                   />
                 </div>
               </div>
@@ -223,7 +223,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                 placeholder="Brief summary of how this content type is used..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] text-sm"
               />
             </div>
 
@@ -242,7 +242,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                       onClick={() => setSelectedIcon(ic.name)}
                       className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 text-xs font-medium cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-pink-50 border-pink-500 text-pink-700 font-bold shadow-sm'
+                          ? 'bg-blue-50 border-[#1e3a8a] text-[#1e3a8a] font-bold shadow-sm'
                           : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                       }`}
                     >
@@ -272,7 +272,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                     onClick={() => handlePresetSelect(preset.id)}
                     className={`p-3.5 border rounded-lg cursor-pointer transition-all ${
                       isSelected
-                        ? 'border-pink-600 bg-pink-50/50 shadow-sm ring-1 ring-pink-500'
+                        ? 'border-[#1e3a8a] bg-blue-50/50 shadow-sm ring-1 ring-[#1e3a8a]'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
@@ -280,12 +280,12 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                       <div className="font-semibold text-gray-900 text-sm flex items-center gap-1.5">
                         <span
                           className={`w-2 h-2 rounded-full ${
-                            isSelected ? 'bg-pink-600' : 'bg-gray-300'
+                            isSelected ? 'bg-[#1e3a8a]' : 'bg-gray-300'
                           }`}
                         />
                         {preset.title}
                       </div>
-                      <Badge variant="info" className="text-[10px] bg-pink-100 text-pink-800">
+                      <Badge variant="info" className="text-[10px] bg-blue-100 text-blue-900">
                         {preset.badge}
                       </Badge>
                     </div>
@@ -324,7 +324,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                   <span className="font-semibold">{field.name}</span>
                   <span className="text-[10px] text-gray-400 font-mono">({field.type})</span>
                   {field.required && (
-                    <span className="text-pink-600 text-xs font-bold">*</span>
+                    <span className="text-[#1e3a8a] text-xs font-bold">*</span>
                   )}
                   {field.id !== 'title' && field.id !== 'slug' && (
                     <button
@@ -346,12 +346,12 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                 placeholder="New field name (e.g. Price, Reading Time, Rating)"
                 value={newFieldName}
                 onChange={(e) => setNewFieldName(e.target.value)}
-                className="flex-1 min-w-[200px] px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="flex-1 min-w-[200px] px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
               />
               <select
                 value={newFieldType}
                 onChange={(e) => setNewFieldType(e.target.value as PageTypeFieldType)}
-                className="px-3 py-1.5 border border-gray-300 rounded-md text-xs bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-xs bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
               >
                 <option value="text">Text (string)</option>
                 <option value="rich-text">Rich Text (HTML/MD)</option>
@@ -367,7 +367,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                 variant="outline"
                 onClick={handleAddField}
                 disabled={!newFieldName.trim()}
-                className="border-pink-600 text-pink-600 hover:bg-pink-50 font-medium"
+                className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-blue-50 font-medium"
               >
                 ＋ Add Field
               </Button>
@@ -380,7 +380,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
           <div className="text-xs text-gray-500">
             {slug ? (
               <span>
-                Endpoint will be registered at <code className="text-pink-600 font-bold">/api/{slug}</code>
+                Endpoint will be registered at <code className="text-[#1e3a8a] font-bold">/api/{slug}</code>
               </span>
             ) : (
               'Enter name and slug to enable creation'
@@ -395,7 +395,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
               variant="primary"
               disabled={!name.trim() || !slug.trim()}
               onClick={handleSave}
-              className="bg-pink-600 hover:bg-pink-700 text-white font-semibold flex items-center gap-1.5 shadow-sm"
+              className="bg-[#1e3a8a] hover:bg-[#172554] text-white font-semibold flex items-center gap-1.5 shadow-sm"
             >
               <span>Create Page Type</span>
             </Button>

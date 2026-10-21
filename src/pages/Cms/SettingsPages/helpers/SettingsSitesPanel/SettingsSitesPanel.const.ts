@@ -15,5 +15,5 @@ export const SITES_GAP_SM = NUMBER_TWO;
 export const DEFAULT_SITE_ID = 'default';
 export const DEFAULT_SITE_LOCALE = 'en';
 export const SITE_INPUT_CLASS =
-  'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 bg-white';
+  'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] bg-white';
 export const SETTINGS_SITES_TEST_ID = 'cms-settings-sites-panel';

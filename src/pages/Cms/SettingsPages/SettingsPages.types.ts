@@ -104,6 +104,7 @@ export type SettingsTabId =
   | 'profile'
   | 'crew'
   | 'site'
+  | 'sites'
   | 'developer'
   | 'theme'
   | 'media'

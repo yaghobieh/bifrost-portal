@@ -504,6 +504,10 @@ export interface Messages {
     alloyActionExecute: string;
     alloyActionApplied: string;
     alloyActionApplying: string;
+    alloyAgentWithYou: string;
+    alloyAgentSubtitle: string;
+    alloyAgentCopilotTitle: string;
+    alloyAgentLaunch: string;
     sessionChecking: string;
     healthOk: string;
     healthDown: string;
