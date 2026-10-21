@@ -1,8 +1,10 @@
 import { useEffect, useState, type FC } from 'react';
 import { Badge, BearIcons, Button, Card, Flex, Typography } from '@forgedevstack/bear';
+import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { GridTable } from '@forgedevstack/grid-table';
 import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
 import { EMPTY_STRING } from '@const/index';
+import { ROUTES } from '@const/routes.const';
 import {
   NUMBER_FOURTEEN,
   NUMBER_SIX,
@@ -39,6 +41,7 @@ import { loadAllPageTypes, PAGE_TYPES_UPDATED_EVENT } from './pageTypes.utils';
 import { PAGE_TYPE_KIND, type PageTypeDefinition } from './pageTypes.types';
 
 export const ContentPages: FC = () => {
+  const { navigate } = useNavigate();
   const {
     t,
     saving,
@@ -263,6 +266,15 @@ export const ContentPages: FC = () => {
             </Typography>
           </div>
           <Flex gap={NUMBER_TWO} align="center">
+            <Button
+              size="sm"
+              variant="outline"
+              icon={<BearIcons.GlobeIcon size={NUMBER_FOURTEEN} />}
+              onClick={() => navigate(ROUTES.CMS_SITES)}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium shadow-2xs"
+            >
+              {t.settings.tabMultiSite}
+            </Button>
             <Button
               size="sm"
               variant="outline"

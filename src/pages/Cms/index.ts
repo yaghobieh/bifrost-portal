@@ -25,3 +25,4 @@ export { CmsOnboarding } from './CmsOnboarding';
 export { DeveloperPages } from './DeveloperPages';
 export { AuditPages } from './DeveloperPages';
 export { ContentTypeBuilder } from './ContentTypeBuilder';
+export { SitesPages } from './SitesPages';
