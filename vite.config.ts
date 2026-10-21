@@ -22,8 +22,8 @@ export default defineConfig(({ command, mode }) => {
   const cmsApi = cmsApiRaw.replace('://localhost', '://127.0.0.1');
   const useLocalInk = env.VITE_USE_LOCAL_INK === '1' || env.VITE_USE_LOCAL_INK === 'true';
   const aliasLocalInk = command === 'serve' && useLocalInk && existsSync(localInkEntry);
-  const aliasLocalBear = existsSync(localBearEntry);
-  const aliasLocalForm = existsSync(localFormEntry);
+  const aliasLocalBear = command === 'serve' && existsSync(localBearEntry);
+  const aliasLocalForm = command === 'serve' && existsSync(localFormEntry);
 
   return {
     plugins: [react(), tsconfigPaths(), cmsDocsPlugin(mode)],
