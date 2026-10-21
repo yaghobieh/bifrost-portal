@@ -66,3 +66,66 @@ export const deleteSite = async (id: string, token?: string): Promise<boolean> =
   }, { silent: false, code: 'sites' });
   return res.ok;
 };
+
+export const fetchSitePlugins = async (siteId: string): Promise<import('./sites.types').SitePlugin[]> => {
+  try {
+    const res = await requestWithError(`${SITES_API_PATH}/${encodeURIComponent(siteId)}/plugins`, undefined, { silent: true, code: 'sites' });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { plugins?: import('./sites.types').SitePlugin[] };
+    return data.plugins || [];
+  } catch {
+    return [];
+  }
+};
+
+export const updateSitePlugins = async (
+  siteId: string,
+  plugins: import('./sites.types').SitePlugin[],
+  applyToAllOnInstall = false,
+  token?: string,
+): Promise<boolean> => {
+  try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const res = await requestWithError(`${SITES_API_PATH}/${encodeURIComponent(siteId)}/plugins`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({ plugins, applyToAllOnInstall }),
+    }, { silent: false, code: 'sites' });
+    return res.ok;
+  } catch {
+    return false;
+  }
+};
+
+export const fetchSiteUsers = async (siteId: string): Promise<import('./sites.types').SiteUser[]> => {
+  try {
+    const res = await requestWithError(`${SITES_API_PATH}/${encodeURIComponent(siteId)}/users`, undefined, { silent: true, code: 'sites' });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { users?: import('./sites.types').SiteUser[] };
+    return data.users || [];
+  } catch {
+    return [];
+  }
+};
+
+export const addSiteUser = async (
+  siteId: string,
+  user: { name: string; role?: string; email?: string },
+  token?: string,
+): Promise<import('./sites.types').SiteUser | null> => {
+  try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const res = await requestWithError(`${SITES_API_PATH}/${encodeURIComponent(siteId)}/users`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(user),
+    }, { silent: false, code: 'sites' });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { user: import('./sites.types').SiteUser };
+    return data.user || null;
+  } catch {
+    return null;
+  }
+};

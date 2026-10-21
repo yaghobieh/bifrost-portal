@@ -351,12 +351,6 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       href: CMS_NAV_ROUTES[CMS_NAV_IDS.SITES],
     },
     {
-      id: CMS_NAV_IDS.PLANS,
-      label: t.cmsShell.plans,
-      icon: <BearIcons.BarChartIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.PLANS],
-    },
-    {
       id: CMS_NAV_IDS.PAGES,
       label: t.cmsShell.pages,
       icon: <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />,

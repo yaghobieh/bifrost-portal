@@ -1,6 +1,13 @@
 import { useState, type FC } from 'react';
 import { Badge, BearIcons, Button, Flex, Typography } from '@forgedevstack/bear';
-import type { PageTypeDefinition, PageTypeDesignPreset, PageTypeFieldDef, PageTypeFieldType } from '../../pageTypes.types';
+import type {
+  PageTypeDefinition,
+  PageTypeDesignPreset,
+  PageTypeFieldDef,
+  PageTypeFieldType,
+  PostTypeCategory,
+  PostTypeStructure,
+} from '../../pageTypes.types';
 import { defaultFieldsForPreset, saveCustomPageType } from '../../pageTypes.utils';
 
 interface CreatePageTypeModalProps {
@@ -9,7 +16,64 @@ interface CreatePageTypeModalProps {
   onCreated: (newType: PageTypeDefinition) => void;
 }
 
-const DESIGN_PRESETS: Array<{
+const POST_TYPE_CATEGORIES: Array<{
+  id: PostTypeCategory;
+  title: string;
+  badge: string;
+  description: string;
+  icon: string;
+  defaultPreset: PageTypeDesignPreset;
+  defaultStructure: PostTypeStructure;
+  defaultName: string;
+  defaultSlug: string;
+}> = [
+  {
+    id: 'page',
+    title: 'Pages',
+    badge: 'Standard Page',
+    description: 'Hierarchical or standalone pages (e.g. Home, About Us, Privacy Policy, Landing).',
+    icon: '📄',
+    defaultPreset: 'landing',
+    defaultStructure: 'single',
+    defaultName: 'New Page',
+    defaultSlug: 'pages',
+  },
+  {
+    id: 'article',
+    title: 'Articles',
+    badge: 'Editorial',
+    description: 'In-depth editorial articles, whitepapers, thought leadership, and long-form publications.',
+    icon: '📰',
+    defaultPreset: 'article',
+    defaultStructure: 'multi',
+    defaultName: 'Articles',
+    defaultSlug: 'articles',
+  },
+  {
+    id: 'blog',
+    title: 'Blog',
+    badge: 'Chronological',
+    description: 'News posts, release updates, author bylines, tags, and chronological feeds.',
+    icon: '✍️',
+    defaultPreset: 'blog',
+    defaultStructure: 'multi',
+    defaultName: 'Blog Posts',
+    defaultSlug: 'blog',
+  },
+  {
+    id: 'custom',
+    title: 'Custom Post Type',
+    badge: 'Custom Schema',
+    description: 'Fully customized data model tailored to your exact business needs.',
+    icon: '⚙️',
+    defaultPreset: 'blank',
+    defaultStructure: 'multi',
+    defaultName: 'Custom Type',
+    defaultSlug: 'custom',
+  },
+];
+
+const TEMPLATE_PRESETS: Array<{
   id: PageTypeDesignPreset;
   title: string;
   badge: string;
@@ -18,45 +82,38 @@ const DESIGN_PRESETS: Array<{
 }> = [
   {
     id: 'blog',
-    title: 'Blog & Announcements',
+    title: 'Blog & Announcements Template',
     badge: 'Chronological',
     description: 'Hero cover image, author byline, publication timestamp, rich text body, and category tags.',
-    preview: '👤 Byline • 📅 Sep 27 • 🏷️ Engineering • 💬 Comments',
+    preview: '👤 Byline • 📅 Timestamp • 🏷️ Categories • 💬 Comments',
   },
   {
     id: 'article',
-    title: 'Editorial & Long-form',
+    title: 'Editorial & Long-form Template',
     badge: 'Editorial',
-    description: 'Lead abstract, typography optimized for long reading, sidebar table of contents, and pull-quotes.',
-    preview: '📰 Lead Abstract • 🔤 Sans/Serif Body • 📑 TOC • 🔖 Citations',
+    description: 'Lead abstract, reading time, table of contents, citations, and markdown body.',
+    preview: '📰 Lead Abstract • 📑 Table of Contents • 🔤 Rich Typography • 🔖 Citations',
+  },
+  {
+    id: 'landing',
+    title: 'Marketing & Landing Showcase Template',
+    badge: 'Commercial',
+    description: 'Hero headline, CTA buttons, feature cards grid, statistics, and testimonials.',
+    preview: '🚀 Hero Headline • 🔘 CTA Buttons • 🌟 Feature Grid • 📊 Stats',
   },
   {
     id: 'doc',
-    title: 'Documentation & Guides',
+    title: 'Documentation & Guide Template',
     badge: 'Developer',
     description: 'Step-by-step tutorial blocks, syntax-highlighted code tabs, bash copy commands, and callouts.',
     preview: '⚡ Quickstart • 💻 Code Snippets • 📦 npm install • ℹ️ Callouts',
   },
   {
-    id: 'landing',
-    title: 'Landing & Marketing',
-    badge: 'Commercial',
-    description: 'Hero headline with dual call-to-action buttons, 3-column feature grid, and testimonials.',
-    preview: '🚀 Hero Headline • 🔘 CTA Buttons • 🌟 Feature Grid • 📊 Stats',
-  },
-  {
-    id: 'catalog',
-    title: 'Product & Catalog',
-    badge: 'Showcase',
-    description: 'Gallery media showcase, feature badges, specifications key-value table, and pricing tier.',
-    preview: '🖼️ Gallery • 💲 Price Tier • ⚙️ Tech Specs • 🛒 Action Button',
-  },
-  {
     id: 'blank',
-    title: 'Custom Canvas',
+    title: 'Blank Canvas Template',
     badge: 'Freeform',
-    description: 'Blank slate with custom schema fields and full visual builder support.',
-    preview: '🎨 Unrestricted Canvas • 🧩 Drag & Drop Widgets • 🔌 API Ready',
+    description: 'Minimal slate with custom schema fields and visual builder support.',
+    preview: '🎨 Clean Schema • 🧩 Custom Fields • 🔌 API Ready',
   },
 ];
 
@@ -75,18 +132,34 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
   onClose,
   onCreated,
 }) => {
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [description, setDescription] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<PostTypeCategory>('article');
+  const [structureMode, setStructureMode] = useState<PostTypeStructure>('multi');
+  const [name, setName] = useState('Articles');
+  const [slug, setSlug] = useState('articles');
+  const [description, setDescription] = useState('Editorial publications and articles');
   const [selectedIcon, setSelectedIcon] = useState('FileText');
-  const [selectedPreset, setSelectedPreset] = useState<PageTypeDesignPreset>('blog');
-  const [fields, setFields] = useState<PageTypeFieldDef[]>(() => defaultFieldsForPreset('blog'));
+  const [selectedPreset, setSelectedPreset] = useState<PageTypeDesignPreset>('article');
+  const [hasTemplate, setHasTemplate] = useState(true);
+  const [fields, setFields] = useState<PageTypeFieldDef[]>(() => defaultFieldsForPreset('article'));
 
   // Custom field add state
   const [newFieldName, setNewFieldName] = useState('');
   const [newFieldType, setNewFieldType] = useState<PageTypeFieldType>('text');
 
   if (!isOpen) return null;
+
+  const handleCategorySelect = (cat: PostTypeCategory) => {
+    setSelectedCategory(cat);
+    const meta = POST_TYPE_CATEGORIES.find((c) => c.id === cat);
+    if (meta) {
+      setName(meta.defaultName);
+      setSlug(meta.defaultSlug);
+      setSelectedPreset(meta.defaultPreset);
+      setStructureMode(meta.defaultStructure);
+      setDescription(meta.description);
+      setFields(defaultFieldsForPreset(meta.defaultPreset));
+    }
+  };
 
   const handleNameChange = (val: string) => {
     setName(val);
@@ -132,10 +205,14 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
     const newType: PageTypeDefinition = {
       id: slug.trim(),
       name: name.trim(),
-      description: description.trim() || `Custom ${name} collection`,
+      postTypeCategory: selectedCategory,
+      structureMode,
+      hasTemplate,
+      templateId: selectedPreset,
+      description: description.trim() || `${name} content type`,
       iconName: selectedIcon,
       designPreset: selectedPreset,
-      color: '#EA0A8E',
+      color: '#1e3a8a',
       fields,
       isBuiltIn: false,
       createdAt: new Date().toISOString(),
@@ -157,11 +234,11 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                 ＋
               </span>
               <Typography variant="h3" className="text-xl font-bold text-gray-900 mb-0">
-                Create New Page Type
+                Add Post Type & Content Model
               </Typography>
             </div>
             <Typography variant="body2" className="text-xs text-gray-500 mt-1">
-              Define a new structured content collection (like Blog, Articles, Press, etc.) with custom layout and database API
+              Create post types like Pages, Articles, Blog, or Custom Models with templates and multi-item collections
             </Typography>
           </div>
           <button
@@ -175,20 +252,96 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1 text-sm text-gray-800">
-          {/* Section 1: General Info */}
+          {/* Section 1: Choose Post Type Kind */}
+          <div className="space-y-3">
+            <Typography variant="caption" className="text-xs font-bold uppercase tracking-wider text-gray-500 block">
+              1. Choose Post Type Category
+            </Typography>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {POST_TYPE_CATEGORIES.map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => handleCategorySelect(cat.id)}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? 'border-[#1e3a8a] bg-blue-50/50 shadow-sm ring-1 ring-[#1e3a8a]'
+                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
+                  >
+                    <div className="text-xl mb-1">{cat.icon}</div>
+                    <div className="font-bold text-gray-900 text-sm">{cat.title}</div>
+                    <div className="text-[11px] text-gray-500 line-clamp-2 mt-0.5 leading-snug">
+                      {cat.description}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section 2: Structure Mode (Multi vs Single) */}
+          <div className="space-y-3">
+            <Typography variant="caption" className="text-xs font-bold uppercase tracking-wider text-gray-500 block">
+              2. Content Structure Model
+            </Typography>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setStructureMode('multi')}
+                className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                  structureMode === 'multi'
+                    ? 'border-[#1e3a8a] bg-blue-50/50 shadow-sm ring-1 ring-[#1e3a8a]'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-bold text-sm text-gray-900">📚 Multi-Item Collection</span>
+                  <Badge variant="info" className="text-[10px]">Collection</Badge>
+                </div>
+                <p className="text-xs text-gray-500 mb-0">
+                  Multiple entries with listing table, pagination, search, and filtering (e.g. multiple blog posts, news articles).
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setStructureMode('single')}
+                className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                  structureMode === 'single'
+                    ? 'border-[#1e3a8a] bg-blue-50/50 shadow-sm ring-1 ring-[#1e3a8a]'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-bold text-sm text-gray-900">📄 Single-Item Document</span>
+                  <Badge variant="outline" className="text-[10px]">Single</Badge>
+                </div>
+                <p className="text-xs text-gray-500 mb-0">
+                  A unique standalone document with no listing (e.g. Homepage, About, Contact, Terms).
+                </p>
+              </button>
+            </div>
+          </div>
+
+          {/* Section 3: Identity & API Route */}
           <div className="space-y-4">
             <Typography variant="caption" className="text-xs font-bold uppercase tracking-wider text-gray-500 block">
-              1. Type Identity & Database Collection
+              3. Identifier & Database Routing
             </Typography>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Page Type Name <span className="text-[#1e3a8a]">*</span>
+                  Post Type Name <span className="text-[#1e3a8a]">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Case Studies, Blog, Products"
+                  placeholder="e.g. Articles, Press Releases, Team"
                   value={name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] text-sm"
@@ -205,7 +358,7 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                   </span>
                   <input
                     type="text"
-                    placeholder="case-studies"
+                    placeholder="articles"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value.toLowerCase().trim())}
                     className="w-full px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] text-sm font-mono"
@@ -226,148 +379,117 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1e3a8a] text-sm"
               />
             </div>
+          </div>
 
-            {/* Icon Selection */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                Collection Icon
+          {/* Section 4: Template Presets */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Typography variant="caption" className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                4. Starter Template & Layout Preset
+              </Typography>
+              <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hasTemplate}
+                  onChange={(e) => setHasTemplate(e.target.checked)}
+                  className="rounded text-[#1e3a8a] focus:ring-[#1e3a8a]"
+                />
+                <span>Include Template</span>
               </label>
-              <div className="flex items-center gap-2 flex-wrap">
-                {AVAILABLE_ICONS.map((ic) => {
-                  const isSelected = selectedIcon === ic.name;
+            </div>
+
+            {hasTemplate && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {TEMPLATE_PRESETS.map((preset) => {
+                  const isSelected = selectedPreset === preset.id;
                   return (
                     <button
-                      key={ic.name}
+                      key={preset.id}
                       type="button"
-                      onClick={() => setSelectedIcon(ic.name)}
-                      className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 text-xs font-medium cursor-pointer transition-all ${
+                      onClick={() => handlePresetSelect(preset.id)}
+                      className={`p-3 rounded-lg border text-left transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-blue-50 border-[#1e3a8a] text-[#1e3a8a] font-bold shadow-sm'
-                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                          ? 'bg-blue-50/50 border-[#1e3a8a] shadow-sm ring-1 ring-[#1e3a8a]'
+                          : 'bg-white border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      {ic.icon}
-                      <span>{ic.label}</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-xs text-gray-900">{preset.title}</span>
+                        <Badge variant="outline" className="text-[10px]">{preset.badge}</Badge>
+                      </div>
+                      <p className="text-[11px] text-gray-500 mb-1 leading-relaxed">
+                        {preset.description}
+                      </p>
+                      <div className="text-[10px] font-mono text-gray-400 truncate">
+                        {preset.preview}
+                      </div>
                     </button>
                   );
                 })}
               </div>
-            </div>
+            )}
           </div>
 
-          <hr className="border-gray-100" />
-
-          {/* Section 2: Design Layout Presets */}
+          {/* Section 5: Schema Fields */}
           <div className="space-y-3">
             <Typography variant="caption" className="text-xs font-bold uppercase tracking-wider text-gray-500 block">
-              2. Design & Layout Preset
+              5. Schema Fields ({fields.length})
             </Typography>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {DESIGN_PRESETS.map((preset) => {
-                const isSelected = selectedPreset === preset.id;
-                return (
-                  <div
-                    key={preset.id}
-                    onClick={() => handlePresetSelect(preset.id)}
-                    className={`p-3.5 border rounded-lg cursor-pointer transition-all ${
-                      isSelected
-                        ? 'border-[#1e3a8a] bg-blue-50/50 shadow-sm ring-1 ring-[#1e3a8a]'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="font-semibold text-gray-900 text-sm flex items-center gap-1.5">
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            isSelected ? 'bg-[#1e3a8a]' : 'bg-gray-300'
-                          }`}
-                        />
-                        {preset.title}
-                      </div>
-                      <Badge variant="info" className="text-[10px] bg-blue-100 text-blue-900">
-                        {preset.badge}
-                      </Badge>
-                    </div>
-                    <div className="text-xs text-gray-500 mb-2 leading-relaxed">
-                      {preset.description}
-                    </div>
-                    <div className="p-2 bg-gray-50 rounded text-[11px] font-mono text-gray-600 border border-gray-100">
-                      {preset.preview}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <hr className="border-gray-100" />
-
-          {/* Section 3: Schema Fields */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Typography variant="caption" className="text-xs font-bold uppercase tracking-wider text-gray-500 block">
-                3. Schema Fields ({fields.length})
-              </Typography>
-              <span className="text-xs text-gray-400">
-                Preset defaults are auto-configured
-              </span>
-            </div>
-
-            {/* Field Pills */}
-            <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[50px]">
-              {fields.map((field) => (
-                <span
-                  key={field.id}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white border border-gray-200 text-xs text-gray-700 shadow-2xs"
+            <div className="space-y-2">
+              {fields.map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center justify-between p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs"
                 >
-                  <span className="font-semibold">{field.name}</span>
-                  <span className="text-[10px] text-gray-400 font-mono">({field.type})</span>
-                  {field.required && (
-                    <span className="text-[#1e3a8a] text-xs font-bold">*</span>
-                  )}
-                  {field.id !== 'title' && field.id !== 'slug' && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveField(field.id)}
-                      className="text-gray-300 hover:text-red-500 ml-1 text-xs cursor-pointer"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-gray-800">{f.name}</span>
+                    <span className="text-gray-400 font-mono">({f.id})</span>
+                    <Badge variant="info" className="text-[10px] uppercase font-mono">
+                      {f.type}
+                    </Badge>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveField(f.id)}
+                    className="text-gray-400 hover:text-rose-600 text-xs px-2 py-0.5"
+                  >
+                    Remove
+                  </button>
+                </div>
               ))}
             </div>
 
-            {/* Add Custom Field row */}
-            <div className="flex items-center gap-2 pt-1 flex-wrap">
+            {/* Quick Add Custom Field */}
+            <div className="flex items-center gap-2 pt-2">
               <input
                 type="text"
-                placeholder="New field name (e.g. Price, Reading Time, Rating)"
+                placeholder="New field name (e.g. Author, Tag, Rating)"
                 value={newFieldName}
                 onChange={(e) => setNewFieldName(e.target.value)}
-                className="flex-1 min-w-[200px] px-3 py-1.5 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-[#1e3a8a]"
               />
               <select
                 value={newFieldType}
                 onChange={(e) => setNewFieldType(e.target.value as PageTypeFieldType)}
-                className="px-3 py-1.5 border border-gray-300 rounded-md text-xs bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                className="px-2.5 py-1.5 border border-gray-300 rounded text-xs bg-white"
               >
-                <option value="text">Text (string)</option>
-                <option value="rich-text">Rich Text (HTML/MD)</option>
+                <option value="text">Short Text</option>
+                <option value="rich-text">Rich Text / Markdown</option>
                 <option value="image">Image URL</option>
-                <option value="tags">Tags / Categories</option>
-                <option value="author">Author relation</option>
-                <option value="date">Date & Time</option>
+                <option value="media">Media File</option>
+                <option value="date">Date</option>
+                <option value="author">Author</option>
+                <option value="tags">Tags</option>
+                <option value="boolean">Boolean Switch</option>
                 <option value="number">Number</option>
-                <option value="boolean">Toggle / Boolean</option>
               </select>
               <Button
+                type="button"
                 size="sm"
                 variant="outline"
                 onClick={handleAddField}
-                disabled={!newFieldName.trim()}
-                className="border-[#1e3a8a] text-[#1e3a8a] hover:bg-blue-50 font-medium"
+                className="text-xs"
               >
                 ＋ Add Field
               </Button>
@@ -378,28 +500,21 @@ export const CreatePageTypeModal: FC<CreatePageTypeModalProps> = ({
         {/* Modal Footer */}
         <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
           <div className="text-xs text-gray-500">
-            {slug ? (
-              <span>
-                Endpoint will be registered at <code className="text-[#1e3a8a] font-bold">/api/{slug}</code>
-              </span>
-            ) : (
-              'Enter name and slug to enable creation'
-            )}
+            Selected: <span className="font-bold text-gray-800">{POST_TYPE_CATEGORIES.find((c) => c.id === selectedCategory)?.title}</span> ({structureMode === 'multi' ? 'Multi-Item Collection' : 'Single Document'})
           </div>
-          <Flex gap={2} align="center">
-            <Button size="sm" variant="ghost" onClick={onClose} className="text-gray-600">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button
-              size="sm"
               variant="primary"
-              disabled={!name.trim() || !slug.trim()}
               onClick={handleSave}
-              className="bg-[#1e3a8a] hover:bg-[#172554] text-white font-semibold flex items-center gap-1.5 shadow-sm"
+              disabled={!name.trim() || !slug.trim()}
+              className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white font-semibold"
             >
-              <span>Create Page Type</span>
+              Create Post Type
             </Button>
-          </Flex>
+          </div>
         </div>
       </div>
     </div>

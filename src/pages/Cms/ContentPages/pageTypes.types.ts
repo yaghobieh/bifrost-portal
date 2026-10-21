@@ -40,10 +40,17 @@ export type PageTypeFieldDef = {
   componentTarget?: string;
 };
 
+export type PostTypeCategory = 'page' | 'article' | 'blog' | 'custom';
+export type PostTypeStructure = 'multi' | 'single';
+
 export type PageTypeDefinition = {
   id: string;
   name: string;
   kind?: PageTypeKind;
+  postTypeCategory?: PostTypeCategory;
+  structureMode?: PostTypeStructure;
+  hasTemplate?: boolean;
+  templateId?: string;
   description: string;
   iconName: string;
   designPreset: PageTypeDesignPreset;
