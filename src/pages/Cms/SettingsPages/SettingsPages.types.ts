@@ -100,11 +100,43 @@ export type BuildMcpConfigParams = {
   siteSlug: string;
 };
 
+export type CmsGithubConnection = {
+  enabled: boolean;
+  token: string;
+  repo: string;
+  branch: string;
+  autoSync: boolean;
+};
+
+export type CmsLinkdingConnection = {
+  enabled: boolean;
+  instanceUrl: string;
+  apiToken: string;
+  defaultTags: string[];
+  autoArchive: boolean;
+};
+
+export type CmsGmailConnection = {
+  enabled: boolean;
+  clientId: string;
+  clientSecret: string;
+  refreshToken: string;
+  senderEmail: string;
+  notifyOnPublish: boolean;
+};
+
+export type CmsConnections = {
+  github: CmsGithubConnection;
+  linkding: CmsLinkdingConnection;
+  gmail: CmsGmailConnection;
+};
+
 export type SettingsTabId =
   | 'profile'
   | 'crew'
   | 'site'
   | 'sites'
+  | 'connections'
   | 'developer'
   | 'theme'
   | 'media'

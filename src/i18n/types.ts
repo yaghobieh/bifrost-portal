@@ -72,6 +72,13 @@ export interface Messages {
     tocA11y: string;
     tocPremium: string;
     tocCollaboration: string;
+    tocMultiSite?: string;
+    tocAlloyAi?: string;
+    tocHeadlessApi?: string;
+    tocPostTypes?: string;
+    tocComponentDocs?: string;
+    tocQuickstartInstall?: string;
+    tocConnections?: string;
   };
   playground: {
     title: string;

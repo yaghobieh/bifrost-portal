@@ -14,30 +14,66 @@ import {
   CMS_CATALOG_STORAGE_KEY,
   CMS_DEV_PREFS_EVENT,
   CMS_THEME_EVENT,
+  CMS_CONNECTIONS_STORAGE_KEY,
+  CMS_CONNECTIONS_EVENT,
   EMPTY_STRING,
   PINK_HEX,
   PINK_SOFT_HEX,
   BRIDGE_BLUE_HEX,
 } from '@const/index';
 import { CMS_NAV_IDS } from '../CmsShell/CmsShell.const';
-import type { SettingsTabId } from './SettingsPages.types';
+import type { CmsConnections, SettingsTabId } from './SettingsPages.types';
 
 export const SETTINGS_THEME_STORAGE_KEY = CMS_THEME_STORAGE_KEY;
 export const SETTINGS_THEME_EVENT = CMS_THEME_EVENT;
 export const SETTINGS_PROFILE_STORAGE_KEY = CMS_PROFILE_STORAGE_KEY;
 export const SETTINGS_SITE_STORAGE_KEY = CMS_SITE_STORAGE_KEY;
 export const SETTINGS_MCP_STORAGE_KEY = CMS_MCP_STORAGE_KEY;
+export const SETTINGS_CONNECTIONS_STORAGE_KEY = CMS_CONNECTIONS_STORAGE_KEY;
+export const SETTINGS_CONNECTIONS_EVENT = CMS_CONNECTIONS_EVENT;
 export const SETTINGS_PROFILE_EMPTY = EMPTY_STRING;
 export const SETTINGS_PROFILE_EVENT = CMS_PROFILE_EVENT;
 export const SETTINGS_SITE_EVENT = CMS_SITE_EVENT;
 export const SETTINGS_CHAT_PREFS_EVENT = CMS_CHAT_PREFS_EVENT;
 export const SETTINGS_NOTIFY_PREFS_EVENT = CMS_NOTIFY_PREFS_EVENT;
 
+export const GITHUB_TOKENS_DOC_URL = 'https://github.com/settings/tokens';
+export const GITHUB_DEVELOPERS_DOC_URL = 'https://github.com/settings/developers';
+export const GOOGLE_CONSOLE_CREDENTIALS_URL = 'https://console.cloud.google.com/apis/credentials';
+export const GOOGLE_APP_PASSWORDS_URL = 'https://myaccount.google.com/apppasswords';
+export const LINKDING_DOCS_URL = 'https://github.com/sissbruecker/linkding';
+
+export const DEFAULT_CONNECTIONS: CmsConnections = {
+  github: {
+    enabled: false,
+    token: EMPTY_STRING,
+    repo: EMPTY_STRING,
+    branch: 'main',
+    autoSync: false,
+  },
+  linkding: {
+    enabled: false,
+    instanceUrl: EMPTY_STRING,
+    apiToken: EMPTY_STRING,
+    defaultTags: ['cms', 'bifrost'],
+    autoArchive: false,
+  },
+  gmail: {
+    enabled: false,
+    clientId: EMPTY_STRING,
+    clientSecret: EMPTY_STRING,
+    refreshToken: EMPTY_STRING,
+    senderEmail: EMPTY_STRING,
+    notifyOnPublish: false,
+  },
+};
+
 export const SETTINGS_TABS = {
   PROFILE: 'profile',
   CREW: 'crew',
   SITE: 'site',
   SITES: 'sites',
+  CONNECTIONS: 'connections',
   DEVELOPER: 'developer',
   THEME: 'theme',
   MEDIA: 'media',

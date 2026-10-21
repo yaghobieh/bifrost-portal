@@ -1,8 +1,10 @@
 import type { InkEditorProps, ToolbarOption, InkCommentThread, InkTrackChange } from '@forgedevstack/ink';
 
+import type { Messages } from '../i18n/types';
+
 export type DocsBlock =
   | { type: 'p'; text: string }
-  | { type: 'code'; code: string; language?: 'tsx' | 'html' | 'json' | 'bash' }
+  | { type: 'code'; code: string; language?: 'tsx' | 'html' | 'json' | 'bash' | 'typescript' }
   | { type: 'html'; html: string }
   | { type: 'steps'; title?: string; items: { title: string; body: string }[] }
   | DocDemoBlock
@@ -43,27 +45,6 @@ export interface DocDemoBlock {
 
 export interface DocsPageContent {
   id: string;
-  labelKey:
-    | 'tocInstallation'
-    | 'tocQuickstart'
-    | 'tocConfiguration'
-    | 'tocToolbar'
-    | 'tocModules'
-    | 'tocTables'
-    | 'tocTrackChanges'
-    | 'tocComments'
-    | 'tocBlocks'
-    | 'tocSignPad'
-    | 'tocMemory'
-    | 'tocFindReplace'
-    | 'tocThemes'
-    | 'tocTypo'
-    | 'tocAi'
-    | 'tocPlugins'
-    | 'tocAngular'
-    | 'tocWordpress'
-    | 'tocA11y'
-    | 'tocPremium'
-    | 'tocCollaboration';
+  labelKey: keyof Messages['docs'];
   blocks: DocsBlock[];
 }

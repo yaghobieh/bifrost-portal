@@ -914,6 +914,359 @@ inkAi.registerProvider({
       },
     ],
   },
+  {
+    id: 'quickstart-install',
+    labelKey: 'tocQuickstartInstall',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Bifrost CMS can be installed in seconds via our automated CLI, by cloning the official open-source repository, or downloading the starter bundle directly from our portal.',
+      },
+      {
+        type: 'steps',
+        title: '3 Ways to Install Bifrost CMS',
+        items: [
+          {
+            title: 'Option 1: Bifrost CLI (Recommended)',
+            body: 'Run the interactive CLI initializer to scaffold a production-ready CMS instance with database migrations and seed data.',
+          },
+          {
+            title: 'Option 2: Git Clone',
+            body: 'Clone the full monorepo from GitHub to inspect full source code, Fastify API, React admin, and public portal docs.',
+          },
+          {
+            title: 'Option 3: Direct Starter Download',
+            body: 'Download the pre-packaged zip bundle directly from our portal and extract locally.',
+          },
+        ],
+      },
+      {
+        type: 'code',
+        language: 'bash',
+        code: `# Option 1: Quickstart with Bifrost CLI
+npx @bifrost/cli init my-bifrost-cms
+cd my-bifrost-cms && npm run dev
+
+# Option 2: Clone repository
+git clone https://github.com/yaghobieh/bifrost.git
+cd bifrost && npm install && npm run build
+npm run dev
+
+# Option 3: Direct Download
+curl -LO https://github.com/yaghobieh/bifrost/archive/refs/heads/main.zip
+unzip main.zip && cd bifrost-main && npm install`,
+      },
+      {
+        type: 'payload',
+        label: 'monorepo workspace topology',
+        data: {
+          workspaces: [
+            'apps/cms-api (Fastify + Neon PostgreSQL backend)',
+            'apps/cms-fe (React 18 + Vite + Bear UI Admin)',
+            'bifrost-portal (Vercel Edge + Headless Public Docs)',
+            'packages/cli (Developer tooling & project generator)',
+          ],
+          defaultPorts: {
+            portal: 3000,
+            adminFe: 5173,
+            api: 4000,
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: 'multi-site',
+    labelKey: 'tocMultiSite',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Bifrost CMS features a true Multi-Site Network Architecture. Orchestrate dozens of independent websites, custom domains, and localized portals from a single unified CMS installation.',
+      },
+      {
+        type: 'steps',
+        title: 'Core Architectural Pillars',
+        items: [
+          {
+            title: 'Scoped API Endpoints',
+            body: 'Every tenant site has isolated REST routes under /api/:siteId/* (content, pages, plugins, users).',
+          },
+          {
+            title: 'Global Grand Manager Authority',
+            body: '1 Global Network Manager maintains superadmin privileges to switch, inspect, and configure any site across the entire network.',
+          },
+          {
+            title: 'Isolated Plugins & Users',
+            body: 'Each site configures its own active plugins (SEO, Analytics, Sitemaps) and site-scoped content editors who cannot touch sibling sites.',
+          },
+          {
+            title: 'Instant Context Switching',
+            body: 'The active site switcher in the topbar immediately changes the editing environment without requiring re-authentication.',
+          },
+        ],
+      },
+      {
+        type: 'code',
+        language: 'bash',
+        code: `# Fetch all sites across the network (Grand Manager)
+curl -H "Authorization: Bearer <TOKEN>" https://bifrost-portal.vercel.app/api/sites
+
+# Create a new network site
+curl -X POST https://bifrost-portal.vercel.app/api/sites \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"Marketing Global Blog","slug":"marketing","domain":"blog.global.io"}'
+
+# Access site-scoped plugins
+curl https://bifrost-portal.vercel.app/api/sites/marketing/plugins
+
+# Access site-scoped users
+curl https://bifrost-portal.vercel.app/api/sites/marketing/users`,
+      },
+      {
+        type: 'payload',
+        label: 'site tenant schema',
+        data: {
+          id: 'marketing',
+          slug: 'marketing',
+          name: 'Marketing Global Blog',
+          domain: 'blog.global.io',
+          locale: 'en',
+          settings: {
+            plugins: [
+              { id: 'seo', enabled: true, version: '1.2.0' },
+              { id: 'analytics', enabled: true, version: '2.0.1' },
+            ],
+            users: [
+              { id: 'usr-manager', name: 'Network Manager (You)', role: 'manager', globalAccess: true },
+              { id: 'usr-marketing-editor', name: 'Site Editor', role: 'editor', globalAccess: false, siteId: 'marketing' },
+            ],
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: 'alloy-ai',
+    labelKey: 'tocAlloyAi',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Alloy 1.5 Flash Copilot is the AI CMS Agent built directly into Bifrost. Positioned above the database connectivity indicator in the sidebar, Alloy understands your content models, sites, and executes structured CMS operations.',
+      },
+      {
+        type: 'steps',
+        title: 'Key Copilot Capabilities',
+        items: [
+          {
+            title: 'Smart Action Execution',
+            body: 'Generates structured ```cms-action blocks that you can apply with 1 click to create pages, modify fields, or draft articles.',
+          },
+          {
+            title: 'Multi-Site Awareness',
+            body: 'Alloy automatically injects the active site slug and domain into generation prompts for tailored translations and SEO.',
+          },
+          {
+            title: 'Real-time Token Tracking',
+            body: 'Monitors prompt tokens, completion tokens, and estimated cost live in the Copilot drawer.',
+          },
+        ],
+      },
+      {
+        type: 'code',
+        language: 'json',
+        code: `// Sample structured action generated by Alloy 1.5 Flash:
+\`\`\`cms-action
+{
+  "action": "create-page",
+  "collection": "pages",
+  "title": "Cloud Infrastructure Overview",
+  "slug": "cloud-infrastructure",
+  "status": "published",
+  "lead": "High-availability, geo-distributed hosting on Vercel Edge and Neon DB."
+}
+\`\`\``,
+      },
+    ],
+  },
+  {
+    id: 'headless-api',
+    labelKey: 'tocHeadlessApi',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Bifrost is designed as a headless-first CMS. All content created in the Content Manager and Builder is immediately accessible via high-performance REST APIs across mobile apps, Next.js, and static websites.',
+      },
+      {
+        type: 'steps',
+        title: 'Headless Endpoints',
+        items: [
+          {
+            title: 'Public Collections',
+            body: 'GET /api/public/content/:collection retrieves published documents with pagination, sorting, and field projections.',
+          },
+          {
+            title: 'Single Document Query',
+            body: 'GET /api/public/content/:collection/:slug fetches a single item by unique slug or ID.',
+          },
+          {
+            title: 'Public Site Navigation',
+            body: 'GET /api/public/nav returns the published menu structure and active links for frontend headers.',
+          },
+        ],
+      },
+      {
+        type: 'code',
+        language: 'typescript',
+        code: `// Fetching headless content in your Next.js / React application:
+export async function getBlogArticle(slug: string) {
+  const res = await fetch(\`https://bifrost-portal.vercel.app/api/public/content/blog/\${slug}\`, {
+    next: { revalidate: 60 },
+  });
+  if (!res.ok) throw new Error('Post not found');
+  return res.json();
+}`,
+      },
+    ],
+  },
+  {
+    id: 'post-types',
+    labelKey: 'tocPostTypes',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Create and configure custom post types easily with the Content-Type Builder. Define repeatable collections or standalone single documents without touching database schemas.',
+      },
+      {
+        type: 'steps',
+        title: 'Post Type Capabilities',
+        items: [
+          {
+            title: '4 Post Categories',
+            body: 'Preset configurations for Standard Pages, Long-form Articles, Chronological Blog posts, or fully Custom schemas.',
+          },
+          {
+            title: 'Structure Modes',
+            body: 'Choose between Multi (Collection for multiple items like blog posts) and Single (Document for standalone views like About or Privacy Policy).',
+          },
+          {
+            title: '9 Attribute Field Types',
+            body: 'String, Rich Text, Media Asset, Boolean Toggle, Date/Time, Number, JSON Object, Select Dropdown, and Relational links.',
+          },
+        ],
+      },
+      {
+        type: 'code',
+        language: 'json',
+        code: `{
+  "name": "Documentation Article",
+  "singularName": "Doc Article",
+  "slug": "docs",
+  "category": "article",
+  "structure": "multi",
+  "attributes": [
+    { "name": "title", "type": "string", "required": true },
+    { "name": "slug", "type": "string", "required": true, "unique": true },
+    { "name": "category", "type": "select", "options": ["General", "API", "Components"] },
+    { "name": "body", "type": "richtext" },
+    { "name": "publishedAt", "type": "datetime" }
+  ]
+}`,
+      },
+    ],
+  },
+  {
+    id: 'component-docs',
+    labelKey: 'tocComponentDocs',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Easily build stunning component documentation pages like Bear UI (e.g. https://bearui.com/components/button) using Bifrost Content Types and Page Builder blocks.',
+      },
+      {
+        type: 'steps',
+        title: 'How to Build Component Documentation Easily',
+        items: [
+          {
+            title: '1. Define the Component Doc Schema',
+            body: 'In Content-Type Builder, create a "Component" collection with fields: title, description, package, importCode, propsSchema (JSON), variants (repeater), and liveDemoCode.',
+          },
+          {
+            title: '2. Populate Component Data',
+            body: 'Add your Button component entry with props table entries (variant: primary | outline | ghost, size: sm | md | lg, loading: boolean).',
+          },
+          {
+            title: '3. Render with Interactive Canvas',
+            body: 'Use Bifrost Page Builder with Bear UI integration to display interactive prop controls, live component rendering, and copyable code blocks.',
+          },
+        ],
+      },
+      {
+        type: 'code',
+        language: 'tsx',
+        code: `// Rendering Bear UI Component Docs from Bifrost CMS:
+import { Button, Card, Typography } from '@forgedevstack/bear';
+
+export function ComponentDocViewer({ component }) {
+  return (
+    <div className="component-doc">
+      <Typography variant="h1">{component.title}</Typography>
+      <Typography variant="body1">{component.description}</Typography>
+
+      {/* Interactive Live Playground */}
+      <Card variant="elevated" padding="lg" className="my-6">
+        <Button variant={component.selectedVariant} size={component.selectedSize}>
+          {component.buttonText || 'Interactive Button'}
+        </Button>
+      </Card>
+
+      {/* Copyable Code Snippet */}
+      <pre><code>{\`import { Button } from '@forgedevstack/bear';\\n<Button variant="primary">Click me</Button>\`}</code></pre>
+
+      {/* Props Table */}
+      <PropsTable props={component.propsSchema} />
+    </div>
+  );
+}`,
+      },
+    ],
+  },
+  {
+    id: 'connections',
+    labelKey: 'tocConnections',
+    blocks: [
+      {
+        type: 'p',
+        text: 'Seamlessly connect your Bifrost CMS with GitHub, Linkding, and Gmail. Manage credentials and configure webhooks with one click from Project Settings.',
+      },
+      {
+        type: 'steps',
+        title: 'Connection Details & API Links',
+        items: [
+          {
+            title: 'GitHub Integration',
+            body: 'Sync Markdown files and push automated Git commits when articles are published. Get token at: https://github.com/settings/tokens (scopes: repo, workflow).',
+          },
+          {
+            title: 'Linkding Web Archiving',
+            body: 'Automatically bookmark and archive published content into your Linkding instance via REST API token.',
+          },
+          {
+            title: 'Gmail & Google Workspace',
+            body: 'Send automated email newsletters and editorial notifications. Configure OAuth 2.0 at: https://console.cloud.google.com/apis/credentials or generate an App Password at: https://myaccount.google.com/apppasswords.',
+          },
+        ],
+      },
+      {
+        type: 'code',
+        language: 'bash',
+        code: `# Direct API links for credentials:
+GitHub Tokens:    https://github.com/settings/tokens
+Google Console:   https://console.cloud.google.com/apis/credentials
+Google Passwords: https://myaccount.google.com/apppasswords
+Linkding API:     <your-instance>/settings -> Integrations -> REST API`,
+      },
+    ],
+  },
 ];
 
 export const DOCS_PAGE_BY_ID = Object.fromEntries(DOCS_PAGES.map((page) => [page.id, page])) as Record<

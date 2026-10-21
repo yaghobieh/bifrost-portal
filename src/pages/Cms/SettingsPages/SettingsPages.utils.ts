@@ -52,6 +52,9 @@ import {
   SETTINGS_STALE_THEME_PRIMARIES,
   SETTINGS_PUBLIC_NAV_CUSTOM_PREFIX,
   SETTINGS_PUBLIC_NAV_DEFAULT_ITEMS,
+  SETTINGS_CONNECTIONS_STORAGE_KEY,
+  SETTINGS_CONNECTIONS_EVENT,
+  DEFAULT_CONNECTIONS,
 } from './SettingsPages.const';
 import { NUMBER_ONE, NUMBER_ZERO } from '@const/numbers.const';
 import type {
@@ -72,6 +75,7 @@ import type {
   PublicNavItem,
   CmsThemeColors,
   CmsTranslations,
+  CmsConnections,
 } from './SettingsPages.types';
 import { fetchSettingsValue, putSettingsValue, SETTINGS_KV_SITE, SETTINGS_KV_TRANSLATIONS } from '@sdk/modules/settings';
 import { CMS_TRANSLATIONS_EVENT, CMS_TRANSLATIONS_STORAGE_KEY } from '@const/strings.const';
@@ -719,4 +723,30 @@ export const buildMcpConfigJson = (params: BuildMcpConfigParams): string => {
     null,
     SETTINGS_MCP_JSON_INDENT,
   );
+};
+
+export const loadCmsConnections = (): CmsConnections => {
+  if (typeof window === 'undefined') return DEFAULT_CONNECTIONS;
+  try {
+    const raw = window.localStorage.getItem(SETTINGS_CONNECTIONS_STORAGE_KEY);
+    if (!raw) return DEFAULT_CONNECTIONS;
+    const parsed = JSON.parse(raw);
+    return {
+      github: { ...DEFAULT_CONNECTIONS.github, ...(parsed.github || {}) },
+      linkding: { ...DEFAULT_CONNECTIONS.linkding, ...(parsed.linkding || {}) },
+      gmail: { ...DEFAULT_CONNECTIONS.gmail, ...(parsed.gmail || {}) },
+    };
+  } catch {
+    return DEFAULT_CONNECTIONS;
+  }
+};
+
+export const saveCmsConnections = (connections: CmsConnections): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(SETTINGS_CONNECTIONS_STORAGE_KEY, JSON.stringify(connections));
+    window.dispatchEvent(new CustomEvent(SETTINGS_CONNECTIONS_EVENT, { detail: connections }));
+  } catch {
+    // ignore
+  }
 };

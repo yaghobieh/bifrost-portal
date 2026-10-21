@@ -73,6 +73,13 @@ export const es: Messages = {
     tocA11y: 'Accesibilidad',
     tocPremium: 'Premium',
     tocCollaboration: 'Colaboración',
+    tocMultiSite: 'Red Multi-Sitio',
+    tocAlloyAi: 'Copiloto Alloy 1.5 Flash',
+    tocHeadlessApi: 'API REST Headless',
+    tocPostTypes: 'Constructor de Tipos y Post Types',
+    tocComponentDocs: 'Documentación de Componentes (Bear UI)',
+    tocQuickstartInstall: 'Inicio Rápido e Instalación',
+    tocConnections: 'Integraciones con GitHub, Linkding y Gmail',
   },
   playground: {
     title: 'Playground',

@@ -427,12 +427,6 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   ].filter(visibleLeaf);
   const generalChildren: CmsSidebarNavItem[] = [
     {
-      id: CMS_NAV_IDS.SITES,
-      label: t.settings.tabMultiSite,
-      icon: <BearIcons.GlobeIcon size={CMS_ICON_SIZE} />,
-      href: CMS_NAV_ROUTES[CMS_NAV_IDS.SITES],
-    },
-    {
       id: CMS_NAV_IDS.SETTINGS,
       label: t.cmsShell.projectSettings,
       icon: <BearIcons.SettingsIcon size={CMS_ICON_SIZE} />,

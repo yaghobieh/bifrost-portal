@@ -111,6 +111,9 @@ import { SettingsSection } from './components/SettingsSection';
 import { SettingsToggleRow } from './components/SettingsToggleRow';
 import { SettingsCatalogPanel } from './components/SettingsCatalogPanel';
 import { SettingsUpdatePanel } from './components/SettingsUpdatePanel';
+import { SettingsConnectionsPanel } from './components/SettingsConnectionsPanel';
+import type { CmsConnections } from './SettingsPages.types';
+import { loadCmsConnections, saveCmsConnections } from './SettingsPages.utils';
 
 export const SettingsPages: FC = () => {
   const { t, setLocale } = useI18n();
@@ -130,6 +133,7 @@ export const SettingsPages: FC = () => {
   const [profile, setProfile] = useState<CmsProfile>(() => loadCmsProfile());
   const [site, setSite] = useState<CmsSite>(() => loadCmsSite());
   const [mcp, setMcp] = useState<CmsMcp>(() => loadCmsMcp());
+  const [connections, setConnections] = useState<CmsConnections>(() => loadCmsConnections());
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
@@ -185,6 +189,7 @@ export const SettingsPages: FC = () => {
 
   const onSaveAll = async () => {
     saveCmsProfile(profile);
+    saveCmsConnections(connections);
     saveCmsThemeColors(colors);
     if (userKey) {
       saveUserThemeColors(userKey, colors);
@@ -361,6 +366,7 @@ export const SettingsPages: FC = () => {
               {chatInstalled ? <Tab id={SETTINGS_TABS.CREW}>{t.settings.tabCrew}</Tab> : null}
               <Tab id={SETTINGS_TABS.SITES}>{t.settings.tabMultiSite}</Tab>
               <Tab id={SETTINGS_TABS.SITE}>{t.settings.tabSite}</Tab>
+              <Tab id={SETTINGS_TABS.CONNECTIONS}>Connections</Tab>
               {devPrefs.showDeveloperPage ? (
                 <Tab id={SETTINGS_TABS.DEVELOPER}>{t.settings.tabDeveloper}</Tab>
               ) : null}
@@ -544,13 +550,25 @@ export const SettingsPages: FC = () => {
                 <SettingsSitesPanel />
               </div>
             </TabPanel>
+            <TabPanel tabId={SETTINGS_TABS.CONNECTIONS}>
+              <div className="bifrost-cms-settings-box">
+                <SettingsConnectionsPanel
+                  connections={connections}
+                  onChange={(next) => {
+                    setConnections(next);
+                    setSaved(false);
+                  }}
+                  onSave={onSaveAll}
+                  token={token ?? undefined}
+                />
+              </div>
+            </TabPanel>
             <TabPanel tabId={SETTINGS_TABS.SITE}>
               <div className="bifrost-cms-settings-split">
                 <nav className="bifrost-cms-settings-split__nav" aria-label={t.settings.tabSite}>
                   {(
                     [
                       [SETTINGS_SITE_PANELS.GENERAL, t.settings.sectionGeneral],
-                      [SETTINGS_SITE_PANELS.SITES, t.settings.tabMultiSite],
                       [SETTINGS_SITE_PANELS.WRITING, t.settings.sectionWriting],
                       [SETTINGS_SITE_PANELS.DISCUSSION, t.settings.sectionDiscussion],
                       [SETTINGS_SITE_PANELS.CHROME, t.settings.sectionChrome],
@@ -675,9 +693,6 @@ export const SettingsPages: FC = () => {
                     fullWidth
                   />
                 </SettingsSection>
-                ) : null}
-                {sitePanel === SETTINGS_SITE_PANELS.SITES ? (
-                  <SettingsSitesPanel />
                 ) : null}
                 {sitePanel === SETTINGS_SITE_PANELS.WRITING ? (
                 <SettingsSection

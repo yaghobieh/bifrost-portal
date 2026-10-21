@@ -76,6 +76,23 @@ export const SiteSwitcher: FC<SiteSwitcherProps> = ({ token, className }) => {
           </div>
 
           <div className="max-h-56 overflow-y-auto py-1">
+            <button
+              type="button"
+              role="option"
+              onClick={() => {
+                setOpen(false);
+                navigate(CMS_NAV_ROUTES[CMS_NAV_IDS.SITES]);
+              }}
+              className="w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors border-b border-gray-100 dark:border-gray-800 bg-blue-50/50 hover:bg-blue-100/60 dark:bg-blue-950/40 text-[#1e3a8a] dark:text-blue-300 font-semibold"
+            >
+              <Flex align="center" gap={NUMBER_TWO} className="truncate">
+                <span className="text-xs">👑</span>
+                <span className="truncate">All Sites (Grand Manager)</span>
+              </Flex>
+              <span className="text-[10px] font-mono bg-blue-100 dark:bg-blue-900 text-[#1e3a8a] dark:text-blue-200 px-1.5 py-0.5 rounded font-bold">
+                {sites.length}
+              </span>
+            </button>
             {sites.map((site) => {
               const isSelected = site.id === activeSiteId || site.slug === activeSiteId;
               return (
