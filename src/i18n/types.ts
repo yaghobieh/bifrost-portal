@@ -498,6 +498,12 @@ export interface Messages {
     chatAskCreatePage: string;
     chatAskTemplate: string;
     chatAskTheme: string;
+    alloyTokensUsage: string;
+    alloyActionCreatePage: string;
+    alloyActionCreateArticle: string;
+    alloyActionExecute: string;
+    alloyActionApplied: string;
+    alloyActionApplying: string;
     sessionChecking: string;
     healthOk: string;
     healthDown: string;

@@ -16,6 +16,6 @@ export const AGENT_DOCK_CLASS = 'bifrost-cms__agent-dock';
 export const AGENT_DOCK_LEFT_CLASS = 'bifrost-cms__agent-dock bifrost-cms__agent-dock--left';
 export const AGENT_BUBBLE_CLASS = 'bifrost-cms__agent-bubble';
 export const AGENT_PANEL_CLASS = 'bifrost-cms__agent-panel';
-export const AGENT_AVATAR_INITIALS = 'AI';
+export const AGENT_AVATAR_INITIALS = 'AL';
 export const BOTTOM_NAV_SHOW_LABELS = 'always' as const;
 export const USER_MENU_MIN_WIDTH = 220;
