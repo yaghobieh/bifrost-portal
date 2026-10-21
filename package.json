@@ -21,7 +21,7 @@
     "@forgedevstack/forge-compass": "^1.0.0",
     "@forgedevstack/forge-form": "^1.0.0",
     "@forgedevstack/grid-table": "^1.1.2",
-    "@forgedevstack/ink": "file:../ink",
+    "@forgedevstack/ink": "^1.2.1",
     "@forgedevstack/lingo": "^1.0.2",
     "@forgedevstack/synapse": "^1.2.1",
     "@neondatabase/serverless": "^0.10.4",
