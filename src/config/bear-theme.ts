@@ -6,19 +6,21 @@ import {
   PINK_SOFT_HEX,
 } from '@const/strings.const';
 
-export const BIFROST_PINK = {
-  50: '#FDE9F5',
-  100: '#F9C8E6',
-  200: '#F49BD4',
-  300: '#EE6CC4',
-  400: '#F03AAB',
-  500: PINK_HEX,
-  600: PINK_HOVER_HEX,
-  700: '#8C0A63',
-  800: '#6B0850',
-  900: '#4A0638',
-  950: '#2A0320',
+export const BIFROST_NAVY = {
+  50: '#EFF6FF',
+  100: '#DBEAFE',
+  200: '#BFDBFE',
+  300: '#93C5FD',
+  400: '#60A5FA',
+  500: '#1E3A8A',
+  600: '#172554',
+  700: '#0F172A',
+  800: '#0B1120',
+  900: '#020617',
+  950: '#01040D',
 } as const;
+
+export const BIFROST_PINK = BIFROST_NAVY;
 
 export const BIFROST_NEUTRAL = {
   50: '#FAFAFB',
@@ -36,7 +38,7 @@ export const BIFROST_NEUTRAL = {
 
 export const bifrostTheme: BearThemeOverride = {
   colors: {
-    primary: BIFROST_PINK,
+    primary: BIFROST_NAVY,
     secondary: BIFROST_NEUTRAL,
   },
   typography: {
@@ -56,39 +58,39 @@ export const bifrostTheme: BearThemeOverride = {
 
 export const bifrostVariants: CustomVariantsMap = {
   bifrost: {
-    bg: PINK_HEX,
-    bgHover: PINK_HOVER_HEX,
+    bg: '#1E3A8A',
+    bgHover: '#172554',
     text: '#ffffff',
-    ring: '#F03AAB',
+    ring: '#38BDF8',
   },
   bifrostGhost: {
-    bg: PINK_SOFT_HEX,
-    bgHover: 'rgba(234, 10, 142, 0.16)',
-    text: PINK_HEX,
-    border: 'rgba(234, 10, 142, 0.28)',
+    bg: '#EFF6FF',
+    bgHover: 'rgba(30, 58, 138, 0.16)',
+    text: '#1E3A8A',
+    border: 'rgba(30, 58, 138, 0.28)',
   },
   ink: {
-    bg: PINK_HEX,
-    bgHover: PINK_HOVER_HEX,
+    bg: '#1E3A8A',
+    bgHover: '#172554',
     text: '#ffffff',
-    ring: '#F03AAB',
+    ring: '#38BDF8',
   },
   inkOutline: {
     bg: 'transparent',
-    bgHover: PINK_SOFT_HEX,
-    text: PINK_HEX,
-    border: PINK_HEX,
+    bgHover: '#EFF6FF',
+    text: '#1E3A8A',
+    border: '#1E3A8A',
   },
 };
 
 export const GRID_THEME_VARS: CSSProperties = {
-  '--gt-accent-primary': PINK_HEX,
-  '--gt-accent-rgb': '234, 10, 142',
+  '--gt-accent-primary': '#1E3A8A',
+  '--gt-accent-rgb': '30, 58, 138',
   '--gt-border-color': '#E7E7EC',
   '--gt-bg-primary': '#FFFFFF',
   '--gt-bg-secondary': '#FAFAFB',
   '--gt-bg-tertiary': '#F5F6F8',
-  '--gt-bg-hover': PINK_SOFT_HEX,
+  '--gt-bg-hover': '#EFF6FF',
   '--gt-text-primary': '#161618',
   '--gt-text-secondary': '#5B5F6A',
   '--gt-text-muted': '#93969F',

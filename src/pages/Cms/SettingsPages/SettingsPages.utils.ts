@@ -113,40 +113,104 @@ const hexLuminance = (hex: string): number => {
 const isDarkThemeBackground = (hex: string): boolean =>
   hexLuminance(hex) < SETTINGS_DARK_LUMINANCE_MAX;
 
+const clampRgb = (v: number): number => Math.min(255, Math.max(0, Math.round(v)));
+
+export const shadeHexColor = (hex: string, percent: number): string => {
+  if (!isHexColor(hex)) return hex;
+  const raw = expandHex(hex);
+  const num = parseInt(raw, 16);
+  const r = (num >> 16) & 0xff;
+  const g = (num >> 8) & 0xff;
+  const b = num & 0xff;
+
+  if (percent > 0) {
+    const nr = clampRgb(r + (255 - r) * (percent / 100));
+    const ng = clampRgb(g + (255 - g) * (percent / 100));
+    const nb = clampRgb(b + (255 - b) * (percent / 100));
+    return `#${((1 << 24) + (nr << 16) + (ng << 8) + nb).toString(16).slice(1)}`;
+  }
+  const factor = (100 + percent) / 100;
+  const nr = clampRgb(r * factor);
+  const ng = clampRgb(g * factor);
+  const nb = clampRgb(b * factor);
+  return `#${((1 << 24) + (nr << 16) + (ng << 8) + nb).toString(16).slice(1)}`;
+};
+
 export const applyCmsThemeColors = (
   root: HTMLElement | null,
   colors: CmsThemeColors,
   colorMode?: 'light' | 'dark',
 ): void => {
-  if (!root) return;
-  root.style.setProperty(SETTINGS_CSS_VARS.PRIMARY, colors.primary);
-  root.style.setProperty(SETTINGS_CSS_VARS.ACCENT, colors.primary);
-  root.style.setProperty(SETTINGS_CSS_VARS.SIDEBAR, SETTINGS_SIDEBAR);
-  const isDark =
-    colorMode === 'dark' ||
-    root.classList.contains('bifrost-cms--dark') ||
-    root.getAttribute('data-color-mode') === 'dark';
-  if (isDark) {
-    if (isDarkThemeBackground(colors.background)) {
-      root.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
-    } else {
-      root.style.setProperty(
-        SETTINGS_CSS_VARS.BACKGROUND,
-        SETTINGS_THEME_DEFAULTS_DARK.background,
-      );
-    }
-  } else if (isDarkThemeBackground(colors.background)) {
-    root.style.setProperty(
-      SETTINGS_CSS_VARS.BACKGROUND,
-      SETTINGS_THEME_DEFAULTS_LIGHT.background,
-    );
-  } else {
-    root.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
+  if (!root && typeof document === 'undefined') return;
+  const primary = isHexColor(colors.primary) ? colors.primary : '#1E3A8A';
+  const accent = isHexColor(colors.accent) ? colors.accent : '#38BDF8';
+  const primaryHover = shadeHexColor(primary, -15);
+  const primaryDark = shadeHexColor(primary, -30);
+  const primarySoft = shadeHexColor(primary, 92);
+
+  const targets: HTMLElement[] = [];
+  if (root) targets.push(root);
+  if (typeof document !== 'undefined' && document.documentElement && !targets.includes(document.documentElement)) {
+    targets.push(document.documentElement);
   }
-  root.style.setProperty(
-    SETTINGS_CSS_VARS.ACCENT_SOFT,
-    isDark ? SETTINGS_ACCENT_SOFT_DARK : SETTINGS_ACCENT_SOFT_LIGHT,
-  );
+
+  targets.forEach((elem) => {
+    // Bear Provider palette (50 - 900)
+    elem.style.setProperty('--bear-primary-50', shadeHexColor(primary, 92));
+    elem.style.setProperty('--bear-primary-100', shadeHexColor(primary, 80));
+    elem.style.setProperty('--bear-primary-200', shadeHexColor(primary, 65));
+    elem.style.setProperty('--bear-primary-300', shadeHexColor(primary, 45));
+    elem.style.setProperty('--bear-primary-400', accent || shadeHexColor(primary, 25));
+    elem.style.setProperty('--bear-primary-500', primary);
+    elem.style.setProperty('--bear-primary-600', primaryHover);
+    elem.style.setProperty('--bear-primary-700', primaryDark);
+    elem.style.setProperty('--bear-primary-800', shadeHexColor(primary, -45));
+    elem.style.setProperty('--bear-primary-900', shadeHexColor(primary, -60));
+
+    // Bear Button specific variables
+    elem.style.setProperty('--bear-btn-primary-bg', primary);
+    elem.style.setProperty('--bear-btn-primary-border', primary);
+    elem.style.setProperty('--bear-btn-primary-ring', accent);
+    elem.style.setProperty('--bear-btn-primary-hover-bg', primaryHover);
+    elem.style.setProperty('--bear-bifrost-bg', primary);
+    elem.style.setProperty('--bear-ink-bg', primary);
+
+    // Accent and CMS tokens
+    elem.style.setProperty('--accent', primary);
+    elem.style.setProperty('--accent-dark', primaryHover);
+    elem.style.setProperty('--accent-soft', primarySoft);
+    elem.style.setProperty(SETTINGS_CSS_VARS.PRIMARY, primary);
+    elem.style.setProperty(SETTINGS_CSS_VARS.ACCENT, accent);
+    elem.style.setProperty('--bifrost-cms-accent-dark', primaryHover);
+    elem.style.setProperty('--bifrost-cms-highlight', primary);
+    elem.style.setProperty(SETTINGS_CSS_VARS.SIDEBAR, SETTINGS_SIDEBAR);
+
+    const isDark =
+      colorMode === 'dark' ||
+      elem.classList.contains('bifrost-cms--dark') ||
+      elem.getAttribute('data-color-mode') === 'dark';
+    if (isDark) {
+      if (isDarkThemeBackground(colors.background)) {
+        elem.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
+      } else {
+        elem.style.setProperty(
+          SETTINGS_CSS_VARS.BACKGROUND,
+          SETTINGS_THEME_DEFAULTS_DARK.background,
+        );
+      }
+    } else if (isDarkThemeBackground(colors.background)) {
+      elem.style.setProperty(
+        SETTINGS_CSS_VARS.BACKGROUND,
+        SETTINGS_THEME_DEFAULTS_LIGHT.background,
+      );
+    } else {
+      elem.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
+    }
+    elem.style.setProperty(
+      SETTINGS_CSS_VARS.ACCENT_SOFT,
+      isDark ? SETTINGS_ACCENT_SOFT_DARK : primarySoft,
+    );
+  });
 };
 
 const isStaleThemePrimary = (primary: string): boolean =>
@@ -177,6 +241,9 @@ export const loadCmsThemeColors = (): CmsThemeColors => {
 
 export const saveCmsThemeColors = (colors: CmsThemeColors): void => {
   localStorage.setItem(SETTINGS_THEME_STORAGE_KEY, JSON.stringify(colors));
+  if (typeof document !== 'undefined') {
+    applyCmsThemeColors(document.documentElement, colors);
+  }
   window.dispatchEvent(new Event(SETTINGS_THEME_EVENT));
 };
 

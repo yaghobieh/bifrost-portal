@@ -10,27 +10,33 @@ html.bifrost-cms-host #root {
 
 .bifrost-cms,
 .bifrost-cms--light {
-  --bear-primary-50: #fdf2f8;
-  --bear-primary-100: #fce7f3;
-  --bear-primary-200: #fbcfe8;
-  --bear-primary-300: #f9a8d4;
-  --bear-primary-400: #f472b6;
-  --bear-primary-500: #EA0A8E;
-  --bear-primary-600: #EA0A8E;
-  --bear-primary-700: #B90A70;
-  --bear-primary-800: #9d174d;
-  --bear-primary-900: #831843;
-  --accent: #EA0A8E;
-  --accent-soft: #FDE6F4;
-  --accent-dark: #B90A70;
+  --bear-primary-50: #eff6ff;
+  --bear-primary-100: #dbeafe;
+  --bear-primary-200: #bfdbfe;
+  --bear-primary-300: #93c5fd;
+  --bear-primary-400: #60a5fa;
+  --bear-primary-500: #1E3A8A;
+  --bear-primary-600: #172554;
+  --bear-primary-700: #0F172A;
+  --bear-primary-800: #0b1120;
+  --bear-primary-900: #020617;
+  --bear-btn-primary-bg: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --bear-btn-primary-border: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --bear-btn-primary-ring: var(--bifrost-cms-bar-1, var(--bear-primary-400, #38BDF8));
+  --bear-bifrost-bg: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --bear-ink-bg: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --accent: var(--bifrost-cms-accent, #1E3A8A);
+  --accent-soft: var(--bifrost-cms-accent-soft, #eff6ff);
+  --accent-dark: var(--bifrost-cms-accent-dark, #172554);
   --bifrost-cms-bg: #F6F6F4;
   --bifrost-cms-surface: #FFFFFF;
   --bifrost-cms-border: #E5E5E2;
   --bifrost-cms-text: #17171C;
   --bifrost-cms-muted: #6B6B76;
-  --bifrost-cms-accent: #EA0A8E;
-  --bifrost-cms-accent-soft: #FDE6F4;
-  --bifrost-cms-highlight: #FDE6F4;
+  --bifrost-cms-accent: #1E3A8A;
+  --bifrost-cms-accent-dark: #172554;
+  --bifrost-cms-accent-soft: #eff6ff;
+  --bifrost-cms-highlight: #eff6ff;
   --bifrost-cms-sidebar: #151319;
   --bifrost-cms-sidebar-text: #E9E6EF;
   --bifrost-cms-sidebar-muted: #8B879A;
@@ -40,7 +46,7 @@ html.bifrost-cms-host #root {
   --bifrost-cms-ai-soft: #f0fdfa;
   --bifrost-cms-ai-border: #14b8a6;
   --bifrost-cms-review: #A6690A;
-  --bifrost-cms-bar-1: #EA0A8E;
+  --bifrost-cms-bar-1: #38BDF8;
   --bifrost-cms-bar-2: var(--bear-warning-600);
   --bifrost-cms-bar-3: var(--bear-warning-50);
   --bifrost-cms-ring-track: var(--bear-neutral-300);
@@ -66,27 +72,34 @@ html.bifrost-cms-host #root {
 }
 
 .bifrost-cms--dark {
-  --bear-primary-50: #fdf2f8;
-  --bear-primary-100: #fce7f3;
-  --bear-primary-200: #fbcfe8;
-  --bear-primary-300: #f9a8d4;
-  --bear-primary-400: #f472b6;
-  --bear-primary-500: #EA0A8E;
-  --bear-primary-600: #EA0A8E;
-  --bear-primary-700: #B90A70;
-  --bear-primary-800: #9d174d;
-  --bear-primary-900: #831843;
-  --accent: #EA0A8E;
-  --accent-soft: #FDE6F4;
-  --accent-dark: #B90A70;
+  --bear-primary-50: #eff6ff;
+  --bear-primary-100: #dbeafe;
+  --bear-primary-200: #bfdbfe;
+  --bear-primary-300: #93c5fd;
+  --bear-primary-400: #60a5fa;
+  --bear-primary-500: #1E3A8A;
+  --bear-primary-600: #172554;
+  --bear-primary-700: #0F172A;
+  --bear-primary-800: #0b1120;
+  --bear-primary-900: #020617;
+  --bear-btn-primary-bg: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --bear-btn-primary-border: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --bear-btn-primary-ring: var(--bifrost-cms-bar-1, var(--bear-primary-400, #38BDF8));
+  --bear-bifrost-bg: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --bear-ink-bg: var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A));
+  --accent: var(--bifrost-cms-accent, #1E3A8A);
+  --accent-soft: var(--bifrost-cms-accent-soft, rgba(30, 58, 138, 0.22));
+  --accent-dark: var(--bifrost-cms-accent-dark, #172554);
   --bifrost-cms-bg: var(--bear-bg-secondary);
   --bifrost-cms-surface: var(--bear-bg-tertiary);
   --bifrost-cms-border: var(--bear-border-default);
   --bifrost-cms-text: var(--bear-text-primary);
   --bifrost-cms-muted: var(--bear-text-secondary);
-  --bifrost-cms-accent: #f472b6;
-  --bifrost-cms-accent-soft: color-mix(in srgb, #EA0A8E 22%, transparent);
-  --bifrost-cms-highlight: #EA0A8E;
+  --bifrost-cms-accent: #1E3A8A;
+  --bifrost-cms-accent-dark: #172554;
+  --bifrost-cms-accent-soft: color-mix(in srgb, #1E3A8A 22%, transparent);
+  --bifrost-cms-highlight: #1E3A8A;
+  --bifrost-cms-bar-1: #38BDF8;
   --bifrost-cms-sidebar: #14161C;
   --bifrost-cms-sidebar-text: #e8eaef;
   --bifrost-cms-sidebar-muted: #9ca3af;
@@ -98,13 +111,13 @@ html.bifrost-cms-host #root {
 .bifrost-cms .Bear-Button--primary,
 .bifrost-cms button.btn-primary,
 .bifrost-cms .btn-primary {
-  background-color: #EA0A8E !important;
+  background-color: var(--bear-btn-primary-bg, var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A))) !important;
   color: #FFFFFF !important;
-  border-color: #EA0A8E !important;
+  border-color: var(--bear-btn-primary-border, var(--bifrost-cms-accent, var(--bear-primary-500, #1E3A8A))) !important;
 
   &:hover:not(:disabled) {
-    background-color: #B90A70 !important;
-    border-color: #B90A70 !important;
+    background-color: var(--bear-primary-600, var(--accent-dark, #172554)) !important;
+    border-color: var(--bear-primary-600, var(--accent-dark, #172554)) !important;
   }
 }
 
@@ -4928,10 +4941,10 @@ html.bifrost-cms-host #root {
   --anchor-ink-faint: #9A9AA3;
   --anchor-border: #E5E5E2;
   --anchor-border-strong: #D6D6D2;
-  --anchor-accent: #EA0A8E;
+  --anchor-accent: var(--bifrost-cms-accent, #1E3A8A);
   --anchor-accent-ink: #FFFFFF;
-  --anchor-accent-soft: #FDE6F4;
-  --anchor-accent-dark: #B90A70;
+  --anchor-accent-soft: var(--bifrost-cms-accent-soft, #eff6ff);
+  --anchor-accent-dark: var(--bifrost-cms-accent-dark, #172554);
   --anchor-success: #147A5C;
   --anchor-success-soft: #E4F5EF;
   --anchor-warning: #A6690A;

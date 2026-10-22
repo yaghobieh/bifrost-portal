@@ -50,7 +50,7 @@ import {
   loadUserDevPrefs,
   saveUserChatPrefs,
 } from '../SettingsPages';
-import { SETTINGS_CHAT_SHOW } from '../SettingsPages/SettingsPages.const';
+import { SETTINGS_CHAT_SHOW, SETTINGS_THEME_EVENT } from '../SettingsPages/SettingsPages.const';
 import { isCrewChatInstalled, hydrateExtensionsRemote } from '../ExtensionsPages';
 import { playChatSound, shouldPlayChatSound } from './CmsCrewChat/cmsChatSound.utils';
 import { CmsAgentBar } from './CmsAgentBar';
@@ -163,7 +163,14 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   }, [site.apiErrorMode]);
 
   useEffect(() => {
-    applyCmsThemeColors(shellRef.current, loadCmsThemeColors(), resolvedMode);
+    const handleThemeChange = () => {
+      applyCmsThemeColors(shellRef.current, loadCmsThemeColors(), resolvedMode);
+    };
+    handleThemeChange();
+    window.addEventListener(SETTINGS_THEME_EVENT, handleThemeChange);
+    return () => {
+      window.removeEventListener(SETTINGS_THEME_EVENT, handleThemeChange);
+    };
   }, [isAuthenticated, token, resolvedMode]);
 
   useEffect(() => {

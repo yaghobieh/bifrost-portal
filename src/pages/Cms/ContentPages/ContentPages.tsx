@@ -292,7 +292,7 @@ export const ContentPages: FC = () => {
               onClick={() => {
                 void onNewPage(templateFilter);
               }}
-              className="bg-[#1e3a8a] hover:bg-[#172554] text-white font-semibold shadow-sm"
+              className="font-semibold shadow-sm"
             >
               {t.dashboard.createEntry}
             </Button>
@@ -305,7 +305,7 @@ export const ContentPages: FC = () => {
             variant="outlined"
             padding="sm"
             className={`cursor-pointer transition-all bg-white border rounded-lg shadow-sm hover:border-gray-300 ${
-              statusFilter === STATUS_FILTER.ALL ? 'ring-2 ring-[#1e3a8a]' : 'border-gray-100'
+              statusFilter === STATUS_FILTER.ALL ? 'ring-2 ring-[var(--bear-primary-500,#1e3a8a)]' : 'border-gray-100'
             }`}
             onClick={() => handleSelectStatusFilter(STATUS_FILTER.ALL)}
           >
@@ -372,7 +372,7 @@ export const ContentPages: FC = () => {
         {selectedRows.length > NUMBER_ZERO && (
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-wrap items-center justify-between gap-3 shadow-sm animate-fadeIn">
             <Flex gap={NUMBER_TWO} align="center">
-              <Badge variant="info" className="bg-[#1e3a8a] text-white font-bold">
+              <Badge variant="info" className="bg-[var(--bear-primary-500,#1e3a8a)] text-white font-bold">
                 {t.dashboard.selectedCount.replace(COUNT_TOKEN, String(selectedRows.length))}
               </Badge>
               <Typography variant="body2" className="text-sm text-blue-900 font-medium">
@@ -444,7 +444,7 @@ export const ContentPages: FC = () => {
                     onClick={() => setTemplateFilter(tab.id)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border ${
                       isActive
-                        ? 'bg-[#1e3a8a] text-white border-[#1e3a8a] shadow-sm'
+                        ? 'bg-[var(--bear-primary-500,#1e3a8a)] text-white border-[var(--bear-primary-500,#1e3a8a)] shadow-sm'
                         : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
@@ -455,7 +455,7 @@ export const ContentPages: FC = () => {
               <button
                 type="button"
                 onClick={() => setShowCreateTypeModal(true)}
-                className="px-2.5 py-1 rounded-full text-xs font-semibold text-[#1e3a8a] border border-dashed border-blue-300 hover:border-[#1e3a8a] hover:bg-blue-50 cursor-pointer whitespace-nowrap transition-all ml-1 shadow-2xs flex items-center gap-1"
+                className="px-2.5 py-1 rounded-full text-xs font-semibold text-[var(--bear-primary-500,#1e3a8a)] border border-dashed border-blue-300 hover:border-[var(--bear-primary-500,#1e3a8a)] hover:bg-blue-50 cursor-pointer whitespace-nowrap transition-all ml-1 shadow-2xs flex items-center gap-1"
                 title={t.dashboard.createTypeTitle}
               >
                 <BearIcons.PlusIcon size={NUMBER_TEN} />
@@ -476,7 +476,7 @@ export const ContentPages: FC = () => {
                 >
                   <BearIcons.FilterIcon size={NUMBER_TWELVE} />
                   <span>{t.dashboard.filterLabel}</span>
-                  {statusFilter !== STATUS_FILTER.ALL && <span className="w-2 h-2 rounded-full bg-[#1e3a8a]" />}
+                  {statusFilter !== STATUS_FILTER.ALL && <span className="w-2 h-2 rounded-full bg-[var(--bear-primary-500,#1e3a8a)]" />}
                 </button>
 
                 {showFilterPopover && (

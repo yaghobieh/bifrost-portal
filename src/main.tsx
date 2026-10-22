@@ -12,11 +12,14 @@ import { CMS_PATH } from '@config/cms.config';
 import { SLASH, THEME_STORAGE_KEY } from '@const/strings.const';
 import { bindWindowVersion, CONSOLE_VERSION_LABEL, fetchVersionInfo } from '@sdk/modules/version';
 import { CMS_CARD_PADDING } from './pages/Cms/CmsShell/CmsShell.const';
+import { applyCmsThemeColors, loadCmsThemeColors } from '@pages/Cms/SettingsPages';
 import { App } from './App';
 import './styles/index.css';
 
 const cmsPath = window.location.pathname;
 const onCmsHost = cmsPath === CMS_PATH || cmsPath.startsWith(`${CMS_PATH}${SLASH}`);
+
+applyCmsThemeColors(document.documentElement, loadCmsThemeColors());
 
 if (onCmsHost) {
   document.documentElement.classList.add('bifrost-cms-host');
