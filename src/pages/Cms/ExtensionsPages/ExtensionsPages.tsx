@@ -50,6 +50,7 @@ import {
   uniqueGitRepos,
 } from './ExtensionsPages.utils';
 import { saveCmsThemeColors } from '../SettingsPages/SettingsPages.utils';
+import { AnalyticsHubView } from './helpers/AnalyticsHubView';
 
 const THEME_PALETTE_BY_ID: Record<string, { primary: string; accent: string; background: string }> = {
   'theme-deep-navy': { primary: '#1E3A8A', accent: '#38BDF8', background: '#0F172A' },
@@ -71,6 +72,7 @@ export const ExtensionsPages: FC = () => {
   const [externalUrl, setExternalUrl] = useState(EXTENSION_SEARCH_EMPTY);
   const [externalNotice, setExternalNotice] = useState(EXTENSION_SEARCH_EMPTY);
   const [selected, setSelected] = useState<ExtensionItem | null>(null);
+  const [activeViewTab, setActiveViewTab] = useState<'marketplace' | 'analytics'>('marketplace');
 
   useEffect(() => {
     if (!token) {
@@ -193,12 +195,42 @@ export const ExtensionsPages: FC = () => {
   return (
     <CmsShell activeNavId={CMS_NAV_IDS.BUNDLES}>
       <Flex direction="column" gap={6} className="bifrost-cms-page">
-        <CmsPageHeader
-          title={t.cmsExtensions.title}
-          subtitle={t.cmsExtensions.subtitle}
-          actionTitle={t.cmsExtensions.install}
-          actionBody={t.cmsExtensions.subtitle}
-        />
+        <div className="flex gap-2 border-b border-gray-200 pb-2 mb-1 overflow-x-auto">
+          <button
+            type="button"
+            onClick={() => setActiveViewTab('marketplace')}
+            className={`px-4 py-2 font-medium text-sm rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+              activeViewTab === 'marketplace'
+                ? 'bg-[var(--bear-primary-500,#1E3A8A)] text-white shadow-sm'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          >
+            Marketplace &amp; Plugins
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveViewTab('analytics')}
+            className={`px-4 py-2 font-medium text-sm rounded-lg transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              activeViewTab === 'analytics'
+                ? 'bg-[var(--bear-primary-500,#1E3A8A)] text-white shadow-sm'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          >
+            <span>Traffic &amp; Analytics Hub</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+        </div>
+
+        {activeViewTab === 'analytics' ? (
+          <AnalyticsHubView />
+        ) : (
+          <>
+            <CmsPageHeader
+              title={t.cmsExtensions.title}
+              subtitle={t.cmsExtensions.subtitle}
+              actionTitle={t.cmsExtensions.install}
+              actionBody={t.cmsExtensions.subtitle}
+            />
         <div className="bifrost-cms-store-filter">
           <Input
             id={EXTENSION_SEARCH_INPUT_ID}
@@ -396,6 +428,8 @@ export const ExtensionsPages: FC = () => {
             </div>
           ) : null}
         </Modal>
+        </>
+        )}
       </Flex>
     </CmsShell>
   );
