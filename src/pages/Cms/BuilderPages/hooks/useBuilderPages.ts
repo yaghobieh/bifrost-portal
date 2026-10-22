@@ -51,7 +51,7 @@ import {
   LAYOUT_MIME,
 } from '../BuilderPages.const';
 import { BEAR_PALETTE, BEAR_PALETTE_GROUPS } from '../BearPalette.const';
-import { MARKETING_GLOBAL_COLORS, MARKETING_WIDGET_GROUPS, MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
+import { MARKETING_CORE_WIDGET_IDS, MARKETING_GLOBAL_COLORS, MARKETING_WIDGET_GROUPS, MARKETING_WIDGET_IDS, MARKETING_WIDGETS } from '../MarketingBlocks.const';
 import type {
   BuilderInspectorTab,
   BuilderStageTab,
@@ -473,6 +473,7 @@ export const useBuilderPages = () => {
     label: marketingLabels[widget.id] || widget.label,
   }));
   const marketingGroupLabels: Record<string, string> = {
+    marketing: t.cmsBuilder.paletteGroupMarketing || 'Marketing',
     basic: t.cmsBuilder.paletteGroupBasic,
     hero: t.cmsBuilder.paletteGroupHero,
     auth: t.cmsBuilder.paletteGroupAuth,
@@ -480,11 +481,27 @@ export const useBuilderPages = () => {
     conversion: t.cmsBuilder.paletteGroupConversion,
     footer: t.cmsBuilder.paletteGroupFooter,
   };
-  const marketingGroups = MARKETING_WIDGET_GROUPS.map((group) => ({
-    id: group,
-    label: marketingGroupLabels[group],
-    widgets: marketingWidgets.filter((widget) => widget.group === group && matchQuery(widget.label)),
-  })).filter((group) => group.widgets.length > NUMBER_ZERO);
+  const coreMarketingWidgets = MARKETING_CORE_WIDGET_IDS.map((id) =>
+    marketingWidgets.find((w) => w.id === id),
+  ).filter((w): w is (typeof marketingWidgets)[number] => Boolean(w && matchQuery(w.label)));
+
+  const marketingCoreGroup =
+    coreMarketingWidgets.length > NUMBER_ZERO
+      ? {
+          id: 'marketing' as const,
+          label: t.cmsBuilder.paletteGroupMarketing || 'Marketing',
+          widgets: coreMarketingWidgets,
+        }
+      : null;
+
+  const marketingGroups = [
+    ...(marketingCoreGroup ? [marketingCoreGroup] : []),
+    ...MARKETING_WIDGET_GROUPS.map((group) => ({
+      id: group,
+      label: marketingGroupLabels[group],
+      widgets: marketingWidgets.filter((widget) => widget.group === group && matchQuery(widget.label)),
+    })).filter((group) => group.widgets.length > NUMBER_ZERO),
+  ];
   const bearGroupLabels: Record<string, string> = {
     basic: t.cmsBuilder.paletteGroupBasic,
     layout: t.cmsBuilder.paletteGroupLayout,

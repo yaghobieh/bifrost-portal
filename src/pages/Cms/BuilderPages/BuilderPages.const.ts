@@ -51,13 +51,14 @@ export const BUILDER_STAGE_TAB = {
 } as const;
 
 export const PALETTE_GROUP_ID = {
+  MARKETING: 'marketing',
   LAYOUT: 'layout',
   CONTENT: 'content',
   FORM: 'form',
   CUSTOM: 'custom',
 } as const;
 
-export const PALETTE_ACCORDION_DEFAULT = ['basic'] as const;
+export const PALETTE_ACCORDION_DEFAULT = ['marketing', 'hero', 'basic'] as const;
 
 export const BUILDER_STYLE_EMPTY = EMPTY_STRING;
 export const EMPTY_NODE_STYLES: CanvasNodeStyles = {

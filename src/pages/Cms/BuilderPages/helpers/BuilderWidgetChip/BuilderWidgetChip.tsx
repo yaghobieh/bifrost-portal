@@ -4,6 +4,9 @@ import { CMS_ICON_SIZE } from '@const/numbers.const';
 import type { BuilderWidgetChipProps } from './BuilderWidgetChip.types';
 
 export const paletteGroupIcon = (group: string): ReactNode => {
+  if (group === 'marketing') {
+    return <BearIcons.StarIcon size={CMS_ICON_SIZE} />;
+  }
   if (group === 'hero') {
     return <BearIcons.MonitorIcon size={CMS_ICON_SIZE} />;
   }

@@ -1,6 +1,7 @@
 import { HERO_IMG_SRC } from '@const/strings.const';
 import { NUMBER_EIGHT_HUNDRED } from '@const/numbers.const';
-import { BEAR_IMAGE_ALT, IMAGE_LOADING_LAZY } from './BearPalette.const';
+export const MARKETING_IMAGE_ALT = 'Image';
+export const MARKETING_IMAGE_LOADING = 'lazy';
 
 export const MARKETING_BLUE = 'var(--bifrost-cms-blue)';
 export const MARKETING_VIOLET = 'var(--bifrost-cms-violet)';
@@ -12,6 +13,10 @@ export const MARKETING_CANVAS = 'var(--bifrost-cms-canvas-fill)';
 export const MARKETING_SPACER_HEIGHT = '2rem';
 export const MARKETING_HEADING_SIZE = '2rem';
 export const MARKETING_GRADIENT = 'var(--bifrost-cms-gradient)';
+
+export const MARKETING_BLUE_HEX = '#2951C4';
+export const MARKETING_VIOLET_HEX = '#8A3FD4';
+export const MARKETING_PINK_HEX = '#EA0A8E';
 
 export const MARKETING_WIDGET_IDS = {
   HERO: 'mkt-hero',
@@ -33,7 +38,16 @@ export const MARKETING_WIDGET_IDS = {
   SPACER: 'mkt-spacer',
 } as const;
 
+export const MARKETING_CORE_WIDGET_IDS = [
+  MARKETING_WIDGET_IDS.HERO,
+  MARKETING_WIDGET_IDS.SPLIT_AUTH,
+  MARKETING_WIDGET_IDS.FEATURE_GRID,
+  MARKETING_WIDGET_IDS.CTA_BAND,
+  MARKETING_WIDGET_IDS.FOOTER,
+] as const;
+
 export const MARKETING_WIDGET_GROUP = {
+  MARKETING: 'marketing',
   BASIC: 'basic',
   HERO: 'hero',
   AUTH: 'auth',
@@ -82,7 +96,7 @@ export const MARKETING_WIDGETS: readonly MarketingWidgetDef[] = [
     id: MARKETING_WIDGET_IDS.IMAGE,
     group: MARKETING_WIDGET_GROUP.BASIC,
     label: 'Image',
-    html: `<img src="${HERO_IMG_SRC}" alt="${BEAR_IMAGE_ALT}" width="${NUMBER_EIGHT_HUNDRED}" loading="${IMAGE_LOADING_LAZY}" />`,
+    html: `<img src="${HERO_IMG_SRC}" alt="${MARKETING_IMAGE_ALT}" width="${NUMBER_EIGHT_HUNDRED}" loading="${MARKETING_IMAGE_LOADING}" />`,
   },
   {
     id: MARKETING_WIDGET_IDS.SPACER,
