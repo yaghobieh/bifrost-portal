@@ -1,0 +1,1 @@
+export { ComponentDocsView } from './ComponentDocsView';
