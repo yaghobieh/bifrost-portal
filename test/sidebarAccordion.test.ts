@@ -103,4 +103,36 @@ test('CMS-91: WP-style Sidenav Accordion & Collapsed Flyouts', async (t) => {
     assert.equal(closedItems[1].children, undefined);
     assert.equal(closedItems[2].children, undefined);
   });
+
+  await t.test('CMS-91: Articles nav route should target collection=articles query parameter', async () => {
+    const { CMS_NAV_ROUTES } = await import('../src/pages/Cms/CmsShell/CmsShell.const');
+    assert.equal(
+      CMS_NAV_ROUTES[CMS_NAV_IDS.ARTICLES],
+      '/cms/content?collection=articles',
+      'Articles nav must route to /cms/content?collection=articles to filter articles collection',
+    );
+  });
+
+  await t.test('CMS-91: Accordion toggle should switch directly between sections in 1 step', () => {
+    let openGroup: string | null = CMS_NAV_SECTIONS.OVERVIEW;
+    const toggle = (target: string) => {
+      openGroup = openGroup === target ? null : target;
+    };
+
+    // User clicks Design: Overview must close, Design must open in 1 click
+    toggle(CMS_NAV_SECTIONS.DESIGN);
+    assert.equal(openGroup, CMS_NAV_SECTIONS.DESIGN);
+
+    const designNav = resolveSidebarNavItems({
+      groups: sampleGroups,
+      collapsed: false,
+      openGroupId: openGroup,
+    });
+    assert.equal(designNav[0].children, undefined, 'Old section Overview must be closed');
+    assert.ok(designNav[1].children?.length, 'New section Design must be open');
+
+    // Clicking Design again toggles it closed
+    toggle(CMS_NAV_SECTIONS.DESIGN);
+    assert.equal(openGroup, null);
+  });
 });

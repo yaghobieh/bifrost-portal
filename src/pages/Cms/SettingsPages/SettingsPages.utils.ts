@@ -78,7 +78,13 @@ import type {
   CmsConnections,
 } from './SettingsPages.types';
 import { fetchSettingsValue, putSettingsValue, SETTINGS_KV_SITE, SETTINGS_KV_TRANSLATIONS } from '@sdk/modules/settings';
-import { CMS_TRANSLATIONS_EVENT, CMS_TRANSLATIONS_STORAGE_KEY } from '@const/strings.const';
+import {
+  CMS_MODE_DARK,
+  CMS_MODE_LIGHT,
+  CMS_MODE_STORAGE_KEY,
+  CMS_TRANSLATIONS_EVENT,
+  CMS_TRANSLATIONS_STORAGE_KEY,
+} from '@const/strings.const';
 
 const isHexColor = (value: unknown): value is string =>
   typeof value === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value);
@@ -185,31 +191,33 @@ export const applyCmsThemeColors = (
     elem.style.setProperty('--bifrost-cms-highlight', primary);
     elem.style.setProperty(SETTINGS_CSS_VARS.SIDEBAR, SETTINGS_SIDEBAR);
 
+    const backgroundIsDark = isDarkThemeBackground(colors.background);
     const isDark =
       colorMode === 'dark' ||
+      (colorMode === undefined && backgroundIsDark) ||
       elem.classList.contains('bifrost-cms--dark') ||
       elem.getAttribute('data-color-mode') === 'dark';
-    if (isDark) {
-      if (isDarkThemeBackground(colors.background)) {
-        elem.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
-      } else {
-        elem.style.setProperty(
-          SETTINGS_CSS_VARS.BACKGROUND,
-          SETTINGS_THEME_DEFAULTS_DARK.background,
-        );
-      }
-    } else if (isDarkThemeBackground(colors.background)) {
-      elem.style.setProperty(
-        SETTINGS_CSS_VARS.BACKGROUND,
-        SETTINGS_THEME_DEFAULTS_LIGHT.background,
-      );
-    } else {
-      elem.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
-    }
+
+    elem.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
     elem.style.setProperty(
       SETTINGS_CSS_VARS.ACCENT_SOFT,
       isDark ? SETTINGS_ACCENT_SOFT_DARK : primarySoft,
     );
+
+    if (
+      elem.classList.contains('bifrost-cms') ||
+      elem === document.documentElement ||
+      elem === document.body
+    ) {
+      elem.setAttribute('data-color-mode', isDark ? 'dark' : 'light');
+      if (isDark) {
+        elem.classList.add('bifrost-cms--dark');
+        elem.classList.remove('bifrost-cms--light');
+      } else {
+        elem.classList.add('bifrost-cms--light');
+        elem.classList.remove('bifrost-cms--dark');
+      }
+    }
   });
 };
 
@@ -241,8 +249,31 @@ export const loadCmsThemeColors = (): CmsThemeColors => {
 
 export const saveCmsThemeColors = (colors: CmsThemeColors): void => {
   localStorage.setItem(SETTINGS_THEME_STORAGE_KEY, JSON.stringify(colors));
+  const isDark = isDarkThemeBackground(colors.background);
+  localStorage.setItem(CMS_MODE_STORAGE_KEY, isDark ? CMS_MODE_DARK : CMS_MODE_LIGHT);
+
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.endsWith(':theme')) {
+        localStorage.setItem(k, JSON.stringify(colors));
+      }
+    }
+  } catch {
+    // noop
+  }
+
   if (typeof document !== 'undefined') {
-    applyCmsThemeColors(document.documentElement, colors);
+    applyCmsThemeColors(document.documentElement, colors, isDark ? 'dark' : 'light');
+    if (document.body) {
+      document.body.classList.toggle('dark', isDark);
+      document.body.classList.toggle('light', !isDark);
+      applyCmsThemeColors(document.body, colors, isDark ? 'dark' : 'light');
+    }
+    const shells = document.querySelectorAll<HTMLElement>('.bifrost-cms');
+    shells.forEach((shell) => {
+      applyCmsThemeColors(shell, colors, isDark ? 'dark' : 'light');
+    });
   }
   window.dispatchEvent(new Event(SETTINGS_THEME_EVENT));
 };

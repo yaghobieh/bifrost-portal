@@ -11,7 +11,6 @@ import {
   Dropdown,
   Flex,
   Input,
-  Sidebar,
   Typography,
   useBearMode,
 } from '@forgedevstack/bear';
@@ -165,7 +164,9 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
 
   useEffect(() => {
     const handleThemeChange = () => {
-      applyCmsThemeColors(shellRef.current, loadCmsThemeColors(), resolvedMode);
+      const mode = loadCmsModePreference();
+      setModePreference(mode);
+      applyCmsThemeColors(shellRef.current, loadCmsThemeColors(), resolveCmsMode(mode));
     };
     handleThemeChange();
     window.addEventListener(SETTINGS_THEME_EVENT, handleThemeChange);
@@ -681,38 +682,142 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
       )}
       <div className="bifrost-cms__rail">
       <div className="bifrost-cms__rail-stack">
-      <Sidebar
-        items={sidebarItems}
-        activeItemId={activeNavId}
-        onItemClick={onItemClick}
-        width={sidebarWidth}
-        collapsedWidth={CMS_SIDEBAR_COLLAPSED_WIDTH_PX}
-        collapsed={collapsed}
-        onCollapsedChange={onCollapsedChange}
-        fullHeight
-        activeVariant={CMS_SIDEBAR_ACTIVE_VARIANT}
-        variant="default"
-        position="left"
-        className="bifrost-cms__sidebar"
-        header={
-          <Flex direction="column" gap={2} className="bifrost-cms__brand-block">
-            <Flex align="center" gap={2}>
-              <img
-                src={toCloudinarySrc(site.logoDataUrl || BIFROST_ICON_SRC, cloudName)}
-                alt={site.siteName || t.cmsShell.brand}
-                className="bifrost-cms__logo"
-                width={CMS_LOGO_SIZE_PX}
-                height={CMS_LOGO_SIZE_PX}
-              />
-              {collapsed ? null : (
-                <Typography variant="h6" className="bifrost-cms__brand mb-0">
+      <aside
+        className={`Bear-Sidebar Bear-Sidebar--default${collapsed ? ' Bear-Sidebar--collapsed' : ''} bifrost-cms__sidebar bear-flex bear-flex-col bear-h-full bear-transition-all bear-duration-300 bear-border-r`}
+        style={{ width: collapsed ? CMS_SIDEBAR_COLLAPSED_WIDTH_PX : sidebarWidth }}
+      >
+        <div className="Bear-Sidebar__header flex items-center justify-between px-3 py-3 border-b border-[#23262f]">
+          {!collapsed && (
+            <Flex direction="column" gap={2} className="bifrost-cms__brand-block">
+              <Flex align="center" gap={2}>
+                <img
+                  src={toCloudinarySrc(site.logoDataUrl || BIFROST_ICON_SRC, cloudName)}
+                  alt={site.siteName || t.cmsShell.brand}
+                  className="bifrost-cms__logo"
+                  width={CMS_LOGO_SIZE_PX}
+                  height={CMS_LOGO_SIZE_PX}
+                />
+                <Typography variant="h6" className="bifrost-cms__brand mb-0 truncate">
                   {site.siteName || t.cmsShell.brand}
                 </Typography>
-              )}
+              </Flex>
             </Flex>
-          </Flex>
-        }
-      />
+          )}
+          <button
+            type="button"
+            onClick={() => onCollapsedChange(!collapsed)}
+            className="Bear-Sidebar__toggle p-1 rounded hover:bg-white/10 text-white cursor-pointer ml-auto"
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {collapsed ? (
+              <BearIcons.ChevronRightIcon size={16} />
+            ) : (
+              <BearIcons.ChevronLeftIcon size={16} />
+            )}
+          </button>
+        </div>
+
+        <nav className="Bear-Sidebar__nav bear-flex-1 bear-overflow-y-auto bear-px-2 bear-py-3 bear-space-y-1 bear-min-h-0">
+          {visibleGroups.map((group) => {
+            const isGroupOpen = openSectionId === group.id;
+            const hasChildren = (group.children?.length ?? 0) > 0;
+            const isGroupActive =
+              group.id === activeNavId ||
+              (group.children ?? []).some((child) => child.id === activeNavId);
+
+            if (collapsed) {
+              const isFlyoutOpen = flyoutId === group.id;
+              return (
+                <div key={group.id} className="Bear-Sidebar__item-wrapper">
+                  <button
+                    type="button"
+                    onClick={() => setFlyoutId((cur) => (cur === group.id ? null : group.id))}
+                    className={`Bear-Sidebar__item Bear-Sidebar__item--collapsed bear-justify-center w-full flex items-center p-2 rounded-md transition-colors cursor-pointer ${
+                      isGroupActive || isFlyoutOpen ? 'Bear-Sidebar__item--active' : ''
+                    }`}
+                    title={group.label}
+                  >
+                    {group.icon && (
+                      <span className="Bear-Sidebar__item-icon bear-shrink-0 bear-w-5 bear-h-5 bear-flex bear-items-center bear-justify-center">
+                        {group.icon}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <div key={group.id} className="Bear-Sidebar__item-wrapper mb-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenSectionId((curr) => (curr === group.id ? null : group.id));
+                  }}
+                  className={`Bear-Sidebar__item w-full flex items-center px-2.5 py-2 rounded-md transition-colors text-left cursor-pointer select-none ${
+                    isGroupActive && !isGroupOpen ? 'font-semibold text-white' : ''
+                  }`}
+                  aria-expanded={isGroupOpen}
+                >
+                  {group.icon && (
+                    <span className="Bear-Sidebar__item-icon bear-shrink-0 bear-w-5 bear-h-5 bear-flex bear-items-center bear-justify-center mr-2">
+                      {group.icon}
+                    </span>
+                  )}
+                  <span className="Bear-Sidebar__item-row bear-flex bear-items-center bear-flex-1 bear-min-w-0">
+                    <span className="Bear-Sidebar__item-label bear-flex-1 bear-truncate font-medium">
+                      {group.label}
+                    </span>
+                    {hasChildren && (
+                      <span
+                        className={`Bear-Sidebar__item-chevron bear-ml-1 bear-transition-transform bear-duration-200 flex items-center ${
+                          isGroupOpen ? 'bear-rotate-180 transform rotate-180' : ''
+                        }`}
+                      >
+                        <BearIcons.ChevronDownIcon size={14} />
+                      </span>
+                    )}
+                  </span>
+                </button>
+
+                {isGroupOpen && hasChildren && (
+                  <div className="Bear-Sidebar__children bear-mt-1 space-y-0.5 pl-2">
+                    {group.children?.map((child) => {
+                      const isActive = child.id === activeNavId;
+                      return (
+                        <button
+                          key={child.id}
+                          type="button"
+                          onClick={() => onItemClick(child)}
+                          className={`Bear-Sidebar__item w-full flex items-center px-2 py-1.5 rounded-md text-sm transition-colors text-left cursor-pointer ${
+                            isActive
+                              ? 'Bear-Sidebar__item--active bg-[var(--bear-primary-500,#1e3a8a)] text-white font-medium'
+                              : 'text-gray-300 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          {child.icon && (
+                            <span className="Bear-Sidebar__item-icon bear-shrink-0 bear-w-4 bear-h-4 bear-flex bear-items-center bear-justify-center mr-2 opacity-80">
+                              {child.icon}
+                            </span>
+                          )}
+                          <span className="Bear-Sidebar__item-label bear-flex-1 bear-truncate">
+                            {child.label}
+                          </span>
+                          {child.badge && (
+                            <span className="Bear-Sidebar__item-badge bear-ml-auto">
+                              {child.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
       <div className="bifrost-cms__rail-footer">
           <Flex direction="column" gap={2} className="bifrost-cms__footer">
             <Flex align="center" gap={2} className="bifrost-cms__footer-user">

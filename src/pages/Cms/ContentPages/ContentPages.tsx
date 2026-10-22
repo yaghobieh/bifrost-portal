@@ -1,6 +1,6 @@
 import { useEffect, useState, type FC } from 'react';
 import { Badge, BearIcons, Button, Card, Flex, Typography } from '@forgedevstack/bear';
-import { useNavigate } from '@forgedevstack/forge-compass/react';
+import { useNavigate, useQuery } from '@forgedevstack/forge-compass/react';
 import { GridTable } from '@forgedevstack/grid-table';
 import { CmsShell, CMS_NAV_IDS } from '../CmsShell';
 import { EMPTY_STRING } from '@const/index';
@@ -83,14 +83,45 @@ export const ContentPages: FC = () => {
   const [pageTypes, setPageTypes] = useState<PageTypeDefinition[]>(() => loadAllPageTypes());
   const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
 
+  const normalizeCollectionFilter = (val: string | null | undefined): string => {
+    if (!val) return COLLECTION_TAB_ID.ALL;
+    if (val === 'article' || val === 'articles') return COLLECTION_TAB_ID.ARTICLES;
+    if (val === 'page' || val === 'pages') return COLLECTION_TAB_ID.PAGES;
+    return val;
+  };
+
+  const query = useQuery();
+
   const [templateFilter, setTemplateFilter] = useState(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
-      return sp.get('kind') || sp.get('collection') || COLLECTION_TAB_ID.ALL;
+      return normalizeCollectionFilter(sp.get('collection') || sp.get('kind'));
     } catch {
       return COLLECTION_TAB_ID.ALL;
     }
   });
+
+  useEffect(() => {
+    const rawKind = typeof query.kind === 'string' ? query.kind : null;
+    const rawCol = typeof query.collection === 'string' ? query.collection : null;
+    const sp = new URLSearchParams(window.location.search);
+    const target = normalizeCollectionFilter(rawCol || rawKind || sp.get('collection') || sp.get('kind'));
+    setTemplateFilter(target);
+  }, [query.kind, query.collection]);
+
+  useEffect(() => {
+    const onLocationChange = () => {
+      try {
+        const sp = new URLSearchParams(window.location.search);
+        const target = normalizeCollectionFilter(sp.get('collection') || sp.get('kind'));
+        setTemplateFilter(target);
+      } catch {
+        // noop
+      }
+    };
+    window.addEventListener('popstate', onLocationChange);
+    return () => window.removeEventListener('popstate', onLocationChange);
+  }, []);
 
   useEffect(() => {
     const handleTypesUpdate = () => {
@@ -111,19 +142,17 @@ export const ContentPages: FC = () => {
     setShowFilterPopover(false);
   };
 
-  useEffect(() => {
-    const onLocationChange = () => {
-      try {
-        const sp = new URLSearchParams(window.location.search);
-        const k = sp.get('kind') || sp.get('collection');
-        if (k) setTemplateFilter(k);
-      } catch {
-        // noop
-      }
-    };
-    window.addEventListener('popstate', onLocationChange);
-    return () => window.removeEventListener('popstate', onLocationChange);
-  }, []);
+  const handleSelectTab = (tabId: string) => {
+    setTemplateFilter(tabId);
+    try {
+      const nextUrl = tabId === COLLECTION_TAB_ID.ALL
+        ? ROUTES.CMS_CONTENT
+        : `${ROUTES.CMS_CONTENT}?collection=${tabId}`;
+      window.history.pushState(null, '', nextUrl);
+    } catch {
+      // noop
+    }
+  };
 
   const filteredByTemplate = filterRowsByTemplate(rows, templateFilter);
   const visibleRows = filteredByTemplate.filter((row) => {
@@ -272,7 +301,13 @@ export const ContentPages: FC = () => {
   };
 
   return (
-    <CmsShell activeNavId={CMS_NAV_IDS.PAGES}>
+    <CmsShell
+      activeNavId={
+        templateFilter === COLLECTION_TAB_ID.ARTICLES
+          ? CMS_NAV_IDS.ARTICLES
+          : CMS_NAV_IDS.PAGES
+      }
+    >
       <Flex direction="column" gap={NUMBER_SIX} className="bifrost-cms-page">
         <div className="bifrost-cms-header-row flex justify-between items-center flex-wrap gap-4">
           <div>
@@ -464,7 +499,7 @@ export const ContentPages: FC = () => {
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => setTemplateFilter(tab.id)}
+                    onClick={() => handleSelectTab(tab.id)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border ${
                       isActive
                         ? 'bg-[var(--bear-primary-500,#1e3a8a)] text-white border-[var(--bear-primary-500,#1e3a8a)] shadow-sm'
