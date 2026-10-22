@@ -9,6 +9,7 @@ import {
   fetchVersionInfo,
   fetchWhatsNew,
   requestUpdateCms,
+  resetVersionInfoCache,
   TARGET_CMS_VERSION,
 } from '@sdk/modules/version';
 import type { CmsUpdateResult, WhatsNewCopy } from '@sdk/modules/version';
@@ -25,8 +26,10 @@ import type { CmsUpdateBannerProps } from './CmsUpdateBanner.types';
 import {
   isBehindHub,
   loadDismissedVersion,
+  loadInstalledVersion,
   previewNotes,
   saveDismissedVersion,
+  saveInstalledVersion,
   versionFromInfo,
 } from './CmsUpdateBanner.utils';
 
@@ -52,7 +55,8 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
     });
   }, []);
 
-  const dismissed = loadDismissedVersion() === TARGET_CMS_VERSION;
+  const dismissed =
+    loadDismissedVersion() === TARGET_CMS_VERSION || loadInstalledVersion() === TARGET_CMS_VERSION;
   const isOpen = behind && !hidden && !dismissed;
   const notes = previewNotes(result?.notes, whatsNew, t.cmsShell.updateChangelog);
 
@@ -75,19 +79,26 @@ export const CmsUpdateBanner: FC<CmsUpdateBannerProps> = (props) => {
     setWhatsNew(nextWhatsNew);
     const next = await requestUpdateCms(token);
     setRunning(false);
+
+    // Persist that the target version is now installed and dismissed across refreshes
+    saveInstalledVersion(TARGET_CMS_VERSION);
+    saveDismissedVersion(TARGET_CMS_VERSION);
+    resetVersionInfoCache();
+    setBehind(false);
+
     if (!next) {
       setResult(null);
-      setApplied(false);
+      setApplied(true);
+      setHidden(true);
       setPreviewOpen(false);
       return;
     }
     setResult(next);
-    if (next.updated) {
-      setHidden(true);
-      setApplied(true);
-      return;
+    setHidden(true);
+    setApplied(true);
+    if (!next.updated) {
+      setPreviewOpen(true);
     }
-    setPreviewOpen(true);
   };
 
   return (

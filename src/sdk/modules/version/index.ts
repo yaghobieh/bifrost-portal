@@ -1,4 +1,4 @@
-export { fetchVersionInfo, fetchWhatsNew, EMPTY_VERSION_INFO, EMPTY_WHATS_NEW } from './version.api';
+export { fetchVersionInfo, fetchWhatsNew, resetVersionInfoCache, EMPTY_VERSION_INFO, EMPTY_WHATS_NEW } from './version.api';
 export {
   BIFROST_VERSION_PATH,
   CMS_VERSION_PATH,

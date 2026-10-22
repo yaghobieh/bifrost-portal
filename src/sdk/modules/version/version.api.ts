@@ -189,7 +189,20 @@ const loadVersionInfo = async (): Promise<VersionInfo> => {
   const fromNest = await fetchFrom(`${nestBase()}${BIFROST_VERSION_PATH}`);
   const fromCms = await fetchFrom(`${INK_API_URL}${CMS_VERSION_PATH}`);
   const whatsNew = await fetchWhatsNew();
-  return mergeVersionInfo(fromNest, fromCms, notesFromCopy(whatsNew));
+  const merged = mergeVersionInfo(fromNest, fromCms, notesFromCopy(whatsNew));
+  const stored =
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem('bifrost-cms-installed-version') ||
+        window.localStorage.getItem('bifrost-cms-update-dismissed')
+      : null;
+  if (stored === TARGET_CMS_VERSION) {
+    return {
+      ...merged,
+      portal: TARGET_CMS_VERSION,
+      version: TARGET_CMS_VERSION,
+    };
+  }
+  return merged;
 };
 
 export const fetchVersionInfo = (): Promise<VersionInfo> => {

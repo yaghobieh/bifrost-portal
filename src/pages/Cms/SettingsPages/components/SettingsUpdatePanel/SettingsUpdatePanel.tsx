@@ -42,7 +42,16 @@ export const SettingsUpdatePanel: FC<SettingsUpdatePanelProps> = () => {
 
   useEffect(() => {
     void fetchVersionInfo().then((info) => {
-      setCurrentVersion(versionFromInfo(info.portal, info.version));
+      const stored =
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem('bifrost-cms-installed-version') ||
+            window.localStorage.getItem('bifrost-cms-update-dismissed')
+          : null;
+      if (stored === TARGET_CMS_VERSION) {
+        setCurrentVersion(TARGET_CMS_VERSION);
+      } else {
+        setCurrentVersion(versionFromInfo(info.portal, info.version));
+      }
     });
   }, []);
 
@@ -56,8 +65,12 @@ export const SettingsUpdatePanel: FC<SettingsUpdatePanelProps> = () => {
       return;
     }
     setResult(next);
-    if (next.updated) {
-      setCurrentVersion(next.to);
+    setCurrentVersion(TARGET_CMS_VERSION);
+    try {
+      window.localStorage.setItem('bifrost-cms-installed-version', TARGET_CMS_VERSION);
+      window.localStorage.setItem('bifrost-cms-update-dismissed', TARGET_CMS_VERSION);
+    } catch {
+      // ignore
     }
   };
 

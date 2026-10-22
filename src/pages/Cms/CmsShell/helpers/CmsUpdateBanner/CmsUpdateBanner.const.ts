@@ -3,6 +3,7 @@ import { NUMBER_TWENTY_FOUR } from '@const/numbers.const';
 export const CMS_UPDATE_BANNER_ID = 'bifrost-cms-update-banner';
 export const CMS_UPDATE_APPLIED_ID = 'bifrost-cms-update-applied';
 export const CMS_UPDATE_DISMISS_KEY = 'bifrost-cms-update-dismissed';
+export const CMS_UPDATE_INSTALLED_KEY = 'bifrost-cms-installed-version';
 export const CMS_UPDATE_SNACKBAR_SEVERITY = 'info' as const;
 export const CMS_UPDATE_SNACKBAR_STICKY = null;
 export const CMS_UPDATE_SNACKBAR_CLOSE_ON_OUTSIDE = false;
