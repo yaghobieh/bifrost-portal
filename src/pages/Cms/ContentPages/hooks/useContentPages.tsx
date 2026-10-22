@@ -60,7 +60,7 @@ import {
 } from '@pages/Cms/TemplatesPages/TemplatesPages.const';
 import { useSites } from '@hooks/useSites';
 
-export const useContentPages = (): UseContentPagesResult => {
+export const useContentPages = (options?: { onShare?: (id: string) => void }): UseContentPagesResult => {
   const { t } = useI18n();
   const { navigate } = useNavigate();
   const { token: providerToken } = useAuth();
@@ -287,6 +287,28 @@ export const useContentPages = (): UseContentPagesResult => {
     await fetchContent(activeToken);
   };
 
+  const onSharePageToSite = async (targetSiteId: string, id: string) => {
+    if (!activeToken) return;
+    const source = items.find((item) => item.id === id);
+    if (!source) return;
+    const item = await saveContentRequest(activeToken, {
+      collection: source.collection,
+      slug: `${source.slug}-${targetSiteId}`,
+      locale: source.locale || DOCUMENT_DEFAULT_LOCALE,
+      title: `${source.title} (${targetSiteId})`,
+      status: source.status || CONTENT_STATUS_DRAFT,
+      payload: {
+        ...source.payload,
+        siteId: targetSiteId,
+        site_id: targetSiteId,
+        [PAYLOAD_KEY_CREATED_BY]: actorName,
+        [PAYLOAD_KEY_UPDATED_BY]: actorName,
+      },
+    });
+    if (!item) return;
+    await fetchContent(activeToken);
+  };
+
   const columns = [
     {
       id: CONTENT_COLUMN_IDS.TITLE,
@@ -368,6 +390,7 @@ export const useContentPages = (): UseContentPagesResult => {
           onOpen={(id) => {
             onOpenRow(id);
           }}
+          onShare={options?.onShare}
           onStage={(id) => navigate(cmsBuilderPath({ doc: id }))}
           onDuplicate={(id) => {
             void onDuplicatePage(id);
@@ -400,5 +423,6 @@ export const useContentPages = (): UseContentPagesResult => {
     onSetStatus,
     onDeletePage,
     onDuplicatePage,
+    onSharePageToSite,
   };
 };

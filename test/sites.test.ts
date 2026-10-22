@@ -38,4 +38,55 @@ test('Multi-Site Architecture — Acceptance Criteria (CMS-238)', async (t) => {
     assert.ok(SITE_SWITCHER_ICON_SIZE > 0);
     assert.ok(SITE_SWITCHER_CHEVRON_SIZE > 0);
   });
+
+  await t.test('should persist newly created site to storage across refresh', async () => {
+    const { CMS_SITES_STORAGE_KEY, createSite, fetchSites, getStoredSites, deleteSite } = await import(
+      '../src/data/sites.api'
+    );
+    assert.equal(CMS_SITES_STORAGE_KEY, 'bifrost_cms_sites_list');
+
+    const storageMap = new Map<string, string>();
+    if (typeof (globalThis as any).window === 'undefined') {
+      (globalThis as any).window = {};
+    }
+    const origStorage = (globalThis as any).window.localStorage;
+    (globalThis as any).window.localStorage = {
+      getItem: (k: string) => storageMap.get(k) || null,
+      setItem: (k: string, v: string) => storageMap.set(k, v),
+      removeItem: (k: string) => storageMap.delete(k),
+    };
+
+    try {
+      const testSlug = `test-site-${Date.now()}`;
+      const newSite = await createSite({
+        name: 'Test Enterprise Portal',
+        slug: testSlug,
+        domain: 'test.example.com',
+        locale: 'en',
+      });
+
+      assert.ok(newSite);
+      assert.equal(newSite.name, 'Test Enterprise Portal');
+
+      // Verify immediate local storage persistence
+      const stored = getStoredSites();
+      const foundInStorage = stored.find((s) => s.slug === testSlug);
+      assert.ok(foundInStorage, 'Site must be found in localStorage');
+      assert.equal(foundInStorage.name, 'Test Enterprise Portal');
+
+      // Simulating page refresh: fetchSites recovers the stored site even with mock API
+      const refreshed = await fetchSites();
+      const foundInRefresh = refreshed.find((s) => s.slug === testSlug);
+      assert.ok(foundInRefresh, 'Site must persist across refresh');
+
+      // Delete site removes it from storage
+      await deleteSite(newSite.id);
+      const afterDelete = getStoredSites();
+      assert.equal(afterDelete.some((s) => s.slug === testSlug), false);
+    } finally {
+      if (origStorage) {
+        (globalThis as any).window.localStorage = origStorage;
+      }
+    }
+  });
 });

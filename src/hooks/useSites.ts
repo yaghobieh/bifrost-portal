@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  CMS_SITES_STORAGE_KEY,
   createSite,
   deleteSite,
   fetchSites,
+  getStoredSites,
   updateSite,
 } from '../data/sites.api';
 import type { CmsSite, CreateSiteInput, UpdateSiteInput } from '../data/sites.types';
 
 export const CMS_ACTIVE_SITE_KEY = 'bifrost_cms_active_site_id';
 export const CMS_ACTIVE_SITE_EVENT = 'cms_active_site_changed';
+export { CMS_SITES_STORAGE_KEY };
 
 const getInitialActiveSiteId = (): string => {
   try {
@@ -26,7 +29,7 @@ const getInitialActiveSiteId = (): string => {
  * @returns Sites state, active site object, and management handlers
  */
 export const useSites = (token?: string) => {
-  const [sites, setSites] = useState<CmsSite[]>([]);
+  const [sites, setSites] = useState<CmsSite[]>(getStoredSites);
   const [activeSiteId, setActiveSiteIdState] = useState<string>(getInitialActiveSiteId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,12 +39,15 @@ export const useSites = (token?: string) => {
     setError(null);
     try {
       const data = await fetchSites();
-      if (data.length > 0) {
+      if (data && data.length > 0) {
         setSites(data);
+      } else {
+        setSites(getStoredSites());
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to load sites';
       setError(msg);
+      setSites(getStoredSites());
     } finally {
       setLoading(false);
     }

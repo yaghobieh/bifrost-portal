@@ -38,5 +38,6 @@ export type UseContentPagesResult = {
   onSetStatus: (id: string, status: 'draft' | 'published') => Promise<void>;
   onDeletePage: (id: string) => void;
   onDuplicatePage: (id: string) => Promise<void>;
+  onSharePageToSite?: (targetSiteId: string, id: string) => Promise<void>;
 };
 

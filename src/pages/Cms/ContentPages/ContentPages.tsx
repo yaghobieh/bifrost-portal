@@ -39,9 +39,29 @@ import type { ContentTableRow } from './ContentPages.types';
 import { CreatePageTypeModal } from './helpers/CreatePageTypeModal';
 import { loadAllPageTypes, PAGE_TYPES_UPDATED_EVENT } from './pageTypes.utils';
 import { PAGE_TYPE_KIND, type PageTypeDefinition } from './pageTypes.types';
+import { useSites } from '@hooks/useSites';
+import { ShareContentModal, type ShareContentItem } from './helpers/ShareContentModal';
 
 export const ContentPages: FC = () => {
   const { navigate } = useNavigate();
+  const { sites, activeSiteId } = useSites();
+  const [shareItem, setShareItem] = useState<ShareContentItem | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const handleOpenShareModal = (rowOrId: ContentTableRow | string) => {
+    const row = typeof rowOrId === 'string' ? rows.find((r) => r.id === rowOrId) : rowOrId;
+    if (!row) return;
+    setShareItem({
+      id: String(row.id),
+      title: String(row.title || row.slug),
+      slug: String(row.slug),
+      kind: String(row.templateKind || row.collection || 'page'),
+      collection: String(row.collection),
+      currentSiteId: activeSiteId,
+    });
+    setShowShareModal(true);
+  };
+
   const {
     t,
     saving,
@@ -55,7 +75,10 @@ export const ContentPages: FC = () => {
     onSetStatus,
     onDeletePage,
     onDuplicatePage,
-  } = useContentPages();
+    onSharePageToSite,
+  } = useContentPages({
+    onShare: (id) => handleOpenShareModal(id),
+  });
 
   const [pageTypes, setPageTypes] = useState<PageTypeDefinition[]>(() => loadAllPageTypes());
   const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
@@ -583,10 +606,29 @@ export const ContentPages: FC = () => {
             onRowClick={(row) => {
               onOpenRow(String(row.id));
             }}
+            onRowDoubleClick={(row) => {
+              handleOpenShareModal(row);
+            }}
             columns={columns}
           />
         </div>
       </Flex>
+
+      <ShareContentModal
+        isOpen={showShareModal}
+        onClose={() => {
+          setShowShareModal(false);
+          setShareItem(null);
+        }}
+        item={shareItem}
+        sites={sites}
+        activeSiteId={activeSiteId}
+        onShareToSite={async (targetSiteId, item) => {
+          if (onSharePageToSite) {
+            await onSharePageToSite(targetSiteId, item.id);
+          }
+        }}
+      />
 
       <CreatePageTypeModal
         isOpen={showCreateTypeModal}

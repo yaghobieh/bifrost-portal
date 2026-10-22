@@ -23,4 +23,6 @@ export type ContentRowActionsProps = {
   onDraft: (id: string) => void;
   onPublish: (id: string) => void;
   onDelete: (id: string) => void;
+  onShare?: (id: string) => void;
+  shareLabel?: string;
 };
