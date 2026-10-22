@@ -1450,6 +1450,7 @@ export const en: Messages = {
     subtitle: 'Profile, site, theme, MCP, and API. One Save applies every tab.',
     tabProfile: 'Profile',
     tabCrew: 'Crew chat',
+    tabSecurity: 'Security & Access',
     tabSite: 'Site',
     tabDeveloper: 'Developer',
     tabTheme: 'Theme',

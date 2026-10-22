@@ -134,6 +134,7 @@ export type CmsConnections = {
 export type SettingsTabId =
   | 'profile'
   | 'crew'
+  | 'security'
   | 'site'
   | 'sites'
   | 'connections'

@@ -71,6 +71,7 @@ export const DEFAULT_CONNECTIONS: CmsConnections = {
 export const SETTINGS_TABS = {
   PROFILE: 'profile',
   CREW: 'crew',
+  SECURITY: 'security',
   SITE: 'site',
   SITES: 'sites',
   CONNECTIONS: 'connections',

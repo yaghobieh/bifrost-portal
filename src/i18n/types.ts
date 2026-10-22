@@ -1389,6 +1389,7 @@ export interface Messages {
     subtitle: string;
     tabProfile: string;
     tabCrew: string;
+    tabSecurity: string;
     tabSite: string;
     tabDeveloper: string;
     tabTheme: string;

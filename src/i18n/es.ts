@@ -1450,6 +1450,7 @@ export const es: Messages = {
     subtitle: 'Perfil, sitio, tema, MCP y API. Un solo Guardar aplica todas las pestañas.',
     tabProfile: 'Perfil',
     tabCrew: 'Chat de equipo',
+    tabSecurity: 'Seguridad y Acceso',
     tabSite: 'Sitio',
     tabDeveloper: 'Desarrollador',
     tabTheme: 'Tema',

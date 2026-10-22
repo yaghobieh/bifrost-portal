@@ -115,6 +115,7 @@ import { SettingsToggleRow } from './components/SettingsToggleRow';
 import { SettingsCatalogPanel } from './components/SettingsCatalogPanel';
 import { SettingsUpdatePanel } from './components/SettingsUpdatePanel';
 import { SettingsConnectionsPanel } from './components/SettingsConnectionsPanel';
+import { SettingsSecurityPanel } from './components/SettingsSecurityPanel';
 import type { CmsConnections } from './SettingsPages.types';
 import { loadCmsConnections, saveCmsConnections } from './SettingsPages.utils';
 
@@ -368,6 +369,7 @@ export const SettingsPages: FC = () => {
             <TabList className="mb-4" wrap>
               <Tab id={SETTINGS_TABS.PROFILE}>{t.settings.tabProfile}</Tab>
               {chatInstalled ? <Tab id={SETTINGS_TABS.CREW}>{t.settings.tabCrew}</Tab> : null}
+              <Tab id={SETTINGS_TABS.SECURITY}>{t.settings.tabSecurity}</Tab>
               <Tab id={SETTINGS_TABS.SITES}>{t.settings.tabMultiSite}</Tab>
               <Tab id={SETTINGS_TABS.SITE}>{t.settings.tabSite}</Tab>
               <Tab id={SETTINGS_TABS.CONNECTIONS}>Connections</Tab>
@@ -549,6 +551,11 @@ export const SettingsPages: FC = () => {
               </div>
             </TabPanel>
             ) : null}
+            <TabPanel tabId={SETTINGS_TABS.SECURITY}>
+              <div className="bifrost-cms-settings-box">
+                <SettingsSecurityPanel onSave={() => setSaved(true)} />
+              </div>
+            </TabPanel>
             <TabPanel tabId={SETTINGS_TABS.SITES}>
               <div className="bifrost-cms-settings-box">
                 <SettingsSitesPanel />
