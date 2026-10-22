@@ -15,6 +15,7 @@ export const ROUTES = {
   DEMO_MOBILE: '/demos/mobile',
   PLAYGROUND: '/playground',
   GET_STARTED: '/get-started',
+  INSTALL: '/install',
   CHANGELOG: '/changelog',
   STATUS: '/status',
   AI: '/ai',

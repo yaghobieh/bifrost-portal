@@ -117,6 +117,13 @@ export const GetStarted: FC = () => {
             Choose your preferred onboarding method: direct browser starter bundle download,
             automated git clone, or the interactive ForgeStack CLI.
           </p>
+          <a
+            href="/install"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#1e3a8a] to-blue-600 text-white text-xs font-semibold shadow-md hover:brightness-110 transition-all border border-sky-400/30"
+          >
+            <span>🚀</span>
+            <span>Prefer a visual step-by-step setup? Launch Web Installer (/install) →</span>
+          </a>
         </div>
 
         {/* Method Switcher Tabs */}
