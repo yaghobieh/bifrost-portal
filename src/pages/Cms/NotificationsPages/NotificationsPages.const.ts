@@ -5,6 +5,7 @@ export const NOTIFICATIONS_RANGE_ID = 'bifrost-cms-notifications-range';
 export const NOTIFICATIONS_FILTER = {
   ALL: 'all',
   UNREAD: 'unread',
+  SEEN: 'seen',
 } as const;
 
 export const NOTIFICATIONS_GROUP_SEP = ' · ';

@@ -1,6 +1,6 @@
 import { useEffect, useState, type FC, type ReactNode } from 'react';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
-import { Badge, BearIcons, Button, Card, DateRangePicker, Flex, Typography } from '@forgedevstack/bear';
+import { Badge, BearIcons, Button, Card, DateRangePicker, Flex, List, ListItem, Typography } from '@forgedevstack/bear';
 import { useAuth } from '@hooks/index';
 import { useI18n } from '@i18n/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
@@ -55,7 +55,11 @@ export const NotificationsPages: FC = () => {
 
   const unreadCount = items.filter((item) => !item.readAt).length;
   const visible =
-    filter === NOTIFICATIONS_FILTER.UNREAD ? items.filter((item) => !item.readAt) : items;
+    filter === NOTIFICATIONS_FILTER.UNREAD
+      ? items.filter((item) => !item.readAt)
+      : filter === NOTIFICATIONS_FILTER.SEEN
+        ? items.filter((item) => Boolean(item.readAt))
+        : items;
   const groups = groupNotificationsByDay(visible, locale);
 
   const markItem = (id: string) => {
@@ -107,6 +111,13 @@ export const NotificationsPages: FC = () => {
             >
               {t.cmsNotifications.unread} · {unreadCount}
             </Button>
+            <Button
+              size="sm"
+              variant={filter === NOTIFICATIONS_FILTER.SEEN ? 'ink' : 'outline'}
+              onClick={() => setFilter(NOTIFICATIONS_FILTER.SEEN)}
+            >
+              {t.cmsShell.alertsSeen}
+            </Button>
           </Flex>
           <Flex align="center" gap={2} className="flex-wrap bifrost-cms-notifications__actions">
             {seeAll ? null : (
@@ -134,38 +145,52 @@ export const NotificationsPages: FC = () => {
         ) : (
           groups.map((group) => (
             <Flex key={group.key} direction="column" gap={2}>
-              <Typography variant="caption" className="bifrost-cms__muted mb-0">
+              <Typography variant="caption" className="bifrost-cms__muted mb-0 font-medium">
                 {group.label}
               </Typography>
-              {group.items.map((item) => (
-                <Card padding="md"
-                  key={item.id}
-                  onClick={() => {
-                    markItem(item.id);
-                    if (item.href) navigate(item.href);
-                  }}
-                >
-                  <Flex align="start" gap={3}>
-                    {item.readAt ? null : (
-                      <Badge variant="info" className="text-xs">
-                        {t.cmsNotifications.unread}
-                      </Badge>
-                    )}
-                    {severityIcon(item.severity)}
-                    <Flex direction="column" gap={1}>
-                      <Typography variant="body2" className="mb-0 font-medium">
-                        {item.title}
-                      </Typography>
-                      <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                        {item.body}
-                      </Typography>
-                      <Typography variant="caption" className="bifrost-cms__muted mb-0">
-                        {new Date(item.createdAt).toLocaleString()}
-                      </Typography>
-                    </Flex>
-                  </Flex>
-                </Card>
-              ))}
+              <Card padding="none">
+                <List dense hoverable variant="divided">
+                  {group.items.map((item) => (
+                    <ListItem
+                      key={item.id}
+                      leading={severityIcon(item.severity)}
+                      primary={
+                        <Flex align="center" gap={2}>
+                          <span className="font-medium">{item.title}</span>
+                          {item.readAt ? null : (
+                            <Badge variant="info" className="text-xs">
+                              {t.cmsNotifications.unread}
+                            </Badge>
+                          )}
+                        </Flex>
+                      }
+                      secondary={
+                        <Flex direction="column" gap={1}>
+                          <span>{item.body}</span>
+                          <span className="bifrost-cms__muted text-xs">
+                            {new Date(item.createdAt).toLocaleString()}
+                          </span>
+                        </Flex>
+                      }
+                      selected={!item.readAt}
+                      divider
+                      dense
+                      trailing={
+                        !item.readAt ? (
+                          <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-cyan-400 shrink-0" />
+                        ) : null
+                      }
+                      onMouseEnter={() => {
+                        if (!item.readAt) markItem(item.id);
+                      }}
+                      onClick={() => {
+                        markItem(item.id);
+                        if (item.href) navigate(item.href);
+                      }}
+                    />
+                  ))}
+                </List>
+              </Card>
             </Flex>
           ))
         )}

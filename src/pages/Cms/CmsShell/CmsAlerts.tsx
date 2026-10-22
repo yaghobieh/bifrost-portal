@@ -1,13 +1,24 @@
-import { useState, type FC } from 'react';
+import { useState, type FC, type ReactNode } from 'react';
 import { useNavigate } from '@forgedevstack/forge-compass/react';
 import { Badge, BearIcons, Button, Dropdown, Flex, List, ListItem, Typography } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
 import { ROUTES } from '@const/index';
 import { CMS_ICON_SIZE } from '@const/numbers.const';
 import { NUMBER_ZERO } from '@const/numbers.const';
+import type { CmsNotification } from '@sdk/modules/cms';
 import { CMS_ALERT_FILTERS } from './CmsAlerts.const';
 import type { CmsAlertFilter } from './CmsAlerts.types';
 import { useCmsLive } from './CmsLiveProvider';
+
+const severityIcon = (severity: CmsNotification['severity']): ReactNode => {
+  if (severity === 'warning' || severity === 'error') {
+    return <BearIcons.WarningIcon size={CMS_ICON_SIZE} />;
+  }
+  if (severity === 'success') {
+    return <BearIcons.FileTextIcon size={CMS_ICON_SIZE} />;
+  }
+  return <BearIcons.UsersIcon size={CMS_ICON_SIZE} />;
+};
 
 type CmsAlertsProps = {
   onOpen: () => void;
@@ -84,11 +95,22 @@ export const CmsAlerts: FC<CmsAlertsProps> = (props) => {
           key: item.id,
           label: (
             <span className="bifrost-cms-alerts__list-wrap">
-              <List hoverable dense>
+              <List hoverable dense variant="divided">
                 <ListItem
+                  leading={severityIcon(item.severity)}
                   primary={item.title}
                   secondary={item.body}
                   selected={!item.readAt}
+                  divider
+                  dense
+                  trailing={
+                    !item.readAt ? (
+                      <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-cyan-400 shrink-0" />
+                    ) : null
+                  }
+                  onMouseEnter={() => {
+                    if (!item.readAt) markRead(item.id);
+                  }}
                 />
               </List>
             </span>
