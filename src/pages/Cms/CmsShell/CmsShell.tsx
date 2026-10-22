@@ -787,7 +787,15 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
               </Flex>
             }
             centerContent={
-              showAgentBar ? <CmsAgentBar onApply={onAgentApply} /> : undefined
+              showAgentBar ? (
+                <CmsAgentBar
+                  onApply={onAgentApply}
+                  onPromptSubmit={(prompt) => {
+                    setChatPrompt(prompt);
+                    setChatOpen(true);
+                  }}
+                />
+              ) : undefined
             }
             rightContent={
               <Flex align="center" gap={3}>

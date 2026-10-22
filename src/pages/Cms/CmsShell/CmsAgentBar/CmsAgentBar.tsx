@@ -1,5 +1,5 @@
-import type { FC } from 'react';
-import { Avatar, Chip, Flex, Typography } from '@forgedevstack/bear';
+import { useState, type FC, type FormEvent } from 'react';
+import { Avatar, BearIcons, Button, Chip, Flex, Typography } from '@forgedevstack/bear';
 import { useI18n } from '@i18n/index';
 import {
   AGENT_AVATAR_INITIALS,
@@ -23,8 +23,22 @@ const suggestionLabel = (
 };
 
 export const CmsAgentBar: FC<CmsAgentBarProps> = (props) => {
-  const { onApply } = props;
+  const { onApply, onPromptSubmit } = props;
   const { t } = useI18n();
+  const [promptInput, setPromptInput] = useState('');
+
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    const clean = promptInput.trim();
+    if (!clean) return;
+    if (onPromptSubmit) {
+      onPromptSubmit(clean);
+    } else {
+      onApply(clean);
+    }
+    setPromptInput('');
+  };
+
   return (
     <div className={AGENT_BAR_CLASS}>
       <Avatar initials={AGENT_AVATAR_INITIALS} size="sm" variant="circle" />
@@ -36,7 +50,26 @@ export const CmsAgentBar: FC<CmsAgentBarProps> = (props) => {
           {t.cmsShell.agentGreeting}
         </Typography>
       </div>
-      <Flex gap={1} className="flex-wrap">
+
+      <form onSubmit={handleSubmit} className="flex items-center gap-1.5 flex-1 min-w-[200px]">
+        <input
+          type="text"
+          value={promptInput}
+          onChange={(event) => setPromptInput(event.target.value)}
+          placeholder={t.cmsShell.chatPlaceholder || 'Ask Alloy Copilot...'}
+          className="w-full text-xs px-2.5 py-1 rounded-full bg-white/80 dark:bg-gray-800/80 border border-blue-200 dark:border-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1e3a8a] text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
+        />
+        <Button
+          type="submit"
+          size="xs"
+          variant="primary"
+          disabled={!promptInput.trim()}
+          icon={<BearIcons.SparklesIcon size={12} />}
+          className="bg-[#1e3a8a] hover:bg-[#172554] text-white shrink-0 px-2 py-0.5 rounded-full"
+        />
+      </form>
+
+      <Flex gap={1} className="flex-wrap shrink-0">
         {AGENT_SUGGESTION_IDS.map((id) => (
           <Chip key={id} size="sm" onClick={() => onApply(id)}>
             {suggestionLabel(id, t)}
