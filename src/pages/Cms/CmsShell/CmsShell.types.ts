@@ -21,4 +21,6 @@ export type CmsModePreference = 'light' | 'dark' | 'system';
 export type FlattenSidebarGroupsParams = {
   groups: CmsSidebarNavItem[];
   collapsed: boolean;
+  openGroupId?: string | null;
+  renderChevron?: (isOpen: boolean) => ReactNode;
 };

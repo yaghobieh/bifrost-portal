@@ -124,10 +124,21 @@ export const resolveCmsMode = (preference: CmsModePreference): 'light' | 'dark' 
   return preference;
 };
 
+export const findActiveSidebarGroup = (
+  groups: CmsSidebarNavItem[],
+  activeNavId: string,
+): CmsSidebarNavItem | undefined => {
+  return groups.find(
+    (group) =>
+      group.id === activeNavId ||
+      (group.children ?? []).some((child) => child.id === activeNavId),
+  );
+};
+
 export const resolveSidebarNavItems = (
   params: FlattenSidebarGroupsParams,
 ): CmsSidebarNavItem[] => {
-  const { groups, collapsed } = params;
+  const { groups, collapsed, openGroupId, renderChevron } = params;
   if (collapsed) {
     return groups.map((group) => ({
       id: group.id,
@@ -135,6 +146,25 @@ export const resolveSidebarNavItems = (
       icon: group.icon,
     }));
   }
+
+  if (openGroupId !== undefined) {
+    return groups.map((group) => {
+      const isOpen = group.id === openGroupId;
+      if (isOpen) {
+        return {
+          ...group,
+          children: group.children,
+          badge: undefined,
+        };
+      }
+      return {
+        ...group,
+        children: undefined,
+        badge: renderChevron ? renderChevron(false) : undefined,
+      };
+    });
+  }
+
   return groups;
 };
 

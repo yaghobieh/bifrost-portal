@@ -81,6 +81,7 @@ import {
 import type { CmsModePreference, CmsShellProps, CmsSidebarNavItem } from './CmsShell.types';
 import {
   clampSidebarWidth,
+  findActiveSidebarGroup,
   loadCmsModePreference,
   loadSidebarCollapsed,
   loadSidebarWidth,
@@ -498,17 +499,50 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
     ].filter(visibleLeaf),
   });
   const visibleGroups = sidebarGroups.filter((group) => (group.children?.length ?? 0) > 0);
+  const [openSectionId, setOpenSectionId] = useState<string | null>(() => {
+    return findActiveSidebarGroup(visibleGroups, activeNavId)?.id ?? CMS_NAV_SECTIONS.OVERVIEW;
+  });
+
+  useEffect(() => {
+    const activeGroup = findActiveSidebarGroup(visibleGroups, activeNavId);
+    if (activeGroup) {
+      setOpenSectionId(activeGroup.id);
+    }
+  }, [activeNavId]);
+
+  useEffect(() => {
+    if (!flyoutId) return;
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setFlyoutId(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [flyoutId]);
+
   const sidebarItems: CmsSidebarNavItem[] = resolveSidebarNavItems({
     groups: visibleGroups,
     collapsed,
+    openGroupId: openSectionId,
+    renderChevron: () => (
+      <span className="text-gray-400 dark:text-gray-500 flex items-center">
+        <BearIcons.ChevronDownIcon size={12} />
+      </span>
+    ),
   });
   const leafItems = visibleGroups.flatMap((group) => group.children ?? []);
   const flyoutGroup = visibleGroups.find((group) => group.id === flyoutId);
 
   const onItemClick = (item: CmsSidebarNavItem) => {
     if (item.disabled) return;
-    if (collapsed && visibleGroups.some((group) => group.id === item.id)) {
-      setFlyoutId((current) => (current === item.id ? null : item.id));
+    const isGroup = visibleGroups.some((group) => group.id === item.id);
+    if (isGroup) {
+      if (collapsed) {
+        setFlyoutId((current) => (current === item.id ? null : item.id));
+      } else {
+        setOpenSectionId((current) => (current === item.id ? null : item.id));
+      }
       return;
     }
     if (item.onClick) {
@@ -713,22 +747,57 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
         />
       )}
       {collapsed && flyoutGroup && (
-        <div className="bifrost-cms__nav-flyout" role="menu">
-          <Typography variant="caption" className="bifrost-cms__nav-flyout-title mb-0">
-            {flyoutGroup.label}
-          </Typography>
-          {(flyoutGroup.children ?? []).map((child) => (
-            <button
-              key={child.id}
-              type="button"
-              className="bifrost-cms__nav-flyout-item"
-              onClick={() => onItemClick(child)}
-            >
-              {child.icon}
-              <span>{child.label}</span>
-            </button>
-          ))}
-        </div>
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-transparent"
+            onClick={() => setFlyoutId(null)}
+          />
+          <div
+            className="bifrost-cms__nav-flyout absolute left-full top-20 z-50 min-w-[210px] p-2 bg-[#0f172a] dark:bg-gray-900 border border-blue-900/40 dark:border-gray-700/80 rounded-xl shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-left-2 duration-150"
+            role="menu"
+            aria-label={flyoutGroup.label}
+          >
+            <div className="px-3 py-1.5 mb-1.5 border-b border-white/10 dark:border-gray-800 flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300 dark:text-cyan-400">
+                {flyoutGroup.label}
+              </span>
+              <button
+                type="button"
+                onClick={() => setFlyoutId(null)}
+                className="text-gray-400 hover:text-white text-xs px-1 rounded-sm"
+                aria-label="Close flyout"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-0.5">
+              {(flyoutGroup.children ?? []).map((child) => {
+                const isActive = child.id === activeNavId;
+                return (
+                  <button
+                    key={child.id}
+                    type="button"
+                    className={`bifrost-cms__nav-flyout-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
+                      isActive
+                        ? 'bg-[#1e3a8a] text-white shadow-xs font-semibold'
+                        : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                    onClick={() => {
+                      onItemClick(child);
+                      setFlyoutId(null);
+                    }}
+                  >
+                    <span className="w-4 h-4 flex items-center justify-center shrink-0">
+                      {child.icon}
+                    </span>
+                    <span className="truncate flex-1">{child.label}</span>
+                    {child.badge && <span className="ml-auto">{child.badge}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
       )}
       </div>
       <div className="bifrost-cms__main">
