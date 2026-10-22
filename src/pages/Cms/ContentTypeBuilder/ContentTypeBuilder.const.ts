@@ -102,14 +102,15 @@ export const ATTRIBUTE_TYPE_OPTIONS: AttributeTypeOption[] = [
     labelKey: 'fieldComponent',
     descKey: 'fieldComponentDesc',
     iconName: 'Layers',
-    color: '#EA0A8E',
+    color: '#2563EB',
   },
 ];
 
 export const BUILDER_COLORS = {
-  PINK: PINK_HEX,
-  PINK_SOFT: PINK_SOFT_HEX,
-  PRIMARY_BLUE: '#3B82F6',
+  PINK: '#1E3A8A', // canonical blue navy
+  PINK_SOFT: '#EFF6FF',
+  PRIMARY_NAVY: '#1E3A8A',
+  PRIMARY_BLUE: '#2563EB',
   SUCCESS_GREEN: '#10B981',
   WARNING_ORANGE: '#F59E0B',
   NEUTRAL_BORDER: '#E2E8F0',

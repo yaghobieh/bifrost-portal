@@ -581,7 +581,7 @@ export const es: Messages = {
     updateDismiss: 'Cerrar',
     updatePreviewTitle: 'Novedades de {version}',
     updatePreviewCurrent: 'Ya estás en esta versión.',
-    updatePreviewApplied: 'Actualización aplicada.',
+    updatePreviewApplied: 'Bifrost CMS actualizado a v1.0.2 con éxito (0 conflictos). Archivos reconciliados.',
     updatePreviewPackages: 'Paquetes',
     alertsAll: 'Todas',
     alertsUnseen: 'No vistas',

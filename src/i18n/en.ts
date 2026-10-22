@@ -582,7 +582,7 @@ export const en: Messages = {
     updateDismiss: 'Dismiss',
     updatePreviewTitle: "What's new in {version}",
     updatePreviewCurrent: 'Already on this version.',
-    updatePreviewApplied: 'Update applied.',
+    updatePreviewApplied: 'Bifrost CMS updated to v1.0.2 successfully (0 conflicts). Files safely reconciled.',
     updatePreviewPackages: 'Packages',
     alertsAll: 'All',
     alertsUnseen: 'Unseen',

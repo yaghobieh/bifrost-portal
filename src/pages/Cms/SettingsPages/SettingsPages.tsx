@@ -25,6 +25,8 @@ import { fetchCrewRoles, fetchCrewUsers } from '@sdk/modules/cms';
 import { CMS_LOOKS } from '../CmsLook';
 import { hasTaskPermission } from '../TasksPages/TasksPages.utils';
 import type { CrewRole, CrewUser } from '../CrewPages/CrewPages.const';
+import { useNavigate } from '@forgedevstack/forge-compass/react';
+import { ROUTES } from '@const/routes.const';
 import { CMS_AVATAR_MAX_BYTES } from '@const/index';
 import { INK_API_URL } from '@const/billing.const';
 import { browserOrigin } from '@utils/host.utils';
@@ -62,6 +64,7 @@ import {
   SETTINGS_CHAT_SOUND,
   SETTINGS_THEME_DEFAULTS_DARK,
   SETTINGS_THEME_DEFAULTS_LIGHT,
+  SETTINGS_THEME_PALETTES,
   SETTINGS_TIMEZONE_OPTIONS,
   SETTINGS_DATE_FORMAT_OPTIONS,
   SETTINGS_DEV_INPUT_ID,
@@ -116,6 +119,7 @@ import type { CmsConnections } from './SettingsPages.types';
 import { loadCmsConnections, saveCmsConnections } from './SettingsPages.utils';
 
 export const SettingsPages: FC = () => {
+  const { navigate } = useNavigate();
   const { t, setLocale } = useI18n();
   const { mode } = useBearMode();
   const { updateTheme, addVariant } = useBear();
@@ -1038,6 +1042,28 @@ export const SettingsPages: FC = () => {
                   {t.settings.themeLooks}
                 </Typography>
                 <Flex gap={2} className="flex-wrap">
+                  {SETTINGS_THEME_PALETTES.map((palette) => (
+                    <Button
+                      key={palette.id}
+                      size="sm"
+                      variant={
+                        colors.primary.toLowerCase() === palette.primary.toLowerCase() &&
+                        colors.background.toLowerCase() === palette.background.toLowerCase()
+                          ? 'primary'
+                          : 'outline'
+                      }
+                      onClick={() => {
+                        setColors({
+                          primary: palette.primary,
+                          accent: palette.accent,
+                          background: palette.background,
+                        });
+                        markDirty();
+                      }}
+                    >
+                      {palette.name}
+                    </Button>
+                  ))}
                   <Button
                     size="sm"
                     variant="outline"
@@ -1058,23 +1084,14 @@ export const SettingsPages: FC = () => {
                   >
                     {t.settings.themePresetDark}
                   </Button>
-                  {CMS_LOOKS.map((look) => (
-                    <Button
-                      key={look.id}
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setColors({
-                          primary: look.primary,
-                          accent: look.accent,
-                          background: look.background,
-                        });
-                        markDirty();
-                      }}
-                    >
-                      {look.id}
-                    </Button>
-                  ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => navigate(ROUTES.CMS_EXTENSIONS)}
+                    className="border-dashed text-blue-600"
+                  >
+                    🛍️ {t.cmsExtensions.kindTheme} in Store
+                  </Button>
                 </Flex>
                 <Typography variant="caption" className="mb-0">
                   {t.settings.notifyTitle}

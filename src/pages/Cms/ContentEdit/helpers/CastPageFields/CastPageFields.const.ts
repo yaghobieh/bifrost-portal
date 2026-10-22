@@ -73,6 +73,6 @@ export const CAST_VALUE_INPUT_TYPE = {
 
 export const CAST_VALUE_SUMMARY_JOIN = ' · ';
 export const CAST_VALUE_SUMMARY_SEP = ': ';
-export const CAST_BACKGROUND_FALLBACK = PINK_HEX;
+export const CAST_BACKGROUND_FALLBACK = '#1E3A8A';
 export const CAST_FILE_MAX_FILES = 1;
 export const CAST_FILE_UPLOAD_VARIANT = 'dropzone';

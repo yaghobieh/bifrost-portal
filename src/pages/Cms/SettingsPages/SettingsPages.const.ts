@@ -96,18 +96,56 @@ export const SETTINGS_SITE_PANELS = {
 export const SETTINGS_SAVE_SOURCE = 'settings' as const;
 
 export const SETTINGS_THEME_DEFAULTS_LIGHT = {
-  primary: PINK_HEX,
-  accent: PINK_HEX,
-  background: '#F6F6F4',
+  primary: '#1E3A8A',
+  accent: '#2563EB',
+  background: '#F8FAFC',
 } as const;
 
 export const SETTINGS_THEME_DEFAULTS_DARK = {
-  primary: PINK_HEX,
-  accent: PINK_HEX,
-  background: '#12192c',
+  primary: '#1E3A8A',
+  accent: '#38BDF8',
+  background: '#0F172A',
 } as const;
 
-export const SETTINGS_THEME_DEFAULTS = SETTINGS_THEME_DEFAULTS_LIGHT;
+export const SETTINGS_THEME_DEFAULTS = SETTINGS_THEME_DEFAULTS_DARK;
+
+export const SETTINGS_THEME_PALETTES = [
+  {
+    id: 'deep-navy',
+    name: 'Deep Navy (Default)',
+    primary: '#1E3A8A',
+    accent: '#38BDF8',
+    background: '#0F172A',
+  },
+  {
+    id: 'midnight-forge',
+    name: 'Midnight Forge',
+    primary: '#1F2937',
+    accent: '#60A5FA',
+    background: '#030712',
+  },
+  {
+    id: 'arctic-clean',
+    name: 'Arctic Clean',
+    primary: '#2563EB',
+    accent: '#0284C7',
+    background: '#F8FAFC',
+  },
+  {
+    id: 'cyber-neon',
+    name: 'Cyber Neon',
+    primary: '#27272A',
+    accent: '#22D3EE',
+    background: '#09090B',
+  },
+  {
+    id: 'forest-slate',
+    name: 'Forest Slate',
+    primary: '#047857',
+    accent: '#34D399',
+    background: '#064E3B',
+  },
+] as const;
 
 export const SETTINGS_HEX_SHORT_LENGTH = 3;
 export const SETTINGS_HEX_FULL_LENGTH = 6;
@@ -362,7 +400,14 @@ export const SETTINGS_DEV_PREFS_DEFAULTS = {
   showDeveloperPage: true,
 } as const;
 export const SETTINGS_STALE_THEME_PRIMARY_SKY = '#54a0ff';
-export const SETTINGS_STALE_THEME_PRIMARIES = [BRIDGE_BLUE_HEX, SETTINGS_STALE_THEME_PRIMARY_SKY];
+export const SETTINGS_STALE_THEME_PRIMARIES = [
+  BRIDGE_BLUE_HEX,
+  SETTINGS_STALE_THEME_PRIMARY_SKY,
+  PINK_HEX,
+  '#EA0A8E',
+  '#EC4899',
+  '#F472C7',
+];
 export const SETTINGS_STALE_SITE_NAMES = ['Ink CMS', 'ink CMS', 'testing 2', 'testing-2'];
 export const SETTINGS_CATALOG_STORAGE_KEY = CMS_CATALOG_STORAGE_KEY;
 export const SETTINGS_CATALOG_FORMAT = {

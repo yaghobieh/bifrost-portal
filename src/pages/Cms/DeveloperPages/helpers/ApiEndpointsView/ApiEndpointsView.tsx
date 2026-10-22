@@ -607,7 +607,7 @@ export const ApiEndpointsView: FC = () => {
               variant="primary"
               size="sm"
               onClick={downloadPostmanCollection}
-              className="bg-pink-600 hover:bg-pink-700 text-white font-semibold flex items-center gap-2 shadow-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-2 shadow-sm"
             >
               <BearIcons.DownloadIcon size={16} />
               <span>Download Postman Collection (.json)</span>
@@ -616,7 +616,7 @@ export const ApiEndpointsView: FC = () => {
           <Button
             variant="outline"
             size="sm"
-            className="border-pink-600 text-pink-600 hover:bg-pink-50 font-medium"
+            className="border-blue-600 text-blue-600 hover:bg-blue-50 font-medium"
           >
             View full reference
           </Button>
@@ -624,12 +624,12 @@ export const ApiEndpointsView: FC = () => {
       </div>
 
       {devMode && (
-        <div className="mb-6 p-4 rounded-lg bg-pink-50 border border-pink-200 flex items-center justify-between shadow-sm">
+        <div className="mb-6 p-4 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-between shadow-sm">
           <Flex gap={2} align="center">
-            <Badge variant="info" className="bg-pink-600 text-white font-bold">
+            <Badge variant="info" className="bg-blue-600 text-white font-bold">
               Dev Mode Active
             </Badge>
-            <Typography variant="body2" className="text-sm text-pink-900">
+            <Typography variant="body2" className="text-sm text-blue-900">
               Postman collection v2.1 with environments and live headers is ready for export.
             </Typography>
           </Flex>
@@ -637,7 +637,7 @@ export const ApiEndpointsView: FC = () => {
             size="sm"
             variant="primary"
             onClick={downloadPostmanCollection}
-            className="bg-pink-600 hover:bg-pink-700 text-white font-semibold flex items-center gap-1.5"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-1.5"
           >
             <BearIcons.DownloadIcon size={14} />
             <span>Export Collection (.json)</span>
@@ -656,7 +656,7 @@ export const ApiEndpointsView: FC = () => {
               onClick={() => setActiveCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border ${
                 isActive
-                  ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
                   : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
@@ -682,7 +682,7 @@ export const ApiEndpointsView: FC = () => {
                   onClick={() => setSelectedEndpointId(ep.id)}
                   className={`p-3.5 flex items-start gap-3 cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-pink-50/70 border-l-4 border-l-pink-600'
+                      ? 'bg-blue-50/70 border-l-4 border-l-blue-600'
                       : 'hover:bg-gray-50'
                   }`}
                 >
@@ -717,7 +717,7 @@ export const ApiEndpointsView: FC = () => {
                   {activeEndpoint.path}
                 </span>
               </div>
-              <Badge variant="info" className="bg-pink-100 text-pink-700 font-semibold border-pink-200">
+              <Badge variant="info" className="bg-blue-100 text-blue-700 font-semibold border-blue-200">
                 {activeEndpoint.category}
               </Badge>
             </div>
@@ -740,12 +740,12 @@ export const ApiEndpointsView: FC = () => {
                       'headers',
                     )
                   }
-                  className="text-xs text-pink-600 hover:text-pink-700 font-semibold cursor-pointer"
+                  className="text-xs text-blue-600 hover:text-blue-700 font-semibold cursor-pointer"
                 >
                   {copiedType === 'headers' ? 'Copied!' : 'Copy'}
                 </button>
               </div>
-              <pre className="p-3 bg-gray-900 text-pink-200 rounded-md text-xs font-mono overflow-x-auto m-0 leading-relaxed">
+              <pre className="p-3 bg-gray-900 text-blue-200 rounded-md text-xs font-mono overflow-x-auto m-0 leading-relaxed">
                 {Object.entries(activeEndpoint.headers)
                   .map(([k, v]) => `${k}: ${v}`)
                   .join('\n')}
@@ -767,7 +767,7 @@ export const ApiEndpointsView: FC = () => {
                         'reqBody',
                       )
                     }
-                    className="text-xs text-pink-600 hover:text-pink-700 font-semibold cursor-pointer"
+                    className="text-xs text-blue-600 hover:text-blue-700 font-semibold cursor-pointer"
                   >
                     {copiedType === 'reqBody' ? 'Copied!' : 'Copy Object'}
                   </button>
@@ -797,7 +797,7 @@ export const ApiEndpointsView: FC = () => {
                       'resBody',
                     )
                   }
-                  className="text-xs text-pink-600 hover:text-pink-700 font-semibold cursor-pointer"
+                  className="text-xs text-blue-600 hover:text-blue-700 font-semibold cursor-pointer"
                 >
                   {copiedType === 'resBody' ? 'Copied!' : 'Copy Response'}
                 </button>
@@ -819,7 +819,7 @@ export const ApiEndpointsView: FC = () => {
           <Button
             size="sm"
             variant="primary"
-            className="bg-pink-600 hover:bg-pink-700 text-white font-semibold"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
           >
             ＋ Generate Token
           </Button>

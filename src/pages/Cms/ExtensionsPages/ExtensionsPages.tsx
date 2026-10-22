@@ -49,6 +49,15 @@ import {
   uniqueAuthors,
   uniqueGitRepos,
 } from './ExtensionsPages.utils';
+import { saveCmsThemeColors } from '../SettingsPages/SettingsPages.utils';
+
+const THEME_PALETTE_BY_ID: Record<string, { primary: string; accent: string; background: string }> = {
+  'theme-deep-navy': { primary: '#1E3A8A', accent: '#38BDF8', background: '#0F172A' },
+  'theme-midnight-forge': { primary: '#1F2937', accent: '#60A5FA', background: '#030712' },
+  'theme-arctic-clean': { primary: '#2563EB', accent: '#0284C7', background: '#F8FAFC' },
+  'theme-cyber-neon': { primary: '#27272A', accent: '#22D3EE', background: '#09090B' },
+  'theme-forest-slate': { primary: '#047857', accent: '#34D399', background: '#064E3B' },
+};
 
 export const ExtensionsPages: FC = () => {
   const { t } = useI18n();
@@ -78,6 +87,9 @@ export const ExtensionsPages: FC = () => {
   };
 
   const openInstalled = (id: string) => {
+    if (id.startsWith('theme-')) {
+      return;
+    }
     if (id === BIF_DYNAMIC_EXTENSION_ID || id === MARKETING_PAGES_EXTENSION_ID) {
       navigate(ROUTES.CMS_BUILDER);
       return;
@@ -94,6 +106,9 @@ export const ExtensionsPages: FC = () => {
   };
 
   const install = (id: string) => {
+    if (THEME_PALETTE_BY_ID[id]) {
+      saveCmsThemeColors(THEME_PALETTE_BY_ID[id]);
+    }
     setItems((current) =>
       current.map((item) => (item.id === id ? { ...item, status: 'installing' } : item)),
     );

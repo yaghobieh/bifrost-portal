@@ -301,7 +301,7 @@
   align-items: center;
   white-space: nowrap;
 }
-.Bl-install__pkg { color: #f472c7; }
+.Bl-install__pkg { color: #38bdf8; }
 
 .Bl-strip { border-top: 1px solid #E4E6EE; border-bottom: 1px solid #E4E6EE; background: #F5F6FA; }
 .Bl-strip__inner {
