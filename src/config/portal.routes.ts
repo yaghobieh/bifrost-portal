@@ -10,6 +10,7 @@ import { AskAi } from '@pages/AskAi';
 import { Changelog } from '@pages/Changelog';
 import { Plans } from '@pages/Plans';
 import { StatusPage } from '@pages/Status';
+import { GetStarted } from '../pages/GetStarted';
 import { CmsPagesRoute } from '@pages/CmsPagesRoute';
 import {
   BuilderPages,
@@ -40,6 +41,7 @@ import {
 
 export const PORTAL_APP_ROUTES = [
   { path: ROUTES.HOME, name: 'home', component: Home },
+  { path: ROUTES.GET_STARTED, name: 'get-started', component: GetStarted },
   { path: ROUTES.BLOG, name: 'blog', component: BlogIndex },
   { path: ROUTES.BLOG_POST, name: 'blog-post', component: BlogPost },
   { path: ROUTES.DOCS, name: 'docs-index', redirect: DOC_PATH(DEFAULT_DOC_SLUG) },

@@ -90,7 +90,7 @@ export const PortalNav: FC<PortalNavProps> = (props) => {
             loginPath={ROUTES.CMS_LOGIN}
             signInLabel={t('nav.signIn')}
           />
-          <Link to={DOC_PATH(DOC_INSTALLATION_SLUG)} className="Bl-nav__cta">
+          <Link to={ROUTES.GET_STARTED} className="Bl-nav__cta">
             {t('landing.startFree')}
           </Link>
         </div>

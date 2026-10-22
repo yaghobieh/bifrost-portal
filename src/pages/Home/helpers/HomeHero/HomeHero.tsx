@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { Link } from '@forgedevstack/forge-compass/react';
-import { DOC_PATH } from '@const/routes.const';
+import { DOC_PATH, ROUTES } from '@const/routes.const';
 import { BIFROST_CLI, INSTALL_COMMAND } from '@const/strings.const';
 import { BlInstallCommand } from '@components/BlInstallCommand';
 import { HOME_DOC_INSTALLATION, HOME_DOC_OVERVIEW } from '../../Home.const';
@@ -20,7 +20,7 @@ export const HomeHero: FC<HomeHeroProps> = (props) => {
         </h1>
         <p className="Bl-hero__sub">{copy.sub}</p>
         <div className="Bl-hero__ctas">
-          <Link to={DOC_PATH(HOME_DOC_INSTALLATION)} className="Bl-btn Bl-btn--grad">
+          <Link to={ROUTES.GET_STARTED} className="Bl-btn Bl-btn--grad">
             {copy.startFree}
           </Link>
           <Link to={DOC_PATH(HOME_DOC_OVERVIEW)} className="Bl-btn Bl-btn--ghost">
