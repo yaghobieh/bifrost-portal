@@ -22,6 +22,7 @@ import {
   CALENDAR_EXTENSION_ID,
   CREW_CHAT_EXTENSION_ID,
   MARKETING_PAGES_EXTENSION_ID,
+  THEMING_EXTENSION_ID,
   EXTENSION_AUTHOR_SELECT_ID,
   EXTENSION_BIF_MARK,
   EXTENSION_EXTERNAL_INPUT_ID,
@@ -49,7 +50,8 @@ import {
   uniqueAuthors,
   uniqueGitRepos,
 } from './ExtensionsPages.utils';
-import { saveCmsThemeColors } from '../SettingsPages/SettingsPages.utils';
+import { loadCmsThemeColors, saveCmsThemeColors } from '../SettingsPages/SettingsPages.utils';
+import { SETTINGS_THEME_DEFAULTS, SETTINGS_THEME_EVENT } from '../SettingsPages/SettingsPages.const';
 import { AnalyticsHubView } from './helpers/AnalyticsHubView';
 
 const THEME_PALETTE_BY_ID: Record<string, { primary: string; accent: string; background: string }> = {
@@ -73,6 +75,44 @@ export const ExtensionsPages: FC = () => {
   const [externalNotice, setExternalNotice] = useState(EXTENSION_SEARCH_EMPTY);
   const [selected, setSelected] = useState<ExtensionItem | null>(null);
   const [activeViewTab, setActiveViewTab] = useState<'marketplace' | 'analytics'>('marketplace');
+  const [activeThemeId, setActiveThemeId] = useState<string>(() => {
+    try {
+      const current = loadCmsThemeColors();
+      for (const [id, palette] of Object.entries(THEME_PALETTE_BY_ID)) {
+        if (
+          current.primary.toLowerCase() === palette.primary.toLowerCase() &&
+          current.background.toLowerCase() === palette.background.toLowerCase()
+        ) {
+          return id;
+        }
+      }
+    } catch {
+      // noop
+    }
+    return '';
+  });
+
+  useEffect(() => {
+    const onThemeUpdated = () => {
+      try {
+        const current = loadCmsThemeColors();
+        for (const [id, palette] of Object.entries(THEME_PALETTE_BY_ID)) {
+          if (
+            current.primary.toLowerCase() === palette.primary.toLowerCase() &&
+            current.background.toLowerCase() === palette.background.toLowerCase()
+          ) {
+            setActiveThemeId(id);
+            return;
+          }
+        }
+      } catch {
+        // noop
+      }
+      setActiveThemeId('');
+    };
+    window.addEventListener(SETTINGS_THEME_EVENT, onThemeUpdated);
+    return () => window.removeEventListener(SETTINGS_THEME_EVENT, onThemeUpdated);
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -88,8 +128,26 @@ export const ExtensionsPages: FC = () => {
     void persistInstalledExtensionIds(token || EXTENSION_SEARCH_EMPTY, ids);
   };
 
+  const activateTheme = (id: string) => {
+    if (THEME_PALETTE_BY_ID[id]) {
+      saveCmsThemeColors(THEME_PALETTE_BY_ID[id]);
+      setActiveThemeId(id);
+      return;
+    }
+    if (id === THEMING_EXTENSION_ID) {
+      saveCmsThemeColors(SETTINGS_THEME_DEFAULTS);
+      setActiveThemeId('theme-deep-navy');
+      navigate(`${ROUTES.CMS_SETTINGS}?tab=theme`);
+    }
+  };
+
   const openInstalled = (id: string) => {
-    if (id.startsWith('theme-')) {
+    if (id.startsWith('theme-') || THEME_PALETTE_BY_ID[id]) {
+      activateTheme(id);
+      return;
+    }
+    if (id === THEMING_EXTENSION_ID) {
+      navigate(`${ROUTES.CMS_SETTINGS}?tab=theme`);
       return;
     }
     if (id === BIF_DYNAMIC_EXTENSION_ID || id === MARKETING_PAGES_EXTENSION_ID) {
@@ -110,6 +168,10 @@ export const ExtensionsPages: FC = () => {
   const install = (id: string) => {
     if (THEME_PALETTE_BY_ID[id]) {
       saveCmsThemeColors(THEME_PALETTE_BY_ID[id]);
+      setActiveThemeId(id);
+    } else if (id === THEMING_EXTENSION_ID) {
+      saveCmsThemeColors(SETTINGS_THEME_DEFAULTS);
+      setActiveThemeId('theme-deep-navy');
     }
     setItems((current) =>
       current.map((item) => (item.id === id ? { ...item, status: 'installing' } : item)),
@@ -328,7 +390,9 @@ export const ExtensionsPages: FC = () => {
                     {installed ? (
                       <span className="bifrost-cms-ext__status">
                         <BearIcons.CheckIcon size={CMS_ICON_SIZE} />
-                        {statusLabel(item.status)}
+                        {THEME_PALETTE_BY_ID[item.id] && activeThemeId === item.id
+                          ? 'Active Theme'
+                          : statusLabel(item.status)}
                       </span>
                     ) : (
                       <span />
@@ -347,13 +411,29 @@ export const ExtensionsPages: FC = () => {
                     ) : null}
                     {installed ? (
                       <span onClick={(event) => event.stopPropagation()}>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openInstalled(item.id)}
-                        >
-                          {t.cmsExtensions.configure}
-                        </Button>
+                        {THEME_PALETTE_BY_ID[item.id] ? (
+                          activeThemeId === item.id ? (
+                            <Button size="sm" variant="outline" disabled className="opacity-80">
+                              Active
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="primary"
+                              onClick={() => activateTheme(item.id)}
+                            >
+                              Apply Theme
+                            </Button>
+                          )
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openInstalled(item.id)}
+                          >
+                            {t.cmsExtensions.configure}
+                          </Button>
+                        )}
                       </span>
                     ) : null}
                   </div>
@@ -410,16 +490,29 @@ export const ExtensionsPages: FC = () => {
                   </Button>
                 ) : null}
                 {selected.status === 'installed' ? (
-                  <Button
-                    size="sm"
-                    variant="primary"
-                    onClick={() => {
-                      setSelected(null);
-                      openInstalled(selected.id);
-                    }}
-                  >
-                    {t.cmsExtensions.configure}
-                  </Button>
+                  THEME_PALETTE_BY_ID[selected.id] ? (
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => {
+                        setSelected(null);
+                        activateTheme(selected.id);
+                      }}
+                    >
+                      {activeThemeId === selected.id ? 'Reapply Theme' : 'Apply Theme'}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => {
+                        setSelected(null);
+                        openInstalled(selected.id);
+                      }}
+                    >
+                      {t.cmsExtensions.configure}
+                    </Button>
+                  )
                 ) : null}
                 <Button size="sm" variant="outline" className="bifrost-cms-ghost-btn" onClick={() => setSelected(null)}>
                   {t.cmsExtensions.close}
