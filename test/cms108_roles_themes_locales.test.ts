@@ -19,12 +19,39 @@ if (typeof globalThis.window === 'undefined') {
   };
 }
 
+const createMockElement = (classes: string[] = []) => {
+  const classSet = new Set(classes);
+  const styles = new Map<string, string>();
+  const attrs = new Map<string, string>();
+  return {
+    lang: 'en',
+    dir: 'ltr',
+    style: {
+      setProperty: (prop: string, val: string) => styles.set(prop, val),
+      getPropertyValue: (prop: string) => styles.get(prop) ?? '',
+    },
+    classList: {
+      add: (cls: string) => classSet.add(cls),
+      remove: (cls: string) => classSet.delete(cls),
+      contains: (cls: string) => classSet.has(cls),
+      toggle: (cls: string, force?: boolean) => {
+        const next = force !== undefined ? force : !classSet.has(cls);
+        if (next) classSet.add(cls);
+        else classSet.delete(cls);
+        return next;
+      },
+    },
+    setAttribute: (name: string, val: string) => attrs.set(name, val),
+    getAttribute: (name: string) => attrs.get(name) ?? null,
+  };
+};
+
 if (typeof globalThis.document === 'undefined') {
   (globalThis as any).document = {
-    documentElement: {
-      lang: 'en',
-      dir: 'ltr',
-    },
+    documentElement: createMockElement(),
+    body: createMockElement(),
+    querySelectorAll: () => [],
+    querySelector: () => null,
   };
 }
 
@@ -38,11 +65,24 @@ import {
 } from '../src/pages/Cms/CrewPages/CrewPages.const';
 import { hasTaskPermission } from '../src/pages/Cms/TasksPages/TasksPages.utils';
 import {
+  applyCmsThemeColors,
+  isDarkThemeBackground,
+  loadCmsThemeColors,
   loadUserThemeColors,
+  saveCmsThemeColors,
   saveUserThemeColors,
   loadUserNotifyPrefs,
   saveUserNotifyPrefs,
 } from '../src/pages/Cms/SettingsPages/SettingsPages.utils';
+import {
+  SETTINGS_THEME_DEFAULTS_DARK,
+  SETTINGS_THEME_DEFAULTS_LIGHT,
+} from '../src/pages/Cms/SettingsPages/SettingsPages.const';
+import {
+  CMS_MODE_STORAGE_KEY,
+  CMS_MODE_LIGHT,
+  CMS_MODE_DARK,
+} from '../src/constants/strings.const';
 import { ALL_LOCALES, RTL_LOCALES } from '../src/i18n/i18n.const';
 import { isLocale, applyDocumentLocale } from '../src/i18n/i18n.utils';
 import { CMS_LOOKS, CMS_LOOK_LABEL_KEY } from '../src/pages/Cms/CmsLook/cmsLook.const';
@@ -225,5 +265,44 @@ test('CMS-108: Roles, per-user theme/notify, locales, color templates', async (t
     }
 
     assert.equal(CMS_LOOKS.length, 6);
+  });
+
+  await t.test('isDarkThemeBackground correctly identifies dark and light hex backgrounds', () => {
+    assert.equal(isDarkThemeBackground('#0F172A'), true); // Dark navy
+    assert.equal(isDarkThemeBackground('#030712'), true); // Dark black
+    assert.equal(isDarkThemeBackground('#18181b'), true); // Dark zinc
+    assert.equal(isDarkThemeBackground('#F8FAFC'), false); // Slate light
+    assert.equal(isDarkThemeBackground('#FFFFFF'), false); // White light
+    assert.equal(isDarkThemeBackground('#F6F6F4'), false); // Warm light
+  });
+
+  await t.test('applyCmsThemeColors applies light mode without dark mode lock-in', () => {
+    const mockElem = createMockElement(['bifrost-cms', 'bifrost-cms--dark']);
+    mockElem.setAttribute('data-color-mode', 'dark');
+
+    // Apply light colors with explicit colorMode 'light'
+    applyCmsThemeColors(mockElem as any, SETTINGS_THEME_DEFAULTS_LIGHT, 'light');
+
+    assert.equal(mockElem.classList.contains('bifrost-cms--light'), true);
+    assert.equal(mockElem.classList.contains('bifrost-cms--dark'), false);
+    assert.equal(mockElem.getAttribute('data-color-mode'), 'light');
+    assert.equal(mockElem.style.getPropertyValue('--bifrost-cms-bg'), SETTINGS_THEME_DEFAULTS_LIGHT.background);
+
+    // Apply dark colors with explicit colorMode 'dark'
+    applyCmsThemeColors(mockElem as any, SETTINGS_THEME_DEFAULTS_DARK, 'dark');
+    assert.equal(mockElem.classList.contains('bifrost-cms--dark'), true);
+    assert.equal(mockElem.classList.contains('bifrost-cms--light'), false);
+    assert.equal(mockElem.getAttribute('data-color-mode'), 'dark');
+  });
+
+  await t.test('loadCmsThemeColors respects CMS_MODE_LIGHT as fallback', () => {
+    localStorage.removeItem('bifrost-cms-theme-colors');
+    localStorage.setItem(CMS_MODE_STORAGE_KEY, CMS_MODE_LIGHT);
+    const lightTheme = loadCmsThemeColors();
+    assert.equal(lightTheme.background, SETTINGS_THEME_DEFAULTS_LIGHT.background);
+
+    localStorage.setItem(CMS_MODE_STORAGE_KEY, CMS_MODE_DARK);
+    const darkTheme = loadCmsThemeColors();
+    assert.equal(darkTheme.background, SETTINGS_THEME_DEFAULTS_DARK.background);
   });
 });

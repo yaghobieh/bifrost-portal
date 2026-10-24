@@ -87,6 +87,7 @@ import type {
 import {
   applyCmsThemeColors,
   buildMcpConfigJson,
+  isDarkThemeBackground,
   loadCmsMcp,
   loadCmsProfile,
   loadCmsSite,
@@ -122,7 +123,7 @@ import { loadCmsConnections, saveCmsConnections } from './SettingsPages.utils';
 export const SettingsPages: FC = () => {
   const { navigate } = useNavigate();
   const { t, setLocale } = useI18n();
-  const { mode } = useBearMode();
+  const { mode, setMode } = useBearMode();
   const { updateTheme, addVariant } = useBear();
   const { token, user } = useAuth();
   const userKey = user?.email || user?.username || SETTINGS_PROFILE_EMPTY;
@@ -189,8 +190,13 @@ export const SettingsPages: FC = () => {
 
   useEffect(() => {
     const root = document.querySelector('.bifrost-cms') as HTMLElement | null;
-    applyCmsThemeColors(root, colors, mode);
-  }, [colors, mode]);
+    const isDark = isDarkThemeBackground(colors.background);
+    const targetMode = isDark ? 'dark' : 'light';
+    applyCmsThemeColors(root, colors, targetMode);
+    if (mode !== targetMode) {
+      setMode(targetMode);
+    }
+  }, [colors, mode, setMode]);
 
   const onSaveAll = async () => {
     saveCmsProfile(profile);
@@ -212,8 +218,11 @@ export const SettingsPages: FC = () => {
       if (ok) setMediaConfigured(true);
     }
     setDefaultApiErrorMode(site.apiErrorMode);
+    const isDark = isDarkThemeBackground(colors.background);
+    const targetMode = isDark ? 'dark' : 'light';
+    setMode(targetMode);
     const root = document.querySelector('.bifrost-cms') as HTMLElement | null;
-    applyCmsThemeColors(root, colors, mode);
+    applyCmsThemeColors(root, colors, targetMode);
     dispatchCmsSave({
       source: SETTINGS_SAVE_SOURCE,
       profile,
@@ -1065,6 +1074,8 @@ export const SettingsPages: FC = () => {
                           accent: palette.accent,
                           background: palette.background,
                         });
+                        const isDark = isDarkThemeBackground(palette.background);
+                        setMode(isDark ? 'dark' : 'light');
                         markDirty();
                       }}
                     >
@@ -1076,6 +1087,7 @@ export const SettingsPages: FC = () => {
                     variant="outline"
                     onClick={() => {
                       setColors({ ...SETTINGS_THEME_DEFAULTS_LIGHT });
+                      setMode('light');
                       markDirty();
                     }}
                   >
@@ -1086,6 +1098,7 @@ export const SettingsPages: FC = () => {
                     variant="outline"
                     onClick={() => {
                       setColors({ ...SETTINGS_THEME_DEFAULTS_DARK });
+                      setMode('dark');
                       markDirty();
                     }}
                   >

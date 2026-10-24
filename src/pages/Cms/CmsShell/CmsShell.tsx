@@ -40,16 +40,23 @@ import { toCloudinarySrc } from '@sdk/modules/media';
 import { setDefaultApiErrorMode } from '@sdk/http';
 import {
   applyCmsThemeColors,
+  isDarkThemeBackground,
   loadCmsProfile,
   loadCmsSite,
   hydrateCmsSiteRemote,
   loadCmsThemeColors,
+  saveCmsThemeColors,
   loadUserChatPrefs,
   loadUserNotifyPrefs,
   loadUserDevPrefs,
   saveUserChatPrefs,
 } from '../SettingsPages';
-import { SETTINGS_CHAT_SHOW, SETTINGS_THEME_EVENT } from '../SettingsPages/SettingsPages.const';
+import {
+  SETTINGS_CHAT_SHOW,
+  SETTINGS_THEME_DEFAULTS_DARK,
+  SETTINGS_THEME_DEFAULTS_LIGHT,
+  SETTINGS_THEME_EVENT,
+} from '../SettingsPages/SettingsPages.const';
 import { isCrewChatInstalled, hydrateExtensionsRemote } from '../ExtensionsPages';
 import { playChatSound, shouldPlayChatSound } from './CmsCrewChat/cmsChatSound.utils';
 import { CmsAgentBar } from './CmsAgentBar';
@@ -341,7 +348,33 @@ export const CmsShell: FC<CmsShellProps> = (props) => {
   const onThemeSelect = (next: CmsModePreference) => {
     setModePreference(next);
     saveCmsModePreference(next);
-    setMode(resolveCmsMode(next));
+    const resolved = resolveCmsMode(next);
+    setMode(resolved);
+    const currentColors = loadCmsThemeColors();
+    const bgDark = isDarkThemeBackground(currentColors.background);
+    if (resolved === CMS_MODE_LIGHT && bgDark) {
+      const nextColors = {
+        ...currentColors,
+        background: SETTINGS_THEME_DEFAULTS_LIGHT.background,
+        accent:
+          currentColors.accent === SETTINGS_THEME_DEFAULTS_DARK.accent
+            ? SETTINGS_THEME_DEFAULTS_LIGHT.accent
+            : currentColors.accent,
+      };
+      saveCmsThemeColors(nextColors);
+    } else if (resolved === CMS_MODE_DARK && !bgDark) {
+      const nextColors = {
+        ...currentColors,
+        background: SETTINGS_THEME_DEFAULTS_DARK.background,
+        accent:
+          currentColors.accent === SETTINGS_THEME_DEFAULTS_LIGHT.accent
+            ? SETTINGS_THEME_DEFAULTS_DARK.accent
+            : currentColors.accent,
+      };
+      saveCmsThemeColors(nextColors);
+    } else {
+      applyCmsThemeColors(shellRef.current, currentColors, resolved);
+    }
   };
 
   const hiddenNav = new Set(site.hiddenNavIds);

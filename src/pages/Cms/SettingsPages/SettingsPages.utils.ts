@@ -116,7 +116,7 @@ const hexLuminance = (hex: string): number => {
   );
 };
 
-const isDarkThemeBackground = (hex: string): boolean =>
+export const isDarkThemeBackground = (hex: string): boolean =>
   hexLuminance(hex) < SETTINGS_DARK_LUMINANCE_MAX;
 
 const clampRgb = (v: number): number => Math.min(255, Math.max(0, Math.round(v)));
@@ -193,12 +193,18 @@ export const applyCmsThemeColors = (
 
     const backgroundIsDark = isDarkThemeBackground(colors.background);
     const isDark =
-      colorMode === 'dark' ||
-      (colorMode === undefined && backgroundIsDark) ||
-      elem.classList.contains('bifrost-cms--dark') ||
-      elem.getAttribute('data-color-mode') === 'dark';
+      colorMode !== undefined
+        ? colorMode === 'dark'
+        : backgroundIsDark;
 
-    elem.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, colors.background);
+    const effectiveBackground =
+      !isDark && backgroundIsDark
+        ? SETTINGS_THEME_DEFAULTS_LIGHT.background
+        : isDark && !backgroundIsDark
+        ? SETTINGS_THEME_DEFAULTS_DARK.background
+        : colors.background;
+
+    elem.style.setProperty(SETTINGS_CSS_VARS.BACKGROUND, effectiveBackground);
     elem.style.setProperty(
       SETTINGS_CSS_VARS.ACCENT_SOFT,
       isDark ? SETTINGS_ACCENT_SOFT_DARK : primarySoft,
@@ -219,6 +225,21 @@ export const applyCmsThemeColors = (
       }
     }
   });
+
+  if (typeof document !== 'undefined') {
+    const isDark =
+      colorMode !== undefined
+        ? colorMode === 'dark'
+        : isDarkThemeBackground(colors.background);
+    if (document.documentElement) {
+      document.documentElement.classList.toggle('dark', isDark);
+      document.documentElement.classList.toggle('light', !isDark);
+    }
+    if (document.body) {
+      document.body.classList.toggle('dark', isDark);
+      document.body.classList.toggle('light', !isDark);
+    }
+  }
 };
 
 const isStaleThemePrimary = (primary: string): boolean =>
@@ -226,20 +247,23 @@ const isStaleThemePrimary = (primary: string): boolean =>
 
 export const loadCmsThemeColors = (): CmsThemeColors => {
   try {
+    const mode = localStorage.getItem(CMS_MODE_STORAGE_KEY);
+    const fallback =
+      mode === CMS_MODE_LIGHT ? SETTINGS_THEME_DEFAULTS_LIGHT : SETTINGS_THEME_DEFAULTS;
     const raw = localStorage.getItem(SETTINGS_THEME_STORAGE_KEY);
-    if (!raw) return { ...SETTINGS_THEME_DEFAULTS };
+    if (!raw) return { ...fallback };
     const parsed = JSON.parse(raw) as Partial<CmsThemeColors>;
     const primary = isHexColor(parsed.primary)
       ? parsed.primary
-      : SETTINGS_THEME_DEFAULTS.primary;
+      : fallback.primary;
     const accent = isHexColor(parsed.accent)
       ? parsed.accent
-      : SETTINGS_THEME_DEFAULTS.accent;
+      : fallback.accent;
     const background = isHexColor(parsed.background)
       ? parsed.background
-      : SETTINGS_THEME_DEFAULTS.background;
+      : fallback.background;
     if (isStaleThemePrimary(primary)) {
-      return { ...SETTINGS_THEME_DEFAULTS };
+      return { ...fallback };
     }
     return { primary, accent, background };
   } catch {

@@ -3930,7 +3930,7 @@ html.bifrost-cms-host #root {
 
 .bifrost-cms-settings-split__tab--active,
 .bifrost-cms-settings-split__tab:hover {
-  background: #fff;
+  background: var(--bifrost-cms-surface, #fff);
 }
 
 .bifrost-cms-settings-split__tab--active {
