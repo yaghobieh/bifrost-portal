@@ -135,4 +135,12 @@ test('CMS-91: WP-style Sidenav Accordion & Collapsed Flyouts', async (t) => {
     toggle(CMS_NAV_SECTIONS.DESIGN);
     assert.equal(openGroup, null);
   });
+
+  await t.test('CMS-156: Accordion sidebar sections match Ink (Overview, Design, General settings)', () => {
+    assert.equal(CMS_NAV_SECTIONS.OVERVIEW, 'sec-overview');
+    assert.equal(CMS_NAV_SECTIONS.DESIGN, 'sec-design');
+    assert.equal(CMS_NAV_SECTIONS.GENERAL, 'sec-general');
+  });
 });
+
+
