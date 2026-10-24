@@ -3,7 +3,7 @@ import type { Messages } from './types';
 
 export const he: Messages = {
   ...en,
-  brand: 'Ink',
+  brand: 'Bifrost',
   cmsShell: {
     ...en.cmsShell,
     online: 'מחוברים',
