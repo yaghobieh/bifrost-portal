@@ -4,6 +4,9 @@ import type { CmsTask, TaskBoardConfig, TaskCreateDraft } from '../TasksPages.ty
 export type TaskIssueModalProps = {
   isOpen: boolean;
   task: CmsTask | null;
+  allTasks?: CmsTask[];
+  currentUserId?: string;
+  currentUserName?: string;
   onClose: () => void;
   onSave: (id: string, draft: TaskCreateDraft) => void;
   users: CrewUser[];

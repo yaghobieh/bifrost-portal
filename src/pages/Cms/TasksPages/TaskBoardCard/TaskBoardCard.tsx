@@ -1,5 +1,5 @@
 import type { DragEvent, FC } from 'react';
-import { Avatar, Chip, Flex, Typography } from '@forgedevstack/bear';
+import { Avatar, BearIcons, Chip, Flex, Typography } from '@forgedevstack/bear';
 import { TASK_DRAG_TYPE, TASK_INITIALS_LENGTH } from '../TasksPages.const';
 import { userDisplayName, userInitials } from '../TasksPages.utils';
 import type { TaskBoardCardProps } from './TaskBoardCard.types';
@@ -31,12 +31,42 @@ export const TaskBoardCard: FC<TaskBoardCardProps> = (props) => {
         </Typography>
       ) : null}
       <Flex justify="between" align="center" className="bifrost-cms-board__card-meta">
-        <Flex gap={1} className="flex-wrap">
+        <Flex gap={1} className="flex-wrap" align="center">
           {task.tags.map((tag) => (
             <Chip key={tag} size="sm" color="primary" variant="soft">
               {tag}
             </Chip>
           ))}
+          {task.subtasks && task.subtasks.length > 0 ? (
+            <span
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--bifrost-text-muted, #64748b)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+              }}
+              title="Subtask progress"
+            >
+              <BearIcons.Status.CheckIcon size={12} />
+              {task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length}
+            </span>
+          ) : null}
+          {task.comments && task.comments.length > 0 ? (
+            <span
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--bifrost-text-muted, #64748b)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+              }}
+              title="Comments count"
+            >
+              <BearIcons.Communication.CommentIcon size={12} />
+              {task.comments.length}
+            </span>
+          ) : null}
         </Flex>
         <Flex gap={1}>
           {agents.map((user) => (

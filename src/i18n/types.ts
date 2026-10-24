@@ -645,6 +645,23 @@ export interface Messages {
     fieldOption: string;
     fieldNone: string;
     pickEmpty: string;
+    acceptanceCriteria: string;
+    subtasks: string;
+    addSubtask: string;
+    subtaskPlaceholder: string;
+    linkedItems: string;
+    addLinkedItem: string;
+    linkedItemPlaceholder: string;
+    comments: string;
+    writeComment: string;
+    saveComment: string;
+    details: string;
+    reporter: string;
+    created: string;
+    updated: string;
+    clearStatus: string;
+    noStatus: string;
+    mentionHint: string;
   };
   cmsLook: {
     label: string;

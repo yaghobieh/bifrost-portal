@@ -31,11 +31,46 @@ const normalizeTask = (item: unknown): CmsTask | null => {
     raw.fieldValues && typeof raw.fieldValues === 'object' && !Array.isArray(raw.fieldValues)
       ? (raw.fieldValues as Record<string, string>)
       : {};
+
+  const subtasks = Array.isArray(raw.subtasks)
+    ? (raw.subtasks as Record<string, unknown>[]).map((s) => ({
+        id: typeof s.id === 'string' ? s.id : createId('sub'),
+        title: typeof s.title === 'string' ? s.title : EMPTY_STRING,
+        completed: Boolean(s.completed),
+      }))
+    : [];
+
+  const linkedItems = Array.isArray(raw.linkedItems)
+    ? (raw.linkedItems as Record<string, unknown>[]).map((l) => ({
+        id: typeof l.id === 'string' ? l.id : createId('link'),
+        title: typeof l.title === 'string' ? l.title : EMPTY_STRING,
+        type: typeof l.type === 'string' ? l.type : undefined,
+        url: typeof l.url === 'string' ? l.url : undefined,
+      }))
+    : [];
+
+  const comments = Array.isArray(raw.comments)
+    ? (raw.comments as Record<string, unknown>[]).map((c) => ({
+        id: typeof c.id === 'string' ? c.id : createId('comment'),
+        userId: typeof c.userId === 'string' ? c.userId : EMPTY_STRING,
+        userName: typeof c.userName === 'string' ? c.userName : EMPTY_STRING,
+        body: typeof c.body === 'string' ? c.body : EMPTY_STRING,
+        createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date().toISOString(),
+      }))
+    : [];
+
   return {
     id: raw.id,
     title: raw.title,
     subtitle: typeof raw.subtitle === 'string' ? raw.subtitle : EMPTY_STRING,
     description: typeof raw.description === 'string' ? raw.description : EMPTY_STRING,
+    acceptanceCriteria:
+      typeof raw.acceptanceCriteria === 'string' ? raw.acceptanceCriteria : EMPTY_STRING,
+    subtasks,
+    linkedItems,
+    comments,
+    reporter: typeof raw.reporter === 'string' ? raw.reporter : EMPTY_STRING,
+    createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : (typeof raw.movedAt === 'string' ? raw.movedAt : new Date().toISOString()),
     tags: readStringArray(raw.tags),
     agentIds,
     status:
@@ -109,11 +144,19 @@ export const saveTasks = (tasks: CmsTask[]): void => {
   localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
 };
 
+export const createTaskId = (prefix: string): string => createId(prefix);
+
 export const createTask = (draft: TaskCreateDraft): CmsTask => ({
   id: createId('task'),
   title: draft.title.trim(),
   subtitle: draft.subtitle.trim(),
   description: draft.description,
+  acceptanceCriteria: draft.acceptanceCriteria ?? EMPTY_STRING,
+  subtasks: draft.subtasks ?? [],
+  linkedItems: draft.linkedItems ?? [],
+  comments: draft.comments ?? [],
+  reporter: draft.reporter ?? EMPTY_STRING,
+  createdAt: new Date().toISOString(),
   tags: draft.tags,
   agentIds: draft.agentIds,
   status: draft.status,
