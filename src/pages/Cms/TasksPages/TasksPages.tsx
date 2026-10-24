@@ -23,6 +23,7 @@ import {
   loadTasks,
   saveBoardConfig,
   saveTasks,
+  userDisplayName,
 } from './TasksPages.utils';
 
 export const TasksPages: FC = () => {
@@ -110,6 +111,31 @@ export const TasksPages: FC = () => {
 
   const onSaveIssue = (id: string, draft: TaskCreateDraft) => {
     if (!canEdit) return;
+    const existing = tasks.find((t) => t.id === id);
+    const oldComments = existing?.comments ?? [];
+    const newComments = draft.comments ?? [];
+
+    // Notify agents tagged in new comments
+    if (token && newComments.length > oldComments.length) {
+      const added = newComments.slice(oldComments.length);
+      const mentionedAgentIds = new Set<string>();
+      added.forEach((c) => {
+        users.forEach((u) => {
+          const name = userDisplayName(u);
+          if (c.body.includes(`@${name}`) || c.body.includes(`!${name}`)) {
+            mentionedAgentIds.add(u.id);
+          }
+        });
+      });
+      if (mentionedAgentIds.size > 0) {
+        void notifyTaskAgentsRequest(token, {
+          title: `Comment on ${draft.title}`,
+          body: added.map((c) => c.body).join('\n'),
+          agentIds: [...mentionedAgentIds],
+        });
+      }
+    }
+
     persistTasks(
       tasks.map((task) =>
         task.id === id
@@ -118,6 +144,11 @@ export const TasksPages: FC = () => {
               title: draft.title.trim(),
               subtitle: draft.subtitle.trim(),
               description: draft.description,
+              acceptanceCriteria: draft.acceptanceCriteria,
+              subtasks: draft.subtasks,
+              linkedItems: draft.linkedItems,
+              comments: draft.comments,
+              reporter: draft.reporter || task.reporter,
               tags: draft.tags,
               agentIds: draft.agentIds,
               status: draft.status,
@@ -208,6 +239,46 @@ export const TasksPages: FC = () => {
           }
         />
         <div className="bifrost-cms-board__columns">
+          {tasks.filter((t) => !t.status || !board.statuses.some((s) => s.id === t.status)).length > 0 ? (
+            <div
+              key="unassigned"
+              className="bifrost-cms-board__column"
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => onDrop(event, EMPTY_STRING)}
+            >
+              <Flex justify="between" align="center" className="bifrost-cms-board__column-head">
+                <Flex align="center" gap={2}>
+                  <BearIcons.ArchiveIcon size={CMS_ICON_SIZE} />
+                  <Typography variant="h4" className="mb-0">
+                    {t.cmsTasks.noStatus}
+                  </Typography>
+                  <Badge variant="neutral" className="text-xs">
+                    {tasks.filter((t) => !t.status || !board.statuses.some((s) => s.id === t.status)).length}
+                  </Badge>
+                </Flex>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  aria-label={t.cmsTasks.add}
+                  icon={<BearIcons.PlusIcon size={CMS_ICON_SIZE} />}
+                  onClick={() => openCreate(EMPTY_STRING)}
+                />
+              </Flex>
+              <Flex direction="column" gap={2}>
+                {tasks
+                  .filter((task) => !task.status || !board.statuses.some((s) => s.id === task.status))
+                  .map((task) => (
+                    <TaskBoardCard
+                      key={task.id}
+                      task={task}
+                      users={users}
+                      canEdit={canEdit}
+                      onOpen={() => setIssueId(task.id)}
+                    />
+                  ))}
+              </Flex>
+            </div>
+          ) : null}
           {board.statuses.map((status) => {
             const columnTasks = tasks.filter((task) => task.status === status.id);
             return (
@@ -265,6 +336,9 @@ export const TasksPages: FC = () => {
       <TaskIssueModal
         isOpen={Boolean(issueTask)}
         task={issueTask}
+        allTasks={tasks}
+        currentUserId={user?.id || userKey}
+        currentUserName={user?.name || userKey || 'Editor'}
         onClose={() => setIssueId(null)}
         onSave={onSaveIssue}
         users={users}
