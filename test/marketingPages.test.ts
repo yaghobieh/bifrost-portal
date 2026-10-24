@@ -76,3 +76,28 @@ test('CMS-158: Canvas Context Menu Actions & Groupings', () => {
   assert.ok(dangerActions.includes('delete'));
   assert.equal(CONTEXT_MENU_DANGER[0].danger, true);
 });
+
+test('CMS-134: Canvas Context Menu for Marketing Pages Blocks', () => {
+  // Acceptance:
+  // - Context menu on marketing blocks on the canvas.
+  // - Actions match HTML mock in Downloads: duplicate, move, style, reuse, delete.
+  // - Menu works after Marketing Pages is installed.
+  const allActions = [
+    ...CONTEXT_MENU_STRUCTURE.map((item) => item.action),
+    ...CONTEXT_MENU_STYLE.map((item) => item.action),
+    ...CONTEXT_MENU_REUSE.map((item) => item.action),
+    ...CONTEXT_MENU_DANGER.map((item) => item.action),
+  ];
+
+  assert.ok(allActions.includes('duplicate'), 'Must include duplicate action');
+  assert.ok(allActions.includes('move-up'), 'Must include move-up action');
+  assert.ok(allActions.includes('move-down'), 'Must include move-down action');
+  assert.ok(allActions.includes('delete'), 'Must include delete action');
+  assert.ok(allActions.includes('edit-content'), 'Must include edit-content action');
+  assert.ok(allActions.includes('inspect-props'), 'Must include inspect-props action');
+  assert.ok(allActions.includes('inspect-style'), 'Must include inspect-style action');
+  assert.ok(allActions.includes('copy-styles'), 'Must include copy-styles action');
+  assert.ok(allActions.includes('paste-styles'), 'Must include paste-styles action');
+  assert.ok(allActions.includes('save-reusable'), 'Must include save-reusable action');
+});
+
